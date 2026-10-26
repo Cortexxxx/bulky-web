@@ -16,18 +16,26 @@ public static class ErrorMiddleware
             }
             catch (WebException e) when ((int)e.StatusCode / 100 is 4 or 5)
             {
+                
                 context.Response.StatusCode = e.StatusCode;
-
-                switch (e.StatusCode)
+                if (context.Request.Url.LocalPath.StartsWith("api/"))
                 {
-                    case HttpStatusCode.NotFound:
-                        if (File.Exists(NotFoundPath))
-                        {
-                            context.Response.WriteBody(
-                                await File.ReadAllBytesAsync(NotFoundPath), ".html");
-                        }
-                        break;
+                    context.Response.WriteJson(new {Error = e.Error});
                 }
+                else
+                {
+                    switch (e.StatusCode)
+                    {
+                        case HttpStatusCode.NotFound:
+                            if (File.Exists(NotFoundPath))
+                            {
+                                context.Response.WriteBody(
+                                    await File.ReadAllBytesAsync(NotFoundPath), ".html");
+                            }
+                            break;
+                    }
+                }
+
             }
             catch (Exception e)
             {

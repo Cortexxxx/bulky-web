@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using Bulky.Http;
 
@@ -28,4 +29,9 @@ public static class WebHelpers
             .ToArray();
 
     public static JsonSerializerOptions GetJsonSerializerOptions() => JsonSerializerOptions;
+
+    public static void ThrowNotFound()
+    {
+        throw new WebException("Not found", HttpStatusCode.NotFound, "not_found");
+    }
 }

@@ -1,37 +1,44 @@
+class HttpError extends Error {
+    constructor(status) {
+        super(`HTTP ${status}`);
+        this.status = status;
+    }
+}
 
 const getButton = document.getElementById("getButton");
 const text = document.getElementById("infoText");
 let programCounter = 0;
 
 getButton.addEventListener("click", async (e) => {
-    let title = "Not found";
-    
-    try {
-        e.preventDefault();
+    e.preventDefault();
 
-        if (programCounter === 5)
-        {
-            programCounter = 0;
-        }
-
-        const data = await getData("http://localhost:8080/api/programs/" + programCounter);
-        title = data.title;
+    if (programCounter === 5) {
+        programCounter = 0;
     }
-    finally {
-        text.textContent = title;
+
+    try {
+        const data = await getData("/api/programs/" + programCounter);
+        text.textContent = data.title;
+    } catch (ex) {
+        if (ex instanceof HttpError) {
+            if (ex.status === 404) {
+                text.textContent = "Not found";
+            }
+        } else {
+            text.textContent = "Не удалось загрузить данные";
+            console.error(ex);
+        }
+    } finally {
         programCounter++;
     }
-
 });
 
-async function getData(url = "", data = {}) {
-    const response = await fetch(url, {
-        method: "GET",
-    });
-    
+async function getData(url) {
+    const response = await fetch(url, { method: "GET" });
+
     if (!response.ok) {
-        throw new Error();
+        throw new HttpError(response.status);
     }
-    
+
     return await response.json();
 }

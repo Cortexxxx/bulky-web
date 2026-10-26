@@ -1,6 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Bulky.Router;
 
-public class Router(Route[] endpoints)
+public class Router(IEnumerable<Route> endpoints)
 {
     public (Route route, Dictionary<string, string>? parameters)? Resolve(string localPath, HttpMethod method)
     {
@@ -66,5 +68,33 @@ public class Router(Route[] endpoints)
         }
 
         return (possibleRouteWithParam, parameters);
+    }
+    
+    public static bool TryGetIntParameter(IReadOnlyDictionary<string, string>? parameters, 
+        string parameterName, [NotNullWhen(true)] out int? param)
+    {
+        int value;
+        param = null;
+        
+        if (parameters != null && parameters.TryGetValue(parameterName, out var stringParam))
+        {
+            var wasParsed = int.TryParse(stringParam, out value);
+            
+            if (!wasParsed) return false;
+        }
+        else
+        {
+            return false;
+        }
+
+        param = value;
+        return true;
+    }
+    
+    public static bool TryGetStringParameter(IReadOnlyDictionary<string, string>? parameters, 
+        string parameterName, [NotNullWhen(true)] out string? param)
+    {
+        param = null;
+        return parameters != null && parameters.TryGetValue(parameterName, out param);
     }
 }

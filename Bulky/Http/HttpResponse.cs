@@ -12,7 +12,7 @@ public class HttpResponse
     }
 
     public Dictionary<string, string> Headers { get; private init; }
-    public HttpStatusCode StatusCode { get; set; }
+    public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
     public byte[] Output { get; private set; } = [];
     public bool WasOutputWritten => Output.Length != 0;
 
