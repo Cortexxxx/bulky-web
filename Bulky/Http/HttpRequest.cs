@@ -27,5 +27,6 @@ public class HttpRequest
 
     public Uri Url { get; private set; }
     public HttpMethod Method { get; set; }
+    public Dictionary<string, string>? RouteParameters { get; set; }
     public Route? Route { get; set; }
 }

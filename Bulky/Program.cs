@@ -13,11 +13,14 @@ httpListener.Start();
 
 var authService = new AuthEndpoints();
 var testService = new TestEndpoints();
+
 List<Route> endpoints =
 [
     new Route(HttpMethod.Get, new RouteTemplate("basic/login"), new AuthRequirements(false), authService.LoginEndpoint),
-    new Route(HttpMethod.Get, new RouteTemplate("api/biceps"), new AuthRequirements(false), testService.GetBiceps)
+    new Route(HttpMethod.Get, new RouteTemplate("api/biceps"), new AuthRequirements(false), testService.GetBiceps),
+    new Route(HttpMethod.Get, new RouteTemplate("api/programs/{id}"), new AuthRequirements(false), testService.GetProgram)
 ];
+
 var router = new Router(endpoints.ToArray());
 
 var middleware = new Middleware();

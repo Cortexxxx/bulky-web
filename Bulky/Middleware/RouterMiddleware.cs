@@ -6,8 +6,14 @@ public static class RouterMiddleware
     {
         middleware.AddElement((async (context, next) =>
         {
-            // Route
-            context.Request.Route = router.Resolve(context.Request.Url.LocalPath, context.Request.Method);
+            var routerResult = router.Resolve(context.Request.Url.LocalPath, context.Request.Method);
+            
+            if (routerResult != null)
+            {
+                context.Request.Route = routerResult.Value.route;
+                context.Request.RouteParameters = routerResult.Value.parameters;
+            }
+            
             await (next?.Invoke(context) ?? Task.CompletedTask);
         }));
     }

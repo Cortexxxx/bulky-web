@@ -2,37 +2,69 @@ namespace Bulky.Router;
 
 public class Router(Route[] endpoints)
 {
-    public Route? Resolve(string localPath, HttpMethod method)
+    public (Route route, Dictionary<string, string>? parameters)? Resolve(string localPath, HttpMethod method)
     {
 
         var parts = WebHelpers.GetPathParts(localPath);
 
-        var partsCount = parts.Count();
+        var partsCount = parts.Length;
+        
         var possibleRoutes = endpoints
             .Where(r => r.Method == method && r.Template.RouteParts.Length == partsCount);
         
-        // Тут маршрут разобран и отобраны те что совпадают по длине
-        Route? foundEndpoint = null;
+        var possibleRoutesWithParams = new List<Route>();
+        
         foreach (var possibleRoute in possibleRoutes)
         {
-            // Проверка точного совпадения
 
             var isCoincides = true;
+            var canBeParamRoute = false;
+            
             for (var i = 0; i < partsCount; i++)
             {
-                if (parts[i] != possibleRoute.Template.RouteParts[i])
+                var templateRoutePart = possibleRoute.Template.RouteParts[i];
+                
+                if (parts[i] == templateRoutePart) continue;
+                
+                if (templateRoutePart.StartsWith('{') 
+                    && templateRoutePart.EndsWith('}'))
                 {
-                    // тут надо проверять на параметр, но не сразу, а когда все проверяться
+                    canBeParamRoute = true;
+                }
+                else
+                {
                     isCoincides = false;
                 }
             }
 
-            if (isCoincides)
+            if (!isCoincides) continue;
+            
+            if (canBeParamRoute)
             {
-                return possibleRoute;
+                possibleRoutesWithParams.Add(possibleRoute);
+            }
+            else
+            {
+                return (possibleRoute, null);
+            }
+        }
+        
+        var possibleRouteWithParam = possibleRoutesWithParams.FirstOrDefault();
+
+        if (possibleRouteWithParam == null) return null;
+        
+        var parameters = new Dictionary<string, string>();
+            
+        for (var i = 0; i < partsCount; i++)
+        {
+            var templateRoutePart = possibleRouteWithParam.Template.RouteParts[i];
+            if (templateRoutePart.StartsWith('{')
+                && templateRoutePart.EndsWith('}'))
+            {
+                parameters[templateRoutePart.Substring(1, templateRoutePart.Length - 2)] = parts[i];
             }
         }
 
-        return null;
+        return (possibleRouteWithParam, parameters);
     }
 }

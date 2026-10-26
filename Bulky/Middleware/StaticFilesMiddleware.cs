@@ -15,7 +15,7 @@ public static class StaticFilesMiddleware
             var absolutePath = Path.GetFullPath(path);
             var publicPath = Path.GetFullPath("public") + Path.DirectorySeparatorChar;
             
-            if (File.Exists(path) && absolutePath.StartsWith(publicPath))
+            if (File.Exists(absolutePath) && absolutePath.StartsWith(publicPath))
             {
                 context.Response.StatusCode = HttpStatusCode.OK;
                 context.Response.WriteBody(
