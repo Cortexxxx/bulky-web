@@ -15,9 +15,9 @@ public class TestEndpoints
     ];
     
     /// <summary>
-    /// Endpoint: api/workouts/{id}
+    /// Endpoint: api/programs/{id}
     /// </summary>
-    public Task GetProgram(HttpContext context)
+    public async Task GetProgram(HttpContext context)
     {
         if (!Router.Router.TryGetIntParameter(context.Request.RouteParameters, "id", out var id))
         {
@@ -35,7 +35,5 @@ public class TestEndpoints
         
             context.Response.WriteJson(obj);
         }
-        
-        return Task.CompletedTask;
     }
 }

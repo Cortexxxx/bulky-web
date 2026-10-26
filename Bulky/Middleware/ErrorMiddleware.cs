@@ -4,8 +4,8 @@ namespace Bulky.Middleware;
 
 public static class ErrorMiddleware
 {
-    private const string NotFoundPath = "public/not_found.html";
-    private const string ServerErrorPath = "public/server_error.html";
+    private const string NotFoundPath = "public/error_pages/not_found.html";
+    private const string ServerErrorPath = "public/error_pages/server_error.html";
     public static void UseErrorMiddleware(this Middleware middleware)
     {
         middleware.AddElement(async (context, next) =>

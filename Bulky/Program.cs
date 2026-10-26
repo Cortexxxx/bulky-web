@@ -12,10 +12,14 @@ Console.WriteLine(prefix);
 httpListener.Start();
 
 var testService = new TestEndpoints();
+var pagesEndpoints = new PagesEndpoints();
 
 List<Route> endpoints =
 [
-    new Route(HttpMethod.Get, new RouteTemplate("api/programs/{id}"), new AuthRequirements(false), testService.GetProgram)
+    new Route(HttpMethod.Get, new RouteTemplate("api/programs/{id}"), new AuthRequirements(false), testService.GetProgram),
+    new Route(HttpMethod.Get, new RouteTemplate(""), new AuthRequirements(false), pagesEndpoints.GetHomePage),
+    new Route(HttpMethod.Get, new RouteTemplate("home"), new AuthRequirements(false), pagesEndpoints.GetHomePage),
+    new Route(HttpMethod.Get, new RouteTemplate("login"), new AuthRequirements(false), pagesEndpoints.GetLoginPage)
 ];
 
 var router = new Router(endpoints.ToArray());

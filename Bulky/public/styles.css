@@ -1,8 +1,135 @@
-body {
-    background-color: #1b1a20;
+/* Bulky: общие стили поверх Bootstrap 5.3 */
+
+:root {
+    --bulky-accent: #0e7c66;
+    --bulky-accent-dark: #095a4a;
+    --bulky-accent-soft: #e3f1ed;
+    --bulky-ink: #14181f;
+    --bulky-muted: #5b6472;
+
+    /* Перекрашиваем «primary» Bootstrap в наш акцент */
+    --bs-primary: var(--bulky-accent);
+    --bs-primary-rgb: 14, 124, 102;
+    --bs-link-color: var(--bulky-accent);
+    --bs-link-color-rgb: 14, 124, 102;
+    --bs-link-hover-color: var(--bulky-accent-dark);
+    --bs-link-hover-color-rgb: 9, 90, 74;
+    --bs-body-color: var(--bulky-ink);
+    --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-h1 {
-    color: aliceblue;
-    font-size: large;
+body {
+    background-color: #f4f5f7;
+    color: var(--bulky-ink);
+}
+
+/* Кнопка primary в нашем цвете */
+.btn-primary {
+    --bs-btn-bg: var(--bulky-accent);
+    --bs-btn-border-color: var(--bulky-accent);
+    --bs-btn-hover-bg: var(--bulky-accent-dark);
+    --bs-btn-hover-border-color: var(--bulky-accent-dark);
+    --bs-btn-active-bg: var(--bulky-accent-dark);
+    --bs-btn-active-border-color: var(--bulky-accent-dark);
+    --bs-btn-disabled-bg: var(--bulky-accent);
+    --bs-btn-disabled-border-color: var(--bulky-accent);
+    --bs-btn-focus-shadow-rgb: 14, 124, 102;
+}
+
+.form-control:focus {
+    border-color: var(--bulky-accent);
+    box-shadow: 0 0 0 0.25rem rgba(14, 124, 102, 0.2);
+}
+
+/* ---------- Хедер (одинаковый на всех страницах) ---------- */
+
+.site-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e3e6eb;
+}
+
+.site-logo {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.site-logo svg {
+    height: 36px;
+    width: auto;
+    display: block;
+}
+
+.site-nav-link {
+    color: var(--bulky-muted);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.site-nav-link:hover {
+    color: var(--bulky-ink);
+}
+
+/* ---------- Страница входа ---------- */
+
+.auth-main {
+    background:
+            radial-gradient(60rem 30rem at 85% -10%, rgba(14, 124, 102, 0.10), transparent 60%),
+            radial-gradient(40rem 24rem at 0% 110%, rgba(14, 124, 102, 0.07), transparent 60%),
+            #f4f5f7;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.25rem;
+    box-shadow: 0 1.25rem 3rem rgba(20, 24, 31, 0.08);
+}
+
+.auth-tabs {
+    background-color: #eef0f3;
+    border-radius: 0.85rem;
+    padding: 0.3rem;
+}
+
+.auth-tabs .nav-link {
+    color: var(--bulky-muted);
+    font-weight: 600;
+    border-radius: 0.65rem;
+}
+
+.auth-tabs .nav-link.active {
+    background-color: #fff;
+    color: var(--bulky-ink);
+    box-shadow: 0 1px 3px rgba(20, 24, 31, 0.15);
+}
+
+/* ---------- Главная ---------- */
+
+.hero-title {
+    font-size: clamp(3.5rem, 9vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+.hero-title span {
+    color: var(--bulky-accent);
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.hero-art {
+    width: 100%;
+    max-width: 520px;
+    height: auto;
 }
