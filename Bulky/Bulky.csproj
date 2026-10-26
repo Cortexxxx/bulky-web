@@ -10,8 +10,4 @@
     <ItemGroup>
         <Content CopyToOutputDirectory="PreserveNewest" Include="public\**\*"/>
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="sql\" />
-    </ItemGroup>
 </Project>
