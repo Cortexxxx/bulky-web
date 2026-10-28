@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bulky", "Bulky\Bulky.csproj", "{A3FACB7A-375D-4604-89D2-F5D8C94E8206}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BulkyTests", "BulkyTests\BulkyTests.csproj", "{B4C5ADC8-555A-439E-950F-5EF443B33F80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{A3FACB7A-375D-4604-89D2-F5D8C94E8206}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3FACB7A-375D-4604-89D2-F5D8C94E8206}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3FACB7A-375D-4604-89D2-F5D8C94E8206}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4C5ADC8-555A-439E-950F-5EF443B33F80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4C5ADC8-555A-439E-950F-5EF443B33F80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4C5ADC8-555A-439E-950F-5EF443B33F80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4C5ADC8-555A-439E-950F-5EF443B33F80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

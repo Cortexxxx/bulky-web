@@ -13,20 +13,11 @@ public class HttpRequest
         }
 
         Url = request.Url;
-        
-        Method = request.HttpMethod switch
-        {
-            "GET" => HttpMethod.Get,
-            "POST" => HttpMethod.Post,
-            "PATCH" => HttpMethod.Patch,
-            "PUT" => HttpMethod.Put,
-            "DELETE" => HttpMethod.Delete,
-            _ => throw new WebException("Unsupported method", HttpStatusCode.MethodNotAllowed)
-        };
+        Method = HttpMethod.Parse(request.HttpMethod);
     }
 
     public Uri Url { get; private set; }
     public HttpMethod Method { get; set; }
-    public Dictionary<string, string>? RouteParameters { get; set; }
+    public IReadOnlyDictionary<string, string> RouteParameters { get; set; }
     public Route? Route { get; set; }
 }

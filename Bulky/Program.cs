@@ -1,8 +1,10 @@
 ﻿using System.Net;
+using Bulky.Data;
 using Bulky.Endpoints;
 using Bulky.Http;
 using Bulky.Middleware;
 using Bulky.Router;
+using Npgsql;
 
 var httpListener = new HttpListener();
 const string prefix = "http://localhost:8080/";
@@ -14,28 +16,26 @@ httpListener.Start();
 var testService = new TestEndpoints();
 var pagesEndpoints = new PagesEndpoints();
 
-List<Route> endpoints =
-[
-    new Route(HttpMethod.Get, new RouteTemplate("api/programs/{id}"), new AuthRequirements(false), testService.GetProgram),
-    new Route(HttpMethod.Get, new RouteTemplate(""), new AuthRequirements(false), pagesEndpoints.GetHomePage),
-    new Route(HttpMethod.Get, new RouteTemplate("home"), new AuthRequirements(false), pagesEndpoints.GetHomePage),
-    new Route(HttpMethod.Get, new RouteTemplate("login"), new AuthRequirements(false), pagesEndpoints.GetLoginPage)
-];
-
-var router = new Router(endpoints.ToArray());
+var router = new Router();
+router.Map(HttpMethod.Get, "api/programs/{id}", testService.GetProgram);
+router.Map(HttpMethod.Get, "", pagesEndpoints.GetHomePage);
+router.Map(HttpMethod.Get, "home", pagesEndpoints.GetHomePage);
+router.Map(HttpMethod.Get, "login", pagesEndpoints.GetLoginPage);
+router.Initialize();
 
 var middleware = new Middleware();
 
 middleware.UseErrorMiddleware();
 middleware.UseStaticFiles();
-
 middleware.UseRouting(router);
 middleware.UseEndpoints();
-
 middleware.UseNotFound();
 
 middleware.Build();
-
+var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable("BULKY_DB_CONNECTION"));
+var dataSource = db.Build();
+var usersRepository = new PostgresUserRepository(dataSource);
+var sessionsRepository = new PostgresSessionRepository(dataSource);
 
 while (httpListener.IsListening)
 {

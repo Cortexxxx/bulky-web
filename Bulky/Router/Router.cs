@@ -1,73 +1,93 @@
 using System.Diagnostics.CodeAnalysis;
+using Bulky.Router.RouteResolutions;
 
 namespace Bulky.Router;
 
-public class Router(IEnumerable<Route> endpoints)
+public class Router
 {
-    public (Route route, Dictionary<string, string>? parameters)? Resolve(string localPath, HttpMethod method)
-    {
+    private readonly List<Route> _endpoints = new();
+    private static readonly AuthRequirements DefaultAuthRequirements = new(false);
+    private bool _isInitialized;
 
+    public void Initialize()
+    {
+        ThrowIfInitialized();
+
+        _isInitialized = true;
+    }
+
+    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler) 
+        => Map(method, template, endpointHandler, DefaultAuthRequirements);
+    
+    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, AuthRequirements authRequirements)
+    {
+        ThrowIfInitialized();
+        
+        if (_endpoints.Any(e => e.Method == method && e.Template.Route == template))
+        {
+            throw new InvalidOperationException("Endpoint with same method and path is already exists");
+        }
+        
+        _endpoints.Add(new Route(method, new RouteTemplate(template), authRequirements, endpointHandler));
+    }
+    
+    public RouteResolution Resolve(string localPath, HttpMethod method)
+    {
         var parts = WebHelpers.GetPathParts(localPath);
 
         var partsCount = parts.Length;
         
-        var possibleRoutes = endpoints
-            .Where(r => r.Method == method && r.Template.RouteParts.Length == partsCount);
+        var possibleEntries = _endpoints
+            .Where(r => r.Template.RouteParts.Length == partsCount).ToList();
         
-        var possibleRoutesWithParams = new List<Route>();
-        
-        foreach (var possibleRoute in possibleRoutes)
-        {
+        var allowedMethods = new HashSet<HttpMethod>();
+        var matchedRoutes = new List<MatchedRouteResolution>();
 
+        foreach (var possibleEntry in possibleEntries)
+        {
             var isCoincides = true;
-            var canBeParamRoute = false;
-            
+            var parameters = new Dictionary<string, string>();
             for (var i = 0; i < partsCount; i++)
             {
-                var templateRoutePart = possibleRoute.Template.RouteParts[i];
-                
-                if (parts[i] == templateRoutePart) continue;
+                var templateRoutePart = possibleEntry.Template.RouteParts[i];
                 
                 if (templateRoutePart.StartsWith('{') 
                     && templateRoutePart.EndsWith('}'))
                 {
-                    canBeParamRoute = true;
+                    parameters[templateRoutePart[1..^1]] = parts[i];
                 }
                 else
                 {
+                    if (parts[i] == templateRoutePart) continue;
+                    
                     isCoincides = false;
                 }
             }
 
             if (!isCoincides) continue;
+
             
-            if (canBeParamRoute)
+            allowedMethods.Add(possibleEntry.Method);
+
+            if (possibleEntry.Method == method)
             {
-                possibleRoutesWithParams.Add(possibleRoute);
-            }
-            else
-            {
-                return (possibleRoute, null);
+                matchedRoutes.Add(new MatchedRouteResolution(possibleEntry, parameters));
             }
         }
-        
-        var possibleRouteWithParam = possibleRoutesWithParams.FirstOrDefault();
 
-        if (possibleRouteWithParam == null) return null;
+        var matchedRouteResolution = matchedRoutes.MinBy(r => r.Parameters.Count);
         
-        var parameters = new Dictionary<string, string>();
-            
-        for (var i = 0; i < partsCount; i++)
+        if (matchedRouteResolution is not null)
         {
-            var templateRoutePart = possibleRouteWithParam.Template.RouteParts[i];
-            if (templateRoutePart.StartsWith('{')
-                && templateRoutePart.EndsWith('}'))
-            {
-                parameters[templateRoutePart.Substring(1, templateRoutePart.Length - 2)] = parts[i];
-            }
+            return matchedRouteResolution;
         }
 
-        return (possibleRouteWithParam, parameters);
+        if (allowedMethods.Count != 0)
+        {
+            return new ForbiddenMethodRouteResolution(allowedMethods);
+        }
+        
+        return new UnknownRouteResolution();
     }
     
     public static bool TryGetIntParameter(IReadOnlyDictionary<string, string>? parameters, 
@@ -96,5 +116,13 @@ public class Router(IEnumerable<Route> endpoints)
     {
         param = null;
         return parameters != null && parameters.TryGetValue(parameterName, out param);
+    }
+    
+    private void ThrowIfInitialized()
+    {
+        if (_isInitialized)
+        {
+            throw new InvalidOperationException("Router is already initialized");
+        }
     }
 }
