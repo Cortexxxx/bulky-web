@@ -36,6 +36,7 @@ middleware.UseNotFound();
 
 middleware.Build();
 
+
 while (httpListener.IsListening)
 {
     var listenerContext = await httpListener.GetContextAsync();

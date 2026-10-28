@@ -10,4 +10,8 @@
     <ItemGroup>
         <Content CopyToOutputDirectory="PreserveNewest" Include="public\**\*"/>
     </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Npgsql" Version="10.0.3"/>
+    </ItemGroup>
 </Project>

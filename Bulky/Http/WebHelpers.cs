@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Bulky.Http;
+using Bulky.Router;
 
 namespace Bulky;
 
@@ -33,5 +34,15 @@ public static class WebHelpers
     public static void ThrowNotFound()
     {
         throw new WebException("Not found", HttpStatusCode.NotFound, "not_found");
+    }
+
+    public static Role GetRoleByString(string stringRole)
+    {
+        return stringRole switch
+        {
+            "user" => Role.User,
+            "admin" => Role.Admin,
+            _ => throw new ArgumentException("Unknown role or incorrect format", nameof(stringRole))
+        };
     }
 }
