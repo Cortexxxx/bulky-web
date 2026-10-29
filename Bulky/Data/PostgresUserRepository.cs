@@ -1,3 +1,5 @@
+using Bulky.Exceptions;
+using Bulky.Http;
 using Bulky.Models;
 using Npgsql;
 using NpgsqlTypes;
@@ -16,6 +18,7 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
             NpgsqlDbType = NpgsqlDbType.Varchar, Value = email
         });
 
+        
         await using var reader = await command.ExecuteReaderAsync(ct);
         return await reader.ReadAsync(ct)
             ? new User
@@ -40,7 +43,21 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
         command.Parameters.AddWithValue("p_password_salt", passwordSalt);
         
         PostgresHelpers.AddOutputParameter("p_id", NpgsqlDbType.Uuid, command);
+        
+        try
+        {
+            var idObj = await command.ExecuteScalarAsync(ct);
+            
+            if (idObj is Guid guid)
+            {
+                return guid;
+            }
 
-        return await command.ExecuteScalarAsync(ct) is Guid id ? id : throw new InvalidOperationException("Not received UUID");
+            throw new InvalidOperationException("Not received UUID");
+        }
+        catch (PostgresException e) when (e.SqlState == "23505")
+        {
+            throw new EmailAlreadyExistsException("Email already exists", e);
+        }
     }
 }

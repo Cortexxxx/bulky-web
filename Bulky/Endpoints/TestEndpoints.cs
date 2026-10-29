@@ -1,4 +1,5 @@
 using System.Net;
+using Bulky.Exceptions;
 using Bulky.Http;
 using Bulky.Router;
 
@@ -21,13 +22,13 @@ public class TestEndpoints
     {
         if (!Router.Router.TryGetIntParameter(context.Request.RouteParameters, "id", out var id))
         {
-            WebHelpers.ThrowNotFound();
+            ExceptionsHelpers.ThrowNotFound();
         }
         else
         {
             if (_programs.Count <= id.Value || id.Value < 0)
             {
-                WebHelpers.ThrowNotFound();
+                ExceptionsHelpers.ThrowNotFound();
             }
             
             var program = _programs[id.Value];

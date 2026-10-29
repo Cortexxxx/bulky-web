@@ -6,27 +6,32 @@ namespace Bulky.Data;
 
 public class PostgresSessionRepository(NpgsqlDataSource dataSource) : ISessionRepository
 {
-    public async Task<Guid> CreateSessionAsync(Guid userId, string token, DateTime expiresAt, CancellationToken ct)
+    public async Task<Guid> CreateSessionAsync(Guid userId, string tokenHash, DateTime expiresAt, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = PostgresHelpers.CreateProcedure("public.create_session", connection);
 
         PostgresHelpers.AddUserId(userId, command);
-        command.Parameters.AddWithValue("p_token", NpgsqlDbType.Varchar, token);
+        command.Parameters.AddWithValue("p_token_hash", NpgsqlDbType.Varchar, tokenHash);
         command.Parameters.AddWithValue("p_expires_at", NpgsqlDbType.TimestampTz, expiresAt);
         PostgresHelpers.AddOutputParameter("p_id", NpgsqlDbType.Uuid, command);
         
         return await command.ExecuteScalarAsync(ct) is Guid id ? id : throw new InvalidOperationException("Not received UUID");
     }
 
-    public async Task<Session?> GetSessionByTokenAsync(string token, CancellationToken ct)
+    public Task<Session?> GetSessionByTokenAsync(string tokenHash, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Session?> GetSessionByTokenHashAsync(string tokenHash, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
-        await using var command = new NpgsqlCommand("SELECT * FROM public.get_session_by_token($1)", connection);
+        await using var command = new NpgsqlCommand("SELECT * FROM public.get_session_by_token_hash($1)", connection);
         
         command.Parameters.Add(new NpgsqlParameter()
         {
-            NpgsqlDbType = NpgsqlDbType.Varchar, Value = token
+            NpgsqlDbType = NpgsqlDbType.Varchar, Value = tokenHash
         });
 
         await using var reader = await command.ExecuteReaderAsync(ct);
@@ -37,7 +42,7 @@ public class PostgresSessionRepository(NpgsqlDataSource dataSource) : ISessionRe
             {
                 Id = reader.GetGuid(reader.GetOrdinal("id")),
                 UserId = reader.GetGuid(reader.GetOrdinal("user_id")),
-                Token = reader.GetString(reader.GetOrdinal("token")),
+                Token = reader.GetString(reader.GetOrdinal("token_hash")),
                 CreatedAt = reader.GetDateTime(reader.GetOrdinal("created_at")),
                 ExpiresAt = reader.GetDateTime(reader.GetOrdinal("expires_at"))
             }

@@ -1,54 +1,61 @@
 using System.Net;
+using System.Text;
+using Bulky.Http;
+using Bulky.Router;
+using WebException = Bulky.Exceptions.WebException;
 
 namespace Bulky.Middleware;
 
 public static class ErrorMiddleware
 {
-    private const string NotFoundPath = "public/error_pages/not_found.html";
-    private const string ServerErrorPath = "public/error_pages/server_error.html";
-    public static void UseErrorMiddleware(this Middleware middleware)
+    private static readonly Dictionary<string, string> ErrorPages = new()
     {
-        middleware.AddElement(async (context, next) =>
+        {"not_found", "public/error_pages/not_found.html"},
+        {"server_error", "public/error_pages/server_error.html"}
+    };
+    private const string DefaultExceptionText = "Something went wrong";
+    public static void UseErrorMiddleware(this Middleware middleware)
         {
-            try
+            middleware.AddElement(async (context, next) =>
             {
-                await (next?.Invoke(context) ?? Task.CompletedTask);
-            }
-            catch (WebException e) when ((int)e.StatusCode / 100 is 4 or 5)
-            {
-                
-                context.Response.StatusCode = e.StatusCode;
-                if (context.Request.Url.LocalPath.StartsWith("api/"))
+                try
                 {
-                    context.Response.WriteJson(new {Error = e.Error});
+                    await (next?.Invoke(context) ?? Task.CompletedTask);
                 }
-                else
+                catch (WebException e)
                 {
-                    switch (e.StatusCode)
+                    context.Response.StatusCode = e.StatusCode;
+
+                    var kind = WebHelpers.GetRouteKind(context.Request);
+                    
+                    switch (kind)
                     {
-                        case HttpStatusCode.NotFound:
-                            if (File.Exists(NotFoundPath))
-                            {
-                                context.Response.WriteBody(
-                                    await File.ReadAllBytesAsync(NotFoundPath), ".html");
-                            }
+                        case RouteKind.Page:
+                            ErrorPages.TryGetValue(e.Error, out var path);
+
+                            context.Response.WriteBody(
+                                path != null && File.Exists(path) 
+                                    ? await File.ReadAllBytesAsync(path) 
+                                    : Encoding.UTF8.GetBytes(DefaultExceptionText), ".html");
+                            
                             break;
+                        case RouteKind.Api:
+                            context.Response.WriteJson(new {error = e.Error});
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(context));
                     }
                 }
-
-            }
-            catch (Exception e)
-            {
-                context.Response.StatusCode = HttpStatusCode.InternalServerError;
-                
-                if (File.Exists(ServerErrorPath))
+                catch (Exception e)
                 {
-                    context.Response.WriteBody(
-                        await File.ReadAllBytesAsync(ServerErrorPath), ".html");
+                    context.Response.StatusCode = HttpStatusCode.InternalServerError;
+                    context.Response.WriteBody(ErrorPages.TryGetValue("server_error", out var path) 
+                                               && File.Exists(path) 
+                            ? await File.ReadAllBytesAsync(path) 
+                            : Encoding.UTF8.GetBytes(DefaultExceptionText), ".html");
+                    
+                    Console.WriteLine($"Error is handled:\n {e}");
                 }
-                
-                Console.WriteLine($"Error is handled:\n {e}");
-            }
-        });
+            });
+        }
     }
-}

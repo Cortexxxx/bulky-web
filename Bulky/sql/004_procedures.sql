@@ -15,15 +15,15 @@ LANGUAGE plpgsql AS
 
 CREATE OR REPLACE PROCEDURE public.create_session(
     IN p_user_id uuid,
-    IN p_token varchar(256),
+    IN p_token_hash varchar(256),
     IN p_expires_at timestamptz,
     OUT p_id uuid
 )
     LANGUAGE plpgsql AS
 $$
 BEGIN
-    INSERT INTO public.sessions(user_id, token, expires_at)
-    VALUES (p_user_id, p_token, p_expires_at)
+    INSERT INTO public.sessions(user_id, token_hash, expires_at)
+    VALUES (p_user_id, p_token_hash, p_expires_at)
     RETURNING id INTO p_id;
 end;
 $$; 

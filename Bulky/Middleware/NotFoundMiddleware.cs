@@ -1,4 +1,5 @@
 using System.Net;
+using WebException = Bulky.Exceptions.WebException;
 
 namespace Bulky.Middleware;
 

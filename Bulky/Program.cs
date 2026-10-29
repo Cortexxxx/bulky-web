@@ -1,9 +1,11 @@
 ﻿using System.Net;
+using Bulky;
 using Bulky.Data;
 using Bulky.Endpoints;
 using Bulky.Http;
 using Bulky.Middleware;
 using Bulky.Router;
+using Bulky.Validators;
 using Npgsql;
 
 var httpListener = new HttpListener();
@@ -13,14 +15,23 @@ httpListener.Prefixes.Add(prefix);
 Console.WriteLine(prefix);
 httpListener.Start();
 
+var cancellationTokenSource = new CancellationTokenSource();
+
 var testService = new TestEndpoints();
 var pagesEndpoints = new PagesEndpoints();
 
+var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable("BULKY_DB_CONNECTION"));
+var dataSource = db.Build();
+
+var authEndpoints = new AuthEndpoints(new RegisterRequestValidator(), 
+    new AuthService(new PostgresUserRepository(dataSource), new PostgresSessionRepository(dataSource)));
+
 var router = new Router();
-router.Map(HttpMethod.Get, "api/programs/{id}", testService.GetProgram);
-router.Map(HttpMethod.Get, "", pagesEndpoints.GetHomePage);
-router.Map(HttpMethod.Get, "home", pagesEndpoints.GetHomePage);
-router.Map(HttpMethod.Get, "login", pagesEndpoints.GetLoginPage);
+router.Map(HttpMethod.Get, "api/programs/{id}", testService.GetProgram, RouteKind.Api);
+router.Map(HttpMethod.Get, "", pagesEndpoints.GetHomePage, RouteKind.Page);
+router.Map(HttpMethod.Get, "home", pagesEndpoints.GetHomePage, RouteKind.Page);
+router.Map(HttpMethod.Get, "login", pagesEndpoints.GetLoginPage, RouteKind.Page);
+router.Map(HttpMethod.Post, "api/register", authEndpoints.RegisterEndpointAsync, RouteKind.Api);
 router.Initialize();
 
 var middleware = new Middleware();
@@ -32,23 +43,19 @@ middleware.UseEndpoints();
 middleware.UseNotFound();
 
 middleware.Build();
-var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable("BULKY_DB_CONNECTION"));
-var dataSource = db.Build();
-var usersRepository = new PostgresUserRepository(dataSource);
-var sessionsRepository = new PostgresSessionRepository(dataSource);
 
-while (httpListener.IsListening)
+
+
+while (httpListener.IsListening || cancellationTokenSource.IsCancellationRequested)
 {
     var listenerContext = await httpListener.GetContextAsync();
 
     _ = Task.Run(async () =>
     {
-        
         HttpContext context = null!;
-        
         try
         {
-            context = new HttpContext(listenerContext);
+            context = new HttpContext(listenerContext, cancellationTokenSource.Token);
             await (middleware.Pipeline?.Invoke(context) ?? Task.CompletedTask);
         }
         catch (Exception e)

@@ -1,4 +1,4 @@
-namespace Bulky.Router.RouteResolutions;
+namespace Bulky.Router;
 
 public abstract class RouteResolution { }
 

@@ -10,7 +10,7 @@ CREATE TABLE public.users (
 CREATE TABLE public.sessions (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-    token varchar(256) UNIQUE NOT NULL,
+    token_hash varchar(256) UNIQUE NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now(),
     expires_at timestamptz NOT NULL CHECK (expires_at > created_at)
 );

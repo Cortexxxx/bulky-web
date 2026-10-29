@@ -1,13 +1,13 @@
-using System.Net;
+using System.Text;
 using System.Text.Json;
-using Bulky.Http;
 using Bulky.Router;
 
-namespace Bulky;
+namespace Bulky.Http;
+
 
 public static class WebHelpers
 {
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions? JsonSerializerOptions = new(JsonSerializerDefaults.Web);
     public static void SetContentType(HttpResponse response, string extension)
     {
         response.Headers["Content-Type"] = extension switch
@@ -29,13 +29,8 @@ public static class WebHelpers
             .Where(p => !string.IsNullOrWhiteSpace(p))
             .ToArray();
 
-    public static JsonSerializerOptions GetJsonSerializerOptions() => JsonSerializerOptions;
-
-    public static void ThrowNotFound()
-    {
-        throw new WebException("Not found", HttpStatusCode.NotFound, "not_found");
-    }
-
+    public static JsonSerializerOptions? GetJsonSerializerOptions() => JsonSerializerOptions;
+    
     public static Role GetRoleByString(string stringRole)
     {
         return stringRole switch
@@ -45,4 +40,17 @@ public static class WebHelpers
             _ => throw new ArgumentException("Unknown role or incorrect format", nameof(stringRole))
         };
     }
+
+    public static RouteKind GetRouteKind(HttpRequest request)
+    {
+        if (request.Route == null)
+        {
+            return request.Url.LocalPath.StartsWith("/api/", StringComparison.Ordinal) 
+                ? RouteKind.Api 
+                : RouteKind.Page;
+        }
+
+        return request.Route.RouteKind;
+    }
+    
 }

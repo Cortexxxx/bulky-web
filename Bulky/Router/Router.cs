@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Bulky.Router.RouteResolutions;
+using Bulky.Http;
 
 namespace Bulky.Router;
 
@@ -16,10 +16,10 @@ public class Router
         _isInitialized = true;
     }
 
-    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler) 
-        => Map(method, template, endpointHandler, DefaultAuthRequirements);
+    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, RouteKind routeKind) 
+        => Map(method, template, endpointHandler, DefaultAuthRequirements, routeKind);
     
-    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, AuthRequirements authRequirements)
+    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, AuthRequirements authRequirements, RouteKind routeKind)
     {
         ThrowIfInitialized();
         
@@ -28,7 +28,7 @@ public class Router
             throw new InvalidOperationException("Endpoint with same method and path is already exists");
         }
         
-        _endpoints.Add(new Route(method, new RouteTemplate(template), authRequirements, endpointHandler));
+        _endpoints.Add(new Route(method, new RouteTemplate(template), authRequirements, endpointHandler, routeKind));
     }
     
     public RouteResolution Resolve(string localPath, HttpMethod method)

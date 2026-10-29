@@ -6,8 +6,11 @@ namespace Bulky.Http;
 
 public class HttpResponse
 {
+    private readonly HttpListenerResponse _httpListenerResponse;
+
     public HttpResponse(HttpListenerResponse httpListenerResponse)
     {
+        _httpListenerResponse = httpListenerResponse;
         Headers = [];
     }
 
@@ -24,9 +27,14 @@ public class HttpResponse
 
     public void WriteJson(object obj)
     {
-        var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        var json = JsonSerializer.Serialize(obj, WebHelpers.GetJsonSerializerOptions());
 
         Output = Encoding.UTF8.GetBytes(json);
         WebHelpers.SetContentType(this, ".json");
+    }
+
+    public void SetCookie(string name, string value, CookieOptions cookieOptions)
+    {
+        _httpListenerResponse.AppendHeader("Set-Cookie", $"{name}={value};{cookieOptions}");
     }
 }

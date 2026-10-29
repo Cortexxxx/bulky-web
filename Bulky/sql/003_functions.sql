@@ -8,11 +8,11 @@ $$
     WHERE u.email = p_email
 $$;
 
-CREATE OR REPLACE FUNCTION public.get_session_by_token(p_token varchar(256))
-    RETURNS TABLE(id uuid, user_id uuid, token varchar(256), created_at timestamptz, expires_at timestamptz)
+CREATE OR REPLACE FUNCTION public.get_session_by_token_hash(p_token_hash varchar(256))
+    RETURNS TABLE(id uuid, user_id uuid, token_hash varchar(256), created_at timestamptz, expires_at timestamptz)
     LANGUAGE sql STABLE AS
 $$
-SELECT s.id, s.user_id, s.token, s.created_at, s.expires_at
+SELECT s.id, s.user_id, s.token_hash, s.created_at, s.expires_at
 FROM public.sessions AS s   
-WHERE s.token = p_token AND s.expires_at > now()
+WHERE s.token_hash = p_token_hash AND s.expires_at > now()
 $$;

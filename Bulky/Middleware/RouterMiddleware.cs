@@ -1,5 +1,6 @@
 using System.Net;
-using Bulky.Router.RouteResolutions;
+using Bulky.Router;
+using WebException = Bulky.Exceptions.WebException;
 
 namespace Bulky.Middleware;
 
