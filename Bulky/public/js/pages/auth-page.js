@@ -1,7 +1,7 @@
-import {HttpError} from "./http.js";
-import {register, me} from "./auth-api.js";
-import {getErrorMessage, defaultError} from "./error-messages.js";
-import {showErrors, clearErrors} from "./ui.js";
+import {HttpError} from "../shared/http.js";
+import {register, me} from "../api/auth-api.js";
+import {getErrorMessage, defaultError} from "../shared/error-messages.js";
+import {showErrors, clearErrors} from "../shared/ui.js";
 
 const registerErrors = document.getElementById("register-error")
 

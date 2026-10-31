@@ -9,6 +9,7 @@
     
     <ItemGroup>
         <Content CopyToOutputDirectory="PreserveNewest" Include="public\**\*"/>
+        <Content CopyToOutputDirectory="PreserveNewest" Include="pages\**\*"/>
     </ItemGroup>
     
     <ItemGroup>
