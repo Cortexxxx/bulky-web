@@ -1,3 +1,6 @@
+import {defaultError, getErrorMessage} from "./error-messages";
+import {showErrors} from "./ui";
+
 export async function postData(path, body) {
     const response = await fetch(path, {
         method: "POST",
@@ -34,6 +37,23 @@ function throwIfNotOk(response, responseBody) {
     if (!response.ok) {
         throw new HttpError(response.status, responseBody);
     }
+}
+
+export function handleErrors(exception) {
+    let errors;
+
+    if (exception instanceof HttpError) {
+        if (exception.body != null || exception.body === "") {
+            errors = [Object.values(exception.body)].flat().map(getErrorMessage);
+        } else {
+            errors = [defaultError]
+        }
+    }
+    else {
+        errors = [defaultError]
+    }
+    
+    return errors;
 }
 
 export class HttpError extends Error {

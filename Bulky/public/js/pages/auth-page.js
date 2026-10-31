@@ -1,46 +1,61 @@
-import {HttpError} from "../shared/http.js";
-import {register, me} from "../api/auth-api.js";
-import {getErrorMessage, defaultError} from "../shared/error-messages.js";
+import {handleErrors} from "../shared/http.js";
+import {login, me, register} from "../api/auth-api.js";
+import {getErrorMessage} from "../shared/error-messages.js";
 import {showErrors, clearErrors} from "../shared/ui.js";
 
-const registerErrors = document.getElementById("register-error")
+async function setupRegisterForm() {
+    const registerForm = document.getElementById("register-form");
+    const registerErrors = document.getElementById("register-error");
+    const email = registerForm.elements.email.value;
+    const password = registerForm.elements.password.value;
+    const passwordRepeat = registerForm.elements.passwordRepeat.value;
 
-const registerForm = document.getElementById("register-form");
-const emailField = document.getElementById("register-email");
-const passwordField = document.getElementById("register-password");
-const passwordRepeatField = document.getElementById("register-password-repeat");
-registerForm.addEventListener('submit', async (event)=> {
-    event.preventDefault();
-    await onRegisterSubmit(emailField.value, passwordField.value, passwordRepeatField.value); 
-});
-
-console.log(await me());
-
-async function onRegisterSubmit(email, password, passwordRepeat) {
-    try {
-        clearErrors(registerErrors);
-        if (password !== passwordRepeat) {
-            showErrors(registerErrors, [getErrorMessage("passwords_mismatch")]);
-            return;
-        }
+    registerForm.addEventListener('submit', async (event)=> {
+        event.preventDefault();
         
-        await register(email, password);
+        await handleSubmit(registerErrors,async () => {
+            
+            if (password !== passwordRepeat) {
+                showErrors(registerErrors, [getErrorMessage("passwords_mismatch")]);
+                return;
+            }
+
+            await register(email, password);
+        });
+    });
+}
+
+async function setupLoginForm() {
+    const loginForm = document.getElementById("login-form");
+    const loginErrors = document.getElementById("login-error");
+    const email = loginForm.elements.email.value;
+    const password = loginForm.elements.password.value;
+
+    loginForm.addEventListener('submit', async (event)=> {
+        event.preventDefault();
+
+        await handleSubmit(loginErrors,async () => await login(email, password));
+    });
+}
+
+async function handleSubmit(errorBox, callback){
+    try {
+        clearErrors(errorBox);
+        await callback();
         location.replace("/account");
     }
     catch (ex) {
-        let errors;
-        
-        if (ex instanceof HttpError) {
-            if (ex.body != null || ex.body === "") {
-                errors = [Object.values(ex.body)].flat().map(getErrorMessage);
-            } else {
-                errors = [defaultError]
-            }
-        } 
-        else {
-            errors = [defaultError]
-        }
-        
-        showErrors(registerErrors, errors);
+        const errors = handleErrors(ex);
+        showErrors(errorBox, errors);
     }
 }
+
+async function redirectIfAuthorized() {
+    if ((await me()) !== null) {
+        location.replace("/account");
+    }
+}
+
+await redirectIfAuthorized();
+await setupRegisterForm();
+await setupLoginForm();

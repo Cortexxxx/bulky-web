@@ -4,7 +4,6 @@ export function showErrors(box, messages) {
     list.className = 'mb-0';
     
     for (const message of messages) {
-        console.log("Message: " + message);
         const item = document.createElement("li");
         item.textContent = message;
         list.append(item);
