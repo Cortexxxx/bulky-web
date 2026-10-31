@@ -1,98 +1,48 @@
 ﻿using System.Net;
 using Bulky;
 using Bulky.Data;
-using Bulky.Endpoints;
 using Bulky.Http;
 using Bulky.Middleware;
 using Bulky.Router;
+using Bulky.Services;
 using Bulky.Validators;
 using Npgsql;
 
 var httpListener = new HttpListener();
-const string prefix = "http://localhost:8080/";
+var prefix = Environment.GetEnvironmentVariable("PREFIX") 
+             ?? throw new Exception("Environment variable 'PREFIX' is not set");
+Console.WriteLine(prefix);
 
 httpListener.Prefixes.Add(prefix);
-Console.WriteLine(prefix);
 httpListener.Start();
 
-var cancellationTokenSource = new CancellationTokenSource();
 
-var testService = new TestEndpoints();
-var pagesEndpoints = new PagesEndpoints();
+var appCts = new CancellationTokenSource();
 
 var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable("BULKY_DB_CONNECTION"));
 var dataSource = db.Build();
+
 var authService = new AuthService(new PostgresUserRepository(dataSource), new PostgresSessionRepository(dataSource));
-var authEndpoints = new AuthEndpoints(new RegisterRequestValidator(), authService);
+
+// Routing
 
 var router = new Router();
-router.Map(HttpMethod.Get, "api/programs/{id}", testService.GetProgram, RouteKind.Api);
-router.Map(HttpMethod.Get, "", pagesEndpoints.GetHomePage, RouteKind.Page);
-router.Map(HttpMethod.Get, "home", pagesEndpoints.GetHomePage, RouteKind.Page);
-router.Map(HttpMethod.Get, "login", pagesEndpoints.GetLoginPage, RouteKind.Page);
-router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterEndpointAsync, RouteKind.Api);
-router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeEndpointAsync, new AuthRequirements(true), RouteKind.Api);
+router.MapPages();
+router.MapAuthApi(authService, new RegisterRequestValidator());
 router.Initialize();
 
+// Middleware
+
 var middleware = new Middleware();
-
-middleware.UseErrorMiddleware();
-middleware.UseApiErrors();
-middleware.UseStaticFiles();
-middleware.UseRouting(router);
-middleware.UseAuthentication(authService);
-middleware.UseEndpoints();
-middleware.UseNotFound();
-
+middleware.Setup(router, authService);
 middleware.Build();
 
+// App cycle
 
+var app = new App(middleware);
 
-while (httpListener.IsListening || cancellationTokenSource.IsCancellationRequested)
+while (httpListener.IsListening || appCts.IsCancellationRequested)
 {
     var listenerContext = await httpListener.GetContextAsync();
-
-    _ = Task.Run(async () =>
-    {
-        HttpContext context = null!;
-        try
-        {
-            context = new HttpContext(listenerContext, cancellationTokenSource.Token);
-            await (middleware.Pipeline?.Invoke(context) ?? Task.CompletedTask);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        finally
-        {
-            try
-            {
-                await Response(context, listenerContext);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-            finally
-            {
-                listenerContext.Response.OutputStream.Close();
-            }
-        }
-    });
-
-
-}
-
-return;
-
-async Task Response(HttpContext httpContext, HttpListenerContext httpListenerContext)
-{
-    foreach (var header in httpContext.Response.Headers)
-    {
-        httpListenerContext.Response.Headers.Set(header.Key, header.Value);
-    }
-
-    httpListenerContext.Response.StatusCode = (int)httpContext.Response.StatusCode;
-    await httpListenerContext.Response.OutputStream.WriteAsync(httpContext.Response.Output);
+    _ = Task.Run(() => app.HandleRequest(listenerContext, appCts.Token));
 }

@@ -2,6 +2,7 @@ using System.Net;
 using Bulky.Exceptions;
 using Bulky.Models;
 using Bulky.Router;
+using Bulky.Services;
 using WebException = Bulky.Exceptions.WebException;
 
 namespace Bulky.Middleware;

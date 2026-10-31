@@ -20,8 +20,17 @@ public class PagesEndpoints
     {
         context.Response.WriteBody(await File.ReadAllBytesAsync("pages/login.html"), ".html");
     }
+    
+    /// <summary>
+    /// Endpoint: GET "account"
+    /// </summary>
+    public async Task GetAccountPage(HttpContext context)
+    {
+        context.Response.WriteBody(await File.ReadAllBytesAsync("pages/account.html"), ".html");
+    }
 
-    public async Task GetPage(HttpContext context)
+    /*
+     public async Task GetPage(HttpContext context)
     {
         try
         {
@@ -33,4 +42,5 @@ public class PagesEndpoints
             throw;
         }
     }
+    */
 }

@@ -2,6 +2,7 @@ using System.Net;
 using Bulky.Exceptions;
 using Bulky.Http;
 using Bulky.Models;
+using Bulky.Services;
 using Bulky.Validators;
 using ValidationException = FluentValidation.ValidationException;
 

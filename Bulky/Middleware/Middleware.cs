@@ -2,7 +2,7 @@ using Bulky.Http;
 
 namespace Bulky.Middleware;
 
-public delegate Task ChainRest(HttpContext context);
+public delegate Task ChainRest(HttpContext? context);
 public delegate Task MiddlewareElement(HttpContext context, ChainRest? next);
 
 public class Middleware
@@ -17,7 +17,6 @@ public class Middleware
 
     public void Build()
     {
-
         for (var i = _elements.Count - 1; i >= 0; i--)
         {
             var iCopy = i;

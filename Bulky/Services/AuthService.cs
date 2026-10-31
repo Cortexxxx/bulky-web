@@ -2,7 +2,7 @@ using Bulky.Data;
 using Bulky.Exceptions;
 using Bulky.Models;
 
-namespace Bulky;
+namespace Bulky.Services;
 
 public class AuthService
 {
