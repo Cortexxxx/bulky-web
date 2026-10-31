@@ -6,12 +6,17 @@ import {showErrors, clearErrors} from "../shared/ui.js";
 async function setupRegisterForm() {
     const registerForm = document.getElementById("register-form");
     const registerErrors = document.getElementById("register-error");
-    const email = registerForm.elements.email.value;
-    const password = registerForm.elements.password.value;
-    const passwordRepeat = registerForm.elements.passwordRepeat.value;
 
-    registerForm.addEventListener('submit', async (event)=> {
+    const emailField = registerForm.elements.email;
+    const passwordField = registerForm.elements.password;
+    const passwordRepeatField = registerForm.elements.passwordRepeat;
+    
+    registerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
+        
+        const email = emailField.value;
+        const password = passwordField.value;
+        const passwordRepeat = passwordRepeatField.value;
         
         await handleSubmit(registerErrors,async () => {
             
@@ -28,12 +33,16 @@ async function setupRegisterForm() {
 async function setupLoginForm() {
     const loginForm = document.getElementById("login-form");
     const loginErrors = document.getElementById("login-error");
-    const email = loginForm.elements.email.value;
-    const password = loginForm.elements.password.value;
 
+    const emailField = loginForm.elements.email;
+    const passwordField = loginForm.elements.password;
+    
     loginForm.addEventListener('submit', async (event)=> {
         event.preventDefault();
-
+        
+        const email = emailField.value;
+        const password = passwordField.value;
+        
         await handleSubmit(loginErrors,async () => await login(email, password));
     });
 }

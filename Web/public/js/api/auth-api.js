@@ -19,5 +19,5 @@ export async function login(email, password) {
 }
 
 export async function me(){
-    return await getData("api/auth/me");
+    return await getData("/api/auth/me");
 }

@@ -11,7 +11,7 @@ public static class SetupExtensions
     public static void Setup(this Middleware.Middleware middleware, Router.Router router, AuthService authService)
     {
         middleware.UseErrorMiddleware();
-        ApiErrorMiddleware.UseApiErrors(middleware);
+        middleware.UseApiErrors();
         middleware.UseStaticFiles();
         middleware.UseRouting(router);
         middleware.UseAuthentication(authService);
@@ -33,6 +33,7 @@ public static class SetupExtensions
     {
         var authEndpoints = new AuthEndpoints(registerRequestValidator, authService);
         router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterEndpointAsync, RouteKind.Api);
+        router.Map(HttpMethod.Post, "api/auth/login", authEndpoints.LoginEndpointAsync, RouteKind.Api);
         router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeEndpointAsync, new AuthRequirements(true), RouteKind.Api);
     }
 }

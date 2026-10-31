@@ -3,7 +3,9 @@ using Application.Exceptions;
 using Application.Services;
 using Domain.Models;
 using Web.Presentation.Exceptions;
+using Web.Presentation.Http;
 using Web.Presentation.Router;
+using WebException = Web.Presentation.Exceptions.WebException;
 
 namespace Web.Presentation.Middleware;
 
@@ -21,10 +23,20 @@ public static class AuthMiddleware
         
                 if (tokenCookie == null)
                 {
-                    throw new NoActiveSessionsException();
+                    ExceptionsHelpers.ThrowUnauthorized();
                 }
-        
-                var session = await authService.GetUserSessionAsync(tokenCookie.Value, context.CancellationToken);
+
+                Session session = default;
+                
+                try
+                {
+                    session = await authService.GetUserSessionAsync(tokenCookie.Value, context.CancellationToken);
+                }
+                catch (NoActiveSessionsException)
+                {
+                    ExceptionsHelpers.ThrowUnauthorized();
+                }
+                
                 var getUserResult = await authService.GetUserByIdAsync(session.UserId, context.CancellationToken);
                 if (getUserResult != null)
                 {
@@ -39,19 +51,7 @@ public static class AuthMiddleware
                 }
                 else
                 {
-                    switch (route.RouteKind)
-                    {
-                        case RouteKind.Page:
-                            context.Response.StatusCode = HttpStatusCode.Redirect;
-                            context.Response.Headers["Location"] = "/login";
-                            context.Response.SetContentLength(0);
-                            return;
-                        case RouteKind.Api:
-                            ExceptionsHelpers.ThrowUnauthorized();
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    ExceptionsHelpers.ThrowUnauthorized();
                 }
             }
             

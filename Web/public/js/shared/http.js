@@ -42,8 +42,8 @@ export function handleErrors(exception) {
     let errors;
 
     if (exception instanceof HttpError) {
-        if (exception.body != null || exception.body === "") {
-            errors = [Object.values(exception.body)].flat().map(getErrorMessage);
+        if (exception.body != null) {
+            errors = Object.values(exception.body).flat().map(getErrorMessage);
         } else {
             errors = [defaultError]
         }

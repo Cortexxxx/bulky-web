@@ -25,13 +25,7 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
 
             context.Response.StatusCode = HttpStatusCode.Created;
             context.Response.SetContentLength(0);
-            
-            context.Response.SetCookie("token", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                MaxAge = TimeSpan.FromMinutes(5)
-            });
+            SetTokenCookie(context, token);
         }
         else
         {
@@ -45,5 +39,27 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         if (user == null) ExceptionsHelpers.ThrowUnauthorized();
         context.Response.WriteJson(user);
         context.Response.StatusCode = HttpStatusCode.OK;
+    }
+
+    public async Task LoginEndpointAsync(HttpContext context)
+    {
+        var ct = context.CancellationToken;
+        var (email, password) = await context.Request.ReadJsonAsync<LoginRequest>(ct);
+
+        var user = await authService.LoginUserAsync(email, password, ct);
+        var (_, token) = await authService.CreateUserSessionAsync(user.Id, ct);
+        
+        context.Response.SetContentLength(0);
+        SetTokenCookie(context, token);
+    }
+
+    private static void SetTokenCookie(HttpContext context, string token)
+    {
+        context.Response.SetCookie("token", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            MaxAge = TimeSpan.FromMinutes(5)
+        });
     }
 }

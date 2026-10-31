@@ -1,6 +1,5 @@
 using System.Net;
 using Web.Presentation.Http;
-using Web.Presentation.Middleware;
 
 namespace Web.Presentation;
 

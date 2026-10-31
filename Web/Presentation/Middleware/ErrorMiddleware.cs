@@ -13,7 +13,6 @@ public static class ErrorMiddleware
     {
         {"not_found", "pages/error-pages/not_found.html"},
         {"server_error", "pages/error-pages/server_error.html"},
-        {"unauthorized", "pages/login.html"}
     };
     private const string DefaultExceptionText = "Something went wrong";
     public static void UseErrorMiddleware(this Middleware middleware)
@@ -32,6 +31,11 @@ public static class ErrorMiddleware
                     
                     switch (kind)
                     {
+                        case RouteKind.Page when context.Response.StatusCode == HttpStatusCode.Unauthorized:
+                            context.Response.StatusCode = HttpStatusCode.Redirect;
+                            context.Response.SetContentLength(0);
+                            context.Response.Headers["Location"] = "/login";
+                            break;
                         case RouteKind.Page:
                             ErrorPages.TryGetValue(e.Error, out var path);
 
@@ -42,7 +46,7 @@ public static class ErrorMiddleware
                             
                             break;
                         case RouteKind.Api:
-                            context.Response.WriteJson(new {error = e.Error});
+                            context.Response.WriteJson(new { error = (string[]) [e.Error] });
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(context));
