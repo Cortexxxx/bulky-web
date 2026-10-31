@@ -22,23 +22,25 @@ var pagesEndpoints = new PagesEndpoints();
 
 var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable("BULKY_DB_CONNECTION"));
 var dataSource = db.Build();
-
-var authEndpoints = new AuthEndpoints(new RegisterRequestValidator(), 
-    new AuthService(new PostgresUserRepository(dataSource), new PostgresSessionRepository(dataSource)));
+var authService = new AuthService(new PostgresUserRepository(dataSource), new PostgresSessionRepository(dataSource));
+var authEndpoints = new AuthEndpoints(new RegisterRequestValidator(), authService);
 
 var router = new Router();
 router.Map(HttpMethod.Get, "api/programs/{id}", testService.GetProgram, RouteKind.Api);
 router.Map(HttpMethod.Get, "", pagesEndpoints.GetHomePage, RouteKind.Page);
 router.Map(HttpMethod.Get, "home", pagesEndpoints.GetHomePage, RouteKind.Page);
 router.Map(HttpMethod.Get, "login", pagesEndpoints.GetLoginPage, RouteKind.Page);
-router.Map(HttpMethod.Post, "api/register", authEndpoints.RegisterEndpointAsync, RouteKind.Api);
+router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterEndpointAsync, RouteKind.Api);
+router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeEndpointAsync, new AuthRequirements(true), RouteKind.Api);
 router.Initialize();
 
 var middleware = new Middleware();
 
 middleware.UseErrorMiddleware();
+middleware.UseApiErrors();
 middleware.UseStaticFiles();
 middleware.UseRouting(router);
+middleware.UseAuthentication(authService);
 middleware.UseEndpoints();
 middleware.UseNotFound();
 

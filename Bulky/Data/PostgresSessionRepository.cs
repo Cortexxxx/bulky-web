@@ -19,11 +19,6 @@ public class PostgresSessionRepository(NpgsqlDataSource dataSource) : ISessionRe
         return await command.ExecuteScalarAsync(ct) is Guid id ? id : throw new InvalidOperationException("Not received UUID");
     }
 
-    public Task<Session?> GetSessionByTokenAsync(string tokenHash, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<Session?> GetSessionByTokenHashAsync(string tokenHash, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);

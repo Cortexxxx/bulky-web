@@ -1,3 +1,4 @@
+using Bulky.Exceptions;
 using Bulky.Http;
 
 namespace Bulky.Endpoints;
@@ -18,5 +19,18 @@ public class PagesEndpoints
     public async Task GetLoginPage(HttpContext context)
     {
         context.Response.WriteBody(await File.ReadAllBytesAsync("public/pages/login.html"), ".html");
+    }
+
+    public async Task GetPage(HttpContext context)
+    {
+        try
+        {
+            context.Response.WriteBody(await File.ReadAllBytesAsync($"public/pages/{context.Request.Url.LocalPath}.html"), ".html");
+        }
+        catch (Exception e)
+        {
+            ExceptionsHelpers.ThrowNotFound("Not found page by path");
+            throw;
+        }
     }
 }

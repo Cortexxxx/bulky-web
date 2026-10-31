@@ -50,7 +50,7 @@ public class AuthService
         var tokenHash = PasswordHasher.HashToken(token);
         
         var sessionId = await _sessionRepository.CreateSessionAsync(userId, 
-            tokenHash, DateTime.Now.AddMinutes(5), ct);
+            tokenHash, DateTime.UtcNow.AddMinutes(5), ct);
 
         return (sessionId, token);
     }
@@ -68,5 +68,10 @@ public class AuthService
         
         throw new NoActiveSessionsException();
     }
-    
+
+    public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken ct)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId, ct);
+        return user;
+    }
 }

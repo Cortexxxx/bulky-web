@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Bulky.Exceptions;
+using Bulky.Models;
 using Bulky.Router;
 using WebException = Bulky.Exceptions.WebException;
 
@@ -16,7 +17,7 @@ public class HttpRequest
         {
             ExceptionsHelpers.ThrowBadRequest("Url is null", "null_url");
         }
-
+        
         _request = request;
 
         Url = request.Url;
@@ -27,6 +28,7 @@ public class HttpRequest
     public HttpMethod Method { get; set; }
     public IReadOnlyDictionary<string, string>? RouteParameters { get; set; }
     public Route? Route { get; set; }
+    public UserClaims? UserClaims;
     private byte[]? _bodyBytes;
     
     public async Task<T> ReadJsonAsync<T>(CancellationToken ct)
@@ -77,5 +79,10 @@ public class HttpRequest
 
         _bodyBytes = bodyStream.ToArray();
         return _bodyBytes;
+    }
+
+    public Cookie? GetCookie(string name)
+    {
+        return _request.Cookies[name];
     }
 }

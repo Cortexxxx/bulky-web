@@ -1,10 +1,6 @@
-class HttpError extends Error {
-    constructor(status) {
-        super(`HTTP ${status}`);
-        this.status = status;
-    }
-}
 
+
+/*
 const getButton = document.getElementById("getButton");
 const text = document.getElementById("infoText");
 let programCounter = 0;
@@ -37,8 +33,8 @@ async function getData(url) {
     const response = await fetch(url, { method: "GET" });
 
     if (!response.ok) {
-        throw new HttpError(response.status);
+        throw new HttpError(response);
     }
 
     return await response.json();
-}
+}*/

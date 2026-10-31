@@ -15,6 +15,6 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         RuleFor(r => r.Email)
             .NotEmpty().WithErrorCode("empty_email")
             .MaximumLength(254).WithErrorCode("long_email")
-            .Matches(@"\A[^@\s]+@[^@\s]+.[^@\s]+\z").WithErrorCode("incorrect_email");
+            .Matches(@"\A[^@\s]+@[^@\s]+\.[^@\s]+\z").WithErrorCode("incorrect_email");
     }
 }

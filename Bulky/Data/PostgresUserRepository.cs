@@ -8,6 +8,7 @@ namespace Bulky.Data;
 
 public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserRepository
 {
+    // TODO: 2 functions and not consider DRY principal
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
@@ -18,6 +19,30 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
             NpgsqlDbType = NpgsqlDbType.Varchar, Value = email
         });
 
+        
+        await using var reader = await command.ExecuteReaderAsync(ct);
+        return await reader.ReadAsync(ct)
+            ? new User
+            {
+                Id = reader.GetGuid(reader.GetOrdinal("id")),
+                Email = reader.GetString(reader.GetOrdinal("email")),
+                Role = WebHelpers.GetRoleByString(reader.GetString(reader.GetOrdinal("role"))),
+                PasswordHash = reader.GetString(reader.GetOrdinal("password_hash")),
+                PasswordSalt = reader.GetString(reader.GetOrdinal("password_salt")),
+                CreatedAt =  reader.GetDateTime(reader.GetOrdinal("created_at"))
+            }
+            : null;
+    }
+
+    public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand("SELECT * FROM public.get_user_by_id($1)", connection);
+
+        command.Parameters.Add(new NpgsqlParameter
+        {
+            NpgsqlDbType = NpgsqlDbType.Uuid, Value = id
+        });
         
         await using var reader = await command.ExecuteReaderAsync(ct);
         return await reader.ReadAsync(ct)

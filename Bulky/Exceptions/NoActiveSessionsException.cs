@@ -1,6 +1,3 @@
 namespace Bulky.Exceptions;
 
-public class NoActiveSessionsException : Exception
-{
-    
-}
+public class NoActiveSessionsException : Exception;

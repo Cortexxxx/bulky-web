@@ -1,3 +1,5 @@
+using System.Net;
+using Bulky.Exceptions;
 using Bulky.Http;
 using Bulky.Models;
 using Bulky.Validators;
@@ -19,8 +21,11 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
             var userId = await authService.RegisterUserAsync(normalizedRequest.Email, normalizedRequest.Password, ct);
 
             var (_, token) = await authService.CreateUserSessionAsync(userId, ct);
+
+            context.Response.StatusCode = HttpStatusCode.Created;
+            context.Response.SetContentLength(0);
             
-            context.Response.SetCookie("token", token, new CookieOptions()
+            context.Response.SetCookie("token", token, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -31,5 +36,13 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         {
             throw new ValidationException("Incorrect register request", validationResult.Errors);
         }
+    }
+    
+    public async Task GetMeEndpointAsync(HttpContext context)
+    {
+        var user = context.Request.UserClaims;
+        if (user == null) ExceptionsHelpers.ThrowUnauthorized();
+        context.Response.WriteJson(user);
+        context.Response.StatusCode = HttpStatusCode.OK;
     }
 }

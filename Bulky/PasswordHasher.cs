@@ -9,7 +9,7 @@ public static class PasswordHasher
 
     private static byte[] HashPasswordInBytes(string password, string passwordSalt)
     {
-        return Rfc2898DeriveBytes.Pbkdf2(Convert.FromBase64String(password), 
+        return Rfc2898DeriveBytes.Pbkdf2(password, 
             Convert.FromBase64String(passwordSalt), 600_000, 
             HashAlgorithmName.SHA256, 32);
     }
