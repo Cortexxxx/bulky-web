@@ -55,6 +55,7 @@ public class HttpResponse
             ".jpeg" => "image/jpeg",
             ".jpg" => "image/jpeg",
             ".json" => "application/json",
+            ".svg" => "image/svg+xml",
             _ => "application/octet-stream"
         };
     }
