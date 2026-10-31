@@ -13,8 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content CopyToOutputDirectory="PreserveNewest" Include="public\**\*"/>
-        <Content CopyToOutputDirectory="PreserveNewest" Include="pages\**\*"/>
+        <Content CopyToOutputDirectory="PreserveNewest" Include="www\**\*"/>
     </ItemGroup>
 
     <ItemGroup>

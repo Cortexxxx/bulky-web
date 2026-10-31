@@ -10,7 +10,7 @@ public class PagesEndpoints
     /// </summary>
     public async Task GetHomePage(HttpContext context)
     {
-        context.Response.WriteBody(await File.ReadAllBytesAsync("pages/home.html"), ".html");
+        context.Response.WriteBody(await File.ReadAllBytesAsync("www/pages/home.html"), ".html");
     }
     
     /// <summary>
@@ -18,7 +18,7 @@ public class PagesEndpoints
     /// </summary>
     public async Task GetLoginPage(HttpContext context)
     {
-        context.Response.WriteBody(await File.ReadAllBytesAsync("pages/login.html"), ".html");
+        context.Response.WriteBody(await File.ReadAllBytesAsync("www/pages/login.html"), ".html");
     }
     
     /// <summary>
@@ -26,7 +26,7 @@ public class PagesEndpoints
     /// </summary>
     public async Task GetAccountPage(HttpContext context)
     {
-        context.Response.WriteBody(await File.ReadAllBytesAsync("pages/account.html"), ".html");
+        context.Response.WriteBody(await File.ReadAllBytesAsync("www/pages/account.html"), ".html");
     }
 
     /*
@@ -34,7 +34,7 @@ public class PagesEndpoints
     {
         try
         {
-            context.Response.WriteBody(await File.ReadAllBytesAsync($"pages/{context.Request.Url.LocalPath}.html"), ".html");
+            context.Response.WriteBody(await File.ReadAllBytesAsync($"www/pages/{context.Request.Url.LocalPath}.html"), ".html");
         }
         catch (Exception e)
         {

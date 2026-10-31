@@ -11,9 +11,9 @@ public static class StaticFilesMiddleware
             var url = context.Request.Url;
 
             var localPath = url.LocalPath;
-            var path = Path.Combine("public", localPath.Trim('/', '\\'));
+            var path = Path.Combine("www/public", localPath.Trim('/', '\\'));
             var absolutePath = Path.GetFullPath(path);
-            var publicPath = Path.GetFullPath("public") + Path.DirectorySeparatorChar;
+            var publicPath = Path.GetFullPath("www/public") + Path.DirectorySeparatorChar;
             
             if (File.Exists(absolutePath) && absolutePath.StartsWith(publicPath))
             {

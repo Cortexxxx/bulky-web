@@ -11,8 +11,8 @@ public static class ErrorMiddleware
 {
     private static readonly Dictionary<string, string> ErrorPages = new()
     {
-        {"not_found", "pages/error-pages/not_found.html"},
-        {"server_error", "pages/error-pages/server_error.html"},
+        {"not_found", "www/pages/error-pages/not_found.html"},
+        {"server_error", "www/pages/error-pages/server_error.html"},
     };
     private const string DefaultExceptionText = "Something went wrong";
     public static void UseErrorMiddleware(this Middleware middleware)
