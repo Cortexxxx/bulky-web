@@ -59,17 +59,5 @@ async function handleSubmit(errorBox, callback){
     }
 }
 
-async function redirectIfAuthorized() {
-    try {
-        if ((await me()) !== null) {
-            location.replace("/account");
-        }
-    } catch (e) {
-        if (e instanceof HttpError && e.status === 401) return;
-        throw e;
-    }
-}
-
-await redirectIfAuthorized();
 await setupRegisterForm();
 await setupLoginForm();

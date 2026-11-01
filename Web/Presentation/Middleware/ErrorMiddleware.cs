@@ -43,7 +43,6 @@ public static class ErrorMiddleware
                                 path != null && File.Exists(path) 
                                     ? await File.ReadAllBytesAsync(path) 
                                     : Encoding.UTF8.GetBytes(DefaultExceptionText), ".html");
-                            
                             break;
                         case RouteKind.Api:
                             context.Response.WriteJson(new { error = (string[]) [e.Error] });

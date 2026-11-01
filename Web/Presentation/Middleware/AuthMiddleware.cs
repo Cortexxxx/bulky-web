@@ -3,9 +3,7 @@ using Application.Exceptions;
 using Application.Services;
 using Domain.Models;
 using Web.Presentation.Exceptions;
-using Web.Presentation.Http;
 using Web.Presentation.Router;
-using WebException = Web.Presentation.Exceptions.WebException;
 
 namespace Web.Presentation.Middleware;
 
@@ -16,46 +14,61 @@ public static class AuthMiddleware
         middleware.AddElement(async (context, next) =>
         {
             var request = context.Request;
+            var response = context.Response;
             var route = context.Request.Route;
-            if (route is { AuthRequirements.NeedAuth: true })
+            
+            var tokenCookie = request.GetCookie("token");
+            
+            if (route != null)
             {
-                var tokenCookie = request.GetCookie("token");
-        
-                if (tokenCookie == null)
-                {
-                    ExceptionsHelpers.ThrowUnauthorized();
-                }
-
-                Session session = default;
+                var claims = await GetClaimsAsync(authService, tokenCookie, context.CancellationToken);
+                request.UserClaims = claims;
                 
-                try
-                {
-                    session = await authService.GetUserSessionAsync(tokenCookie.Value, context.CancellationToken);
-                }
-                catch (NoActiveSessionsException)
+                if (claims == null && route.AuthRequirements.AuthMode == AuthMode.Required)
                 {
                     ExceptionsHelpers.ThrowUnauthorized();
                 }
                 
-                var getUserResult = await authService.GetUserByIdAsync(session.UserId, context.CancellationToken);
-                if (getUserResult != null)
+                if (claims != null && route.AuthRequirements.AuthMode == AuthMode.GuestsOnly)
                 {
-                    var user = getUserResult.Value;
-                    request.UserClaims = new UserClaims
-                    {
-                        Role = user.Role,
-                        Email = user.Email,
-                        Id = user.Id,
-                        CreatedAt = user.CreatedAt,
-                    };
-                }
-                else
-                {
-                    ExceptionsHelpers.ThrowUnauthorized();
+                    response.StatusCode = HttpStatusCode.Redirect;
+                    response.Headers["Location"] = "/dashboard";
+                    response.SetContentLength(0);
+                    return;
                 }
             }
             
             await (next?.Invoke(context) ?? Task.CompletedTask);
         });
+    }
+    
+    private static async Task<UserClaims?> GetClaimsAsync(AuthService authService, Cookie? tokenCookie, CancellationToken ct)
+    {
+        if (tokenCookie == null) return null;
+
+        Session session;
+        
+        try
+        {
+            session = await authService.GetUserSessionAsync(tokenCookie.Value, ct);
+        }
+        catch (NoActiveSessionsException)
+        {
+            return null;
+        }
+                
+        var getUserResult = await authService.GetUserByIdAsync(session.UserId, ct);
+
+        if (getUserResult == null) return null;
+        
+        var user = getUserResult.Value;
+        
+        return new UserClaims
+        {
+            Role = user.Role,
+            Email = user.Email,
+            Id = user.Id,
+            CreatedAt = user.CreatedAt,
+        };
     }
 }

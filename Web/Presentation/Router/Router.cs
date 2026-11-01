@@ -5,8 +5,8 @@ namespace Web.Presentation.Router;
 
 public class Router
 {
-    private readonly List<Route> _endpoints = new();
-    private static readonly AuthRequirements DefaultAuthRequirements = new(false);
+    private readonly List<Route> _endpoints = [];
+    private static readonly AuthRequirements DefaultAuthRequirements = new();
     private bool _isInitialized;
 
     public void Initialize()
@@ -17,9 +17,9 @@ public class Router
     }
 
     public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, RouteKind routeKind) 
-        => Map(method, template, endpointHandler, DefaultAuthRequirements, routeKind);
+        => Map(method, template, endpointHandler, routeKind, DefaultAuthRequirements);
     
-    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, AuthRequirements authRequirements, RouteKind routeKind)
+    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, RouteKind routeKind, AuthRequirements authRequirements)
     {
         ThrowIfInitialized();
         

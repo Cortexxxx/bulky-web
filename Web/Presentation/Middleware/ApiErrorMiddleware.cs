@@ -1,6 +1,5 @@
 using System.Net;
 using Application.Exceptions;
-using Web.Presentation.Validators;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Web.Presentation.Middleware;
