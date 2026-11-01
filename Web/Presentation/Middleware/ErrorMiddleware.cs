@@ -34,7 +34,7 @@ public static class ErrorMiddleware
                         case RouteKind.Page when context.Response.StatusCode == HttpStatusCode.Unauthorized:
                             context.Response.StatusCode = HttpStatusCode.Redirect;
                             context.Response.SetContentLength(0);
-                            context.Response.Headers["Location"] = "/login";
+                            context.Response.Headers["Location"] = PathConstants.AuthorizationPagePath;
                             break;
                         case RouteKind.Page:
                             ErrorPages.TryGetValue(e.Error, out var path);

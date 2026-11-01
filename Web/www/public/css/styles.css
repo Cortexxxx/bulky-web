@@ -70,6 +70,41 @@ body {
     color: var(--bulky-ink);
 }
 
+/* ---------- Кнопки навигации дашборда ---------- */
+
+.dashboard-nav-btn {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    padding: 0.4rem 0.25rem;
+    color: var(--bulky-muted);
+    font-weight: 600;
+    transition: color 0.15s;
+}
+
+.dashboard-nav-btn::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.2rem;
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--bulky-accent);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+}
+
+.dashboard-nav-btn:hover,
+.dashboard-nav-btn[aria-current="page"] {
+    color: var(--bulky-ink);
+}
+
+.dashboard-nav-btn:hover::after,
+.dashboard-nav-btn[aria-current="page"]::after {
+    transform: scaleX(1);
+}
+
 /* ---------- Страница входа ---------- */
 
 .auth-main {

@@ -32,7 +32,7 @@ public static class AuthMiddleware
                 if (claims != null && route.AuthRequirements.AuthMode == AuthMode.GuestsOnly)
                 {
                     response.StatusCode = HttpStatusCode.Redirect;
-                    response.Headers["Location"] = "/dashboard";
+                    response.Headers["Location"] = PathConstants.DashboardWorkoutPagePath;
                     response.SetContentLength(0);
                     return;
                 }

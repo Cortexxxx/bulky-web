@@ -22,10 +22,23 @@ public static class SetupExtensions
     public static void MapPages(this Router.Router router)
     {
         var pagesEndpoints = new PagesEndpoints();
-        router.Map(HttpMethod.Get, "", pagesEndpoints.GetHomePage, RouteKind.Page, new AuthRequirements(AuthMode.GuestsOnly));
-        router.Map(HttpMethod.Get, "home", pagesEndpoints.GetHomePage, RouteKind.Page, new AuthRequirements(AuthMode.GuestsOnly));
-        router.Map(HttpMethod.Get, "login", pagesEndpoints.GetLoginPage, RouteKind.Page, new AuthRequirements(AuthMode.GuestsOnly));
-        router.Map(HttpMethod.Get, "account", pagesEndpoints.GetAccountPage, RouteKind.Page, new AuthRequirements(AuthMode.Required));
+        var guestsOnly = new AuthRequirements(AuthMode.GuestsOnly);
+        var authorizedOnly = new AuthRequirements(AuthMode.Required);
+        
+        router.Map(HttpMethod.Get, "", context =>
+            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, guestsOnly);
+        router.Map(HttpMethod.Get, "home", context => 
+            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, guestsOnly);
+        router.Map(HttpMethod.Get, "login", context => 
+            pagesEndpoints.GetPage(context, "login.html"), RouteKind.Page, guestsOnly);
+        router.Map(HttpMethod.Get, "dashboard/account", context => 
+            pagesEndpoints.GetPage(context, "dashboard/account.html"), RouteKind.Page, authorizedOnly);
+        router.Map(HttpMethod.Get, "dashboard/workout", context => 
+            pagesEndpoints.GetPage(context, "dashboard/workout.html"), RouteKind.Page, authorizedOnly);
+        router.Map(HttpMethod.Get, "dashboard/history", context => 
+            pagesEndpoints.GetPage(context, "dashboard/history.html"), RouteKind.Page, authorizedOnly);
+        router.Map(HttpMethod.Get, "dashboard/analytics", context => 
+            pagesEndpoints.GetPage(context, "dashboard/analytics.html"), RouteKind.Page, authorizedOnly);
     }
 
     public static void MapAuthApi(this Router.Router router, AuthService authService,

@@ -51,7 +51,7 @@ async function handleSubmit(errorBox, callback){
     try {
         clearErrors(errorBox);
         await callback();
-        location.replace("/account");
+        location.replace("/dashboard/workout");
     }
     catch (ex) {
         const errors = handleErrors(ex);
