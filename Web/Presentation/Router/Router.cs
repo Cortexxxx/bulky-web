@@ -118,6 +118,19 @@ public class Router
         return parameters != null && parameters.TryGetValue(parameterName, out param);
     }
     
+    public static bool TryGetGuidParameter(IReadOnlyDictionary<string, string>? parameters, 
+        string parameterName, [NotNullWhen(true)] out Guid? param)
+    {
+        param = null;
+        if (parameters != null && parameters.TryGetValue(parameterName, out var stringParam)
+                               && Guid.TryParse(stringParam, out var guid))
+        {
+            param = guid;
+            return true;
+        }
+
+        return false;
+    }
     private void ThrowIfInitialized()
     {
         if (_isInitialized)

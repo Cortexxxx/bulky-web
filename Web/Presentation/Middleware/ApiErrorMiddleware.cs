@@ -29,6 +29,11 @@ public static class ApiErrorMiddleware
                 context.Response.StatusCode = HttpStatusCode.Unauthorized;
                 context.Response.WriteJson(new { error = (string[]) ["wrong_email_or_password"] });
             }
+            catch (MuscleGroupExistsException)
+            {
+                context.Response.StatusCode = HttpStatusCode.Conflict;
+                context.Response.WriteJson(new { email = (string[]) ["muscle_exists"] });
+            }
             catch (ValidationException e)
             {
                 context.Response.StatusCode = HttpStatusCode.BadRequest;

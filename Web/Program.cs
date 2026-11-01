@@ -22,12 +22,14 @@ var appCts = new CancellationTokenSource();
 var dataSource = db.Build();
 var authService = new AuthService(new PostgresUserRepository(dataSource), 
     new PostgresSessionRepository(dataSource), new PasswordHasher());
+var adminService = new AdminService(new PostgresMuscleGroupsRepository(dataSource));
 
 // Routing
 
 var router = new Router();
 router.MapPages();
 router.MapAuthApi(authService, new RegisterRequestValidator());
+router.MapMuscleGroupsApi(adminService, new MuscleGroupRequestValidator());
 router.Initialize();
 
 // Middleware
