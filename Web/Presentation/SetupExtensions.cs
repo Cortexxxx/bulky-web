@@ -1,4 +1,5 @@
 using Application.Services;
+using Domain.Models.Auth;
 using Web.Presentation.Endpoints;
 using Web.Presentation.Middleware;
 using Web.Presentation.Router;
@@ -15,6 +16,7 @@ public static class SetupExtensions
         middleware.UseStaticFiles();
         middleware.UseRouting(router);
         middleware.UseAuthentication(authService);
+        middleware.UseAuthorization();
         middleware.UseEndpoints();
         middleware.UseNotFound();
     }
@@ -24,6 +26,7 @@ public static class SetupExtensions
         var pagesEndpoints = new PagesEndpoints();
         var guestsOnly = new AuthRequirements(AuthMode.GuestsOnly);
         var authorizedOnly = new AuthRequirements(AuthMode.Required);
+        var adminOnly = authorizedOnly with {RequiredRole = Role.Admin};
         
         router.Map(HttpMethod.Get, "", context =>
             pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, guestsOnly);
@@ -31,6 +34,7 @@ public static class SetupExtensions
             pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, guestsOnly);
         router.Map(HttpMethod.Get, "login", context => 
             pagesEndpoints.GetPage(context, "login.html"), RouteKind.Page, guestsOnly);
+        
         router.Map(HttpMethod.Get, "dashboard/account", context => 
             pagesEndpoints.GetPage(context, "dashboard/account.html"), RouteKind.Page, authorizedOnly);
         router.Map(HttpMethod.Get, "dashboard/workout", context => 
@@ -39,6 +43,9 @@ public static class SetupExtensions
             pagesEndpoints.GetPage(context, "dashboard/history.html"), RouteKind.Page, authorizedOnly);
         router.Map(HttpMethod.Get, "dashboard/analytics", context => 
             pagesEndpoints.GetPage(context, "dashboard/analytics.html"), RouteKind.Page, authorizedOnly);
+        
+        router.Map(HttpMethod.Get, "admin", context => 
+            pagesEndpoints.GetPage(context, "admin/admin.html"), RouteKind.Page, adminOnly);
     }
 
     public static void MapAuthApi(this Router.Router router, AuthService authService,

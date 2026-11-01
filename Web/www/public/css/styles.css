@@ -105,6 +105,19 @@ body {
     transform: scaleX(1);
 }
 
+/* ---------- Админка ---------- */
+
+/* Архивный элемент списка */
+.archived {
+    background-color: #f8f9fa;
+}
+
+.archived .list-group-item-action {
+    color: var(--bulky-muted);
+    text-decoration: line-through;
+    opacity: 0.65;
+}
+
 /* ---------- Страница входа ---------- */
 
 .auth-main {

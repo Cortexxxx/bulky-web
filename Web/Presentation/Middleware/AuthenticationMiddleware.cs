@@ -2,19 +2,16 @@ using System.Net;
 using Application.Exceptions;
 using Application.Services;
 using Domain.Models.Auth;
-using Web.Presentation.Exceptions;
-using Web.Presentation.Router;
 
 namespace Web.Presentation.Middleware;
 
-public static class AuthMiddleware
+public static class AuthenticationMiddleware
 {
     public static void UseAuthentication(this Middleware middleware, AuthService authService)
     {
         middleware.AddElement(async (context, next) =>
         {
             var request = context.Request;
-            var response = context.Response;
             var route = context.Request.Route;
             
             var tokenCookie = request.GetCookie("token");
@@ -23,19 +20,6 @@ public static class AuthMiddleware
             {
                 var claims = await GetClaimsAsync(authService, tokenCookie, context.CancellationToken);
                 request.UserClaims = claims;
-                
-                if (claims == null && route.AuthRequirements.AuthMode == AuthMode.Required)
-                {
-                    ExceptionsHelpers.ThrowUnauthorized();
-                }
-                
-                if (claims != null && route.AuthRequirements.AuthMode == AuthMode.GuestsOnly)
-                {
-                    response.StatusCode = HttpStatusCode.Redirect;
-                    response.Headers["Location"] = PathConstants.DashboardWorkoutPagePath;
-                    response.SetContentLength(0);
-                    return;
-                }
             }
             
             await (next?.Invoke(context) ?? Task.CompletedTask);

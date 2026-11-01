@@ -26,4 +26,10 @@ public static class ExceptionsHelpers
     {
         ThrowWebException(message, HttpStatusCode.Unauthorized, "unauthorized");
     }
+    
+    [DoesNotReturn]
+    public static void ThrowForbidden(string message = "Forbidden", string error = "forbidden")
+    {
+        ThrowWebException(message, HttpStatusCode.Forbidden, error);
+    }
 }

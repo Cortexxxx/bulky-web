@@ -98,7 +98,11 @@
                                 <!-- sample item, replace with rendered items -->
                                 <li class="list-group-item d-flex align-items-center gap-2 p-0">
                                     <button type="button" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1">Chest</button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm me-2">Delete</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2">Archive</button>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center gap-2 p-0 archived">
+                                    <button type="button" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1">Triceps</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2">Unarchive</button>
                                 </li>
                             </ul>
                         </div>
@@ -124,6 +128,36 @@
                                     <label class="form-label" for="exercise-create-description">Description</label>
                                     <textarea class="form-control" id="exercise-create-description" name="description" rows="3"></textarea>
                                 </div>
+                                <div class="mb-3">
+                                    <div class="form-label">Muscle groups</div>
+                                    <div class="list-group list-group-flush border-top border-bottom overflow-auto"
+                                         id="exercise-create-muscles" style="max-height: 14rem">
+                                        <!-- sample row, replace with rendered muscle groups -->
+                                        <div class="list-group-item d-flex align-items-center justify-content-between gap-2 px-0">
+                                            <span>Chest</span>
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Chest role">
+                                                <input class="btn-check" type="radio" name="muscle-1" id="exercise-create-muscle-1-none" value="none" checked>
+                                                <label class="btn btn-outline-secondary" for="exercise-create-muscle-1-none">None</label>
+                                                <input class="btn-check" type="radio" name="muscle-1" id="exercise-create-muscle-1-primary" value="primary">
+                                                <label class="btn btn-outline-primary" for="exercise-create-muscle-1-primary">Primary</label>
+                                                <input class="btn-check" type="radio" name="muscle-1" id="exercise-create-muscle-1-secondary" value="secondary">
+                                                <label class="btn btn-outline-dark" for="exercise-create-muscle-1-secondary">Secondary</label>
+                                            </div>
+                                        </div>
+                                        <!-- sample row, replace with rendered muscle groups -->
+                                        <div class="list-group-item d-flex align-items-center justify-content-between gap-2 px-0">
+                                            <span>Back</span>
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Back role">
+                                                <input class="btn-check" type="radio" name="muscle-2" id="exercise-create-muscle-2-none" value="none" checked>
+                                                <label class="btn btn-outline-secondary" for="exercise-create-muscle-2-none">None</label>
+                                                <input class="btn-check" type="radio" name="muscle-2" id="exercise-create-muscle-2-primary" value="primary">
+                                                <label class="btn btn-outline-primary" for="exercise-create-muscle-2-primary">Primary</label>
+                                                <input class="btn-check" type="radio" name="muscle-2" id="exercise-create-muscle-2-secondary" value="secondary">
+                                                <label class="btn btn-outline-dark" for="exercise-create-muscle-2-secondary">Secondary</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="mb-4">
                                     <label class="form-label" for="exercise-create-image">Image</label>
                                     <input class="form-control" id="exercise-create-image" name="image" type="file" accept="image/*">
@@ -147,6 +181,36 @@
                                     <label class="form-label" for="exercise-edit-description">Description</label>
                                     <textarea class="form-control" id="exercise-edit-description" name="description" rows="3"></textarea>
                                 </div>
+                                <div class="mb-3">
+                                    <div class="form-label">Muscle groups</div>
+                                    <div class="list-group list-group-flush border-top border-bottom overflow-auto"
+                                         id="exercise-edit-muscles" style="max-height: 14rem">
+                                        <!-- sample row, replace with rendered muscle groups -->
+                                        <div class="list-group-item d-flex align-items-center justify-content-between gap-2 px-0">
+                                            <span>Chest</span>
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Chest role">
+                                                <input class="btn-check" type="radio" name="muscle-1" id="exercise-edit-muscle-1-none" value="none" checked>
+                                                <label class="btn btn-outline-secondary" for="exercise-edit-muscle-1-none">None</label>
+                                                <input class="btn-check" type="radio" name="muscle-1" id="exercise-edit-muscle-1-primary" value="primary">
+                                                <label class="btn btn-outline-primary" for="exercise-edit-muscle-1-primary">Primary</label>
+                                                <input class="btn-check" type="radio" name="muscle-1" id="exercise-edit-muscle-1-secondary" value="secondary">
+                                                <label class="btn btn-outline-dark" for="exercise-edit-muscle-1-secondary">Secondary</label>
+                                            </div>
+                                        </div>
+                                        <!-- sample row, replace with rendered muscle groups -->
+                                        <div class="list-group-item d-flex align-items-center justify-content-between gap-2 px-0">
+                                            <span>Back</span>
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Back role">
+                                                <input class="btn-check" type="radio" name="muscle-2" id="exercise-edit-muscle-2-none" value="none" checked>
+                                                <label class="btn btn-outline-secondary" for="exercise-edit-muscle-2-none">None</label>
+                                                <input class="btn-check" type="radio" name="muscle-2" id="exercise-edit-muscle-2-primary" value="primary">
+                                                <label class="btn btn-outline-primary" for="exercise-edit-muscle-2-primary">Primary</label>
+                                                <input class="btn-check" type="radio" name="muscle-2" id="exercise-edit-muscle-2-secondary" value="secondary">
+                                                <label class="btn btn-outline-dark" for="exercise-edit-muscle-2-secondary">Secondary</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="mb-4">
                                     <label class="form-label" for="exercise-edit-image">Image</label>
                                     <input class="form-control" id="exercise-edit-image" name="image" type="file" accept="image/*">
@@ -166,7 +230,11 @@
                                 <!-- sample item, replace with rendered items -->
                                 <li class="list-group-item d-flex align-items-center gap-2 p-0">
                                     <button type="button" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1">Bench press</button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm me-2">Delete</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2">Archive</button>
+                                </li>
+                                <li class="list-group-item d-flex align-items-center gap-2 p-0 archived">
+                                    <button type="button" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1">Dips</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2">Unarchive</button>
                                 </li>
                             </ul>
                         </div>
