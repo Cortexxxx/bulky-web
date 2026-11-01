@@ -1,6 +1,6 @@
 using Application.Abstractions;
 using Application.Exceptions;
-using Domain.Models;
+using Domain.Models.Auth;
 
 namespace Application.Services;
 

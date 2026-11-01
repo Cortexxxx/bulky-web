@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Domain.Models;
+using Domain.Models.Auth;
 using Web.Presentation.Router;
 
 namespace Web.Presentation.Http;

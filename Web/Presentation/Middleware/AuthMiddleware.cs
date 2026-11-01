@@ -1,7 +1,7 @@
 using System.Net;
 using Application.Exceptions;
 using Application.Services;
-using Domain.Models;
+using Domain.Models.Auth;
 using Web.Presentation.Exceptions;
 using Web.Presentation.Router;
 

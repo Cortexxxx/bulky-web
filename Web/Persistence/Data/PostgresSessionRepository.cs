@@ -1,5 +1,5 @@
 using Application.Abstractions;
-using Domain.Models;
+using Domain.Models.Auth;
 using Npgsql;
 using NpgsqlTypes;
 

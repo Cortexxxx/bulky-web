@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Domain.Models;
+using Domain.Models.Auth;
 using Web.Presentation.Exceptions;
 using Web.Presentation.Router;
 using WebException = Web.Presentation.Exceptions.WebException;

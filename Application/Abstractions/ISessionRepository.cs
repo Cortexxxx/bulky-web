@@ -1,5 +1,5 @@
 
-using Domain.Models;
+using Domain.Models.Auth;
 
 namespace Application.Abstractions;
 
