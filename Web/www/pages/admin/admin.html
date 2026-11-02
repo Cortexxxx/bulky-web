@@ -94,16 +94,13 @@
                     <section class="card shadow-sm rounded-4 h-100">
                         <div class="card-body p-4">
                             <h3 class="h6 text-secondary text-uppercase mb-3">List</h3>
-                            <ul class="list-group" id="muscle-group-list">
-                                <!-- sample item, replace with rendered items -->
+                            <template id="muscle-element-template">
                                 <li class="list-group-item d-flex align-items-center gap-2 p-0">
-                                    <button type="button" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1">Chest</button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2">Archive</button>
+                                    <button type="button" data-action="select" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1"></button>
+                                    <button type="button" data-action="archive" class="btn btn-outline-secondary btn-sm me-2"></button>
                                 </li>
-                                <li class="list-group-item d-flex align-items-center gap-2 p-0 archived">
-                                    <button type="button" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1">Triceps</button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2">Unarchive</button>
-                                </li>
+                            </template>
+                            <ul class="list-group" id="muscle-group-list">
                             </ul>
                         </div>
                     </section>
@@ -243,6 +240,6 @@
             </div>
         </section>
 </main>
-
+<script type="module" src="/js/pages/admin-page.js"></script>
 </body>
 </html>

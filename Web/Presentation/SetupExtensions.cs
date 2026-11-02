@@ -64,7 +64,7 @@ public static class SetupExtensions
         const RouteKind kind = RouteKind.Api;
         var adminRequirements = new AuthRequirements(AuthMode.Required, Role.Admin);
         
-        router.Map(HttpMethod.Get, "api/admin/muscle_groups", 
+        router.Map(HttpMethod.Get, "api/muscle_groups", 
             adminEndpoints.GetAllMuscleGroupsEndpoint, kind, new AuthRequirements(AuthMode.Required));
         router.Map(HttpMethod.Post, "api/admin/muscle_groups", 
             adminEndpoints.CreateMuscleGroupEndpoint, kind, adminRequirements);
