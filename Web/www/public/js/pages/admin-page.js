@@ -7,6 +7,12 @@ import {
     updateMuscle
 } from "../api/muscle-api.js";
 import {handleSubmit} from "../shared/http.js";
+let selectedId;
+let selectedElement;
+await setupMuscleList();
+await setupCreateForm();
+await setupEditForm();
+
 async function setupMuscleList() {
     const muscleList = document.getElementById("muscle-group-list");
     document.addEventListener('DOMContentLoaded', async () => {
@@ -14,8 +20,6 @@ async function setupMuscleList() {
         await renderElementsList("muscle-element-template", muscleList, data, 'muscle');
     });
 }
-
-await setupMuscleList();
 
 async function renderElementsList(templateId, list, elements, type) {
     const template = document.getElementById(templateId);
@@ -36,7 +40,7 @@ async function renderElementsList(templateId, list, elements, type) {
         } else
         {
             listElement.classList.remove("archived");
-            archiveButton.dataset.action = 'unarchive';
+            archiveButton.dataset.action = 'archive';
             archiveButton.textContent = "Archive";
         }
 
@@ -48,7 +52,21 @@ async function renderElementsList(templateId, list, elements, type) {
             if (pressedButton.dataset.action === 'select')
             {
                 if (type === 'muscle') {
-                    await enableMuscleEditForm(elementId);
+                    selectedId = elementId;
+                    
+                    if (selectedElement !== undefined) {
+                        selectedElement.classList.remove('active')
+                    }
+                    
+                    selectedElement = listElement;
+                    selectedElement.classList.add('active')
+                    const data = await getMuscleById(selectedId);
+                    const editForm = document.getElementById("muscle-group-edit-form");
+
+                    editForm.querySelector('fieldset').disabled = false;
+
+                    editForm.elements.title.value = data.title;
+                    editForm.elements.description.value = data.description;
                 }
             } else if (pressedButton.dataset.action === 'archive') {
                 if (type === 'muscle') {
@@ -66,13 +84,12 @@ async function renderElementsList(templateId, list, elements, type) {
         list.append(listElement);
     }
 }
-
 async function setupCreateForm() {
     const createForm = document.getElementById("muscle-group-create-form");
     const errorBox = document.getElementById("muscle-group-create-error");
 
-    const titleField = editForm.elements.title;
-    const descriptionField = editForm.elements.description;
+    const titleField = createForm.elements.title;
+    const descriptionField = createForm.elements.description;
 
     createForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -82,24 +99,19 @@ async function setupCreateForm() {
         await handleSubmit(errorBox, async () => await createMuscle(title, description), "/admin")
     });
 }
-
-async function enableMuscleEditForm(muscleId) {
+// тут не работает нормально система. каждый раз при выборе элемента добавляется новый обработчик но старый не пропадает
+async function setupEditForm(muscleId) {
     const editForm = document.getElementById("muscle-group-edit-form");
     const errorBox = document.getElementById("muscle-group-edit-error");
     
-    editForm.querySelector('fieldset').disabled = false;
-    
     const titleField = editForm.elements.title;
     const descriptionField = editForm.elements.description;
-    const muscle = await getMuscleById(muscleId);
-    titleField.value = muscle.title;
-    descriptionField.value = muscle.value;
 
     editForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const title = titleField.value;
         const description = descriptionField.value;
         
-        await handleSubmit(errorBox, async () => await updateMuscle(muscleId, title, description), "/admin")
+        await handleSubmit(errorBox, async () => await updateMuscle(selectedId, title, description));
     });
 }

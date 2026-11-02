@@ -13,7 +13,7 @@ export async function archiveMuscle(id) {
 }
 
 export async function unarchiveMuscle(id) {
-    return await postData(`/api/muscle_groups/${id}/archive`);
+    return await postData(`/api/muscle_groups/${id}/unarchive`);
 }
 
 export async function createMuscle(title, description) {
@@ -21,7 +21,7 @@ export async function createMuscle(title, description) {
 }
 
 export async function updateMuscle(id, title, description) {
-    return await putData(`/api/muscle_groups/${id}/`, buildMuscleRequestBody(title, description));
+    return await putData(`/api/muscle_groups/${id}`, buildMuscleRequestBody(title, description));
 }
 
 function buildMuscleRequestBody(title, description) {

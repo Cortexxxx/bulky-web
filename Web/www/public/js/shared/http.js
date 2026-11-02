@@ -1,5 +1,5 @@
 import {defaultError, getErrorMessage} from "./error-messages.js";
-import {clearErrors, showErrors} from "./ui";
+import {clearErrors, showErrors} from "./ui.js";
 
 export async function postData(path, body = "") {
     const response = await fetch(path, {

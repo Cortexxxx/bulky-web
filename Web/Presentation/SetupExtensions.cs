@@ -68,13 +68,13 @@ public static class SetupExtensions
             adminEndpoints.GetAllMuscleGroupsEndpoint, kind, new AuthRequirements(AuthMode.Required));
         router.Map(HttpMethod.Get, "api/muscle_groups/{id}",
             adminEndpoints.GetMuscleGroupByIdEndpoint, kind, new AuthRequirements(AuthMode.Required));
-        router.Map(HttpMethod.Post, "api/admin/muscle_groups",
+        router.Map(HttpMethod.Post, "api/muscle_groups",
             adminEndpoints.CreateMuscleGroupEndpoint, kind, adminRequirements);
-        router.Map(HttpMethod.Put, "api/admin/muscle_groups/{id}", 
+        router.Map(HttpMethod.Put, "api/muscle_groups/{id}", 
             adminEndpoints.UpdateMuscleGroupEndpoint, kind, adminRequirements);
-        router.Map(HttpMethod.Post, "api/admin/muscle_groups/{id}/archive", 
+        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/archive", 
             adminEndpoints.ArchiveMuscleGroupEndpoint, kind, adminRequirements);
-        router.Map(HttpMethod.Post, "api/admin/muscle_groups/{id}/unarchive", 
-            adminEndpoints.ArchiveMuscleGroupEndpoint, kind, adminRequirements);
+        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/unarchive", 
+            adminEndpoints.UnarchiveMuscleGroupEndpoint, kind, adminRequirements);
     }
 }
