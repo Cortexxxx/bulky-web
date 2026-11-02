@@ -1,16 +1,24 @@
 import {defaultError, getErrorMessage} from "./error-messages.js";
+import {clearErrors, showErrors} from "./ui";
 
-export async function postData(path, body) {
+export async function postData(path, body = "") {
     const response = await fetch(path, {
         method: "POST",
         headers: {'Content-Type': 'application/json'},
         body: body
     });
 
-    let responseBody = await getResponseBody(response);
-    throwIfNotOk(response, responseBody);
-    
-    return responseBody;
+    return await handleResponse(response);
+}
+
+export async function putData(path, body = "") {
+    const response = await fetch(path, {
+        method: "PUT",
+        headers: {'Content-Type': 'application/json'},
+        body: body
+    });
+
+    return await handleResponse(response);
 }
 
 export async function getData(path) {
@@ -18,8 +26,15 @@ export async function getData(path) {
         method: "GET"
     });
 
+    return await handleResponse(response);
+}
+
+async function handleResponse(response) {
     let responseBody = await getResponseBody(response);
-    throwIfNotOk(response, responseBody);
+    
+    if (!response.ok) {
+        throw new HttpError(response.status, responseBody);
+    }
 
     return responseBody;
 }
@@ -29,12 +44,6 @@ async function getResponseBody(response) {
         return JSON.parse(await response.text())
     } catch (e) {
         return null;
-    }
-}
-
-function throwIfNotOk(response, responseBody) {
-    if (!response.ok) {
-        throw new HttpError(response.status, responseBody);
     }
 }
 
@@ -53,6 +62,21 @@ export function handleErrors(exception) {
     }
     
     return errors;
+}
+
+export async function handleSubmit(errorBox, callback, redirectPath = null){
+    try {
+        clearErrors(errorBox);
+        await callback();
+        if (redirectPath !== null) {
+            location.replace(redirectPath);
+
+        }
+    }
+    catch (ex) {
+        const errors = handleErrors(ex);
+        showErrors(errorBox, errors);
+    }
 }
 
 export class HttpError extends Error {

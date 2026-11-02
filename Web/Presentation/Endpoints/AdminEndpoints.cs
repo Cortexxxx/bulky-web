@@ -9,8 +9,6 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Web.Presentation.Endpoints;
 
-// TODO: Refactor, remove boilerplate code, add helpers
-
 public class AdminEndpoints(AdminService adminService, 
     MuscleGroupRequestValidator muscleGroupRequestValidator)
 {
@@ -22,71 +20,57 @@ public class AdminEndpoints(AdminService adminService,
 
     public async Task CreateMuscleGroupEndpoint(HttpContext context)
     {
-        var request = context.Request;
-        var muscleGroup = await request.ReadJsonAsync<MuscleGroupRequest>(context.CancellationToken);
-        var validationResult = await muscleGroupRequestValidator.ValidateAsync(muscleGroup, context.CancellationToken);
+        var muscleGroup = await ReadMuscleGroupAsync(context);
+        await ValidateMuscleGroupAsync(context, muscleGroup);
         
-        if (validationResult.IsValid)
+        var id = await adminService.CreateMuscleGroupAsync(new MuscleGroup
         {
-            var id = await adminService.CreateMuscleGroupAsync(new MuscleGroup
-            {
-                Title = muscleGroup.Title,
-                Description = muscleGroup.Description,
-                ImagePath = null
-            }, context.CancellationToken);
+            Title = muscleGroup.Title,
+            Description = muscleGroup.Description,
+            ImagePath = null
+        }, context.CancellationToken);
             
-            context.Response.StatusCode = HttpStatusCode.Created;
-            context.Response.WriteJson(id);
-        }
-        else
-        {
-            throw new ValidationException("Incorrect muscle group request", validationResult.Errors);
-        }
+        context.Response.StatusCode = HttpStatusCode.Created;
+        context.Response.WriteJson(id);
     }
 
     public async Task UpdateMuscleGroupEndpoint(HttpContext context)
     {
-        var request = context.Request;
-        var muscleGroup = await request.ReadJsonAsync<MuscleGroupRequest>(context.CancellationToken);
-        
-        var validationResult = await muscleGroupRequestValidator.ValidateAsync(muscleGroup, 
-            context.CancellationToken);
-        var isValidParam = Router.Router.TryGetGuidParameter(request.RouteParameters, 
-            "id", out var id);
-        
-        if (!isValidParam)
+        if (!Router.Router.TryGetGuidParameter(context.Request.RouteParameters,
+                "id", out var id))
         {
             ExceptionsHelpers.ThrowNotFound();
         }
         
-        if (validationResult.IsValid)
+        var muscleGroup = await ReadMuscleGroupAsync(context);
+        await ValidateMuscleGroupAsync(context, muscleGroup);
+        
+        var found = await adminService.UpdateMuscleGroupAsync(new MuscleGroup
         {
-            var found = await adminService.UpdateMuscleGroupAsync(new MuscleGroup
-            {
-                Id = id.GetValueOrDefault(),
-                Title = muscleGroup.Title,
-                Description = muscleGroup.Description,
-                ImagePath = null
-            }, context.CancellationToken);
+            Id = id.GetValueOrDefault(),
+            Title = muscleGroup.Title,
+            Description = muscleGroup.Description,
+            ImagePath = null
+        }, context.CancellationToken);
 
-            if (found)
-            {
-                context.Response.StatusCode = HttpStatusCode.OK;
-                context.Response.SetContentLength(0);
-            }
-            else
-            {
-                ExceptionsHelpers.ThrowNotFound();
-            }
-        }
-        else
-        {
-            throw new ValidationException("Incorrect muscle group request", validationResult.Errors);
-        }
+        if (!found) ExceptionsHelpers.ThrowNotFound();
+
+        context.Response.StatusCode = HttpStatusCode.OK;
+        context.Response.SetContentLength(0);
     }
 
     public async Task ArchiveMuscleGroupEndpoint(HttpContext context)
     {
+        await SetArchive(context, true);
+    }
+    
+    public async Task UnarchiveMuscleGroupEndpoint(HttpContext context)
+    {
+        await SetArchive(context, false);
+    }
+
+    private async Task SetArchive(HttpContext context, bool isArchived)
+    {
         var isValidParam = Router.Router.TryGetGuidParameter(context.Request.RouteParameters, 
             "id", out var id);
         
@@ -95,7 +79,7 @@ public class AdminEndpoints(AdminService adminService,
             ExceptionsHelpers.ThrowNotFound();
         }
         
-        var found = await adminService.SetArchivedMuscleGroupAsync(id.GetValueOrDefault(), true, context.CancellationToken);
+        var found = await adminService.SetArchivedMuscleGroupAsync(id.GetValueOrDefault(), isArchived, context.CancellationToken);
         
         if (found)
         {
@@ -107,27 +91,21 @@ public class AdminEndpoints(AdminService adminService,
             ExceptionsHelpers.ThrowNotFound();
         }
     }
-    
-    public async Task UnarchiveMuscleGroupEndpoint(HttpContext context)
+
+    private async Task ValidateMuscleGroupAsync(HttpContext context, MuscleGroupRequest muscleGroup)
     {
-        var isValidParam = Router.Router.TryGetGuidParameter(context.Request.RouteParameters, 
-            "id", out var id);
+        var validationResult = await muscleGroupRequestValidator.ValidateAsync(muscleGroup, 
+            context.CancellationToken);
         
-        if (!isValidParam)
+        if (!validationResult.IsValid)
         {
-            ExceptionsHelpers.ThrowNotFound();
+            throw new ValidationException("Incorrect muscle group request", validationResult.Errors);
         }
-        
-        var found = await adminService.SetArchivedMuscleGroupAsync(id.GetValueOrDefault(), false, context.CancellationToken);
-        
-        if (found)
-        {
-            context.Response.StatusCode = HttpStatusCode.OK;
-            context.Response.SetContentLength(0);
-        }
-        else
-        {
-            ExceptionsHelpers.ThrowNotFound();
-        }
+    }
+    
+    private static async Task<MuscleGroupRequest> ReadMuscleGroupAsync(HttpContext context)
+    {
+        var muscleGroup = await context.Request.ReadJsonAsync<MuscleGroupRequest>(context.CancellationToken);
+        return muscleGroup;
     }
 }

@@ -1,7 +1,7 @@
-import {handleErrors, HttpError} from "../shared/http.js";
-import {login, me, register} from "../api/auth-api.js";
+import {handleSubmit} from "../shared/http.js";
+import {login, register} from "../api/auth-api.js";
 import {getErrorMessage} from "../shared/error-messages.js";
-import {showErrors, clearErrors} from "../shared/ui.js";
+import {showErrors} from "../shared/ui.js";
 
 async function setupRegisterForm() {
     const registerForm = document.getElementById("register-form");
@@ -26,7 +26,7 @@ async function setupRegisterForm() {
             }
 
             await register(email, password);
-        });
+        }, "/dashboard/workout");
     });
 }
 
@@ -43,20 +43,8 @@ async function setupLoginForm() {
         const email = emailField.value;
         const password = passwordField.value;
         
-        await handleSubmit(loginErrors,async () => await login(email, password));
+        await handleSubmit(loginErrors,async () => await login(email, password), "/dashboard/workout");
     });
-}
-
-async function handleSubmit(errorBox, callback){
-    try {
-        clearErrors(errorBox);
-        await callback();
-        location.replace("/dashboard/workout");
-    }
-    catch (ex) {
-        const errors = handleErrors(ex);
-        showErrors(errorBox, errors);
-    }
 }
 
 await setupRegisterForm();
