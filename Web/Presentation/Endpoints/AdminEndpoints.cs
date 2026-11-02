@@ -18,6 +18,18 @@ public class AdminEndpoints(AdminService adminService,
         context.Response.WriteJson(muscleGroups);
     }
 
+    public async Task GetMuscleGroupByIdEndpoint(HttpContext context)
+    {
+        var id = GetIdOrThrowNotFound(context);
+
+        var muscleGroup = await adminService.GetMuscleGroupByIdAsync(id,
+            context.CancellationToken);
+
+        if (muscleGroup is null) ExceptionsHelpers.ThrowNotFound();
+
+        context.Response.WriteJson(muscleGroup);
+    }
+
     public async Task CreateMuscleGroupEndpoint(HttpContext context)
     {
         var muscleGroup = await ReadMuscleGroupAsync(context);
@@ -36,18 +48,14 @@ public class AdminEndpoints(AdminService adminService,
 
     public async Task UpdateMuscleGroupEndpoint(HttpContext context)
     {
-        if (!Router.Router.TryGetGuidParameter(context.Request.RouteParameters,
-                "id", out var id))
-        {
-            ExceptionsHelpers.ThrowNotFound();
-        }
-        
+        var id = GetIdOrThrowNotFound(context);
+
         var muscleGroup = await ReadMuscleGroupAsync(context);
         await ValidateMuscleGroupAsync(context, muscleGroup);
-        
+
         var found = await adminService.UpdateMuscleGroupAsync(new MuscleGroup
         {
-            Id = id.GetValueOrDefault(),
+            Id = id,
             Title = muscleGroup.Title,
             Description = muscleGroup.Description,
             ImagePath = null
@@ -71,15 +79,9 @@ public class AdminEndpoints(AdminService adminService,
 
     private async Task SetArchive(HttpContext context, bool isArchived)
     {
-        var isValidParam = Router.Router.TryGetGuidParameter(context.Request.RouteParameters, 
-            "id", out var id);
-        
-        if (!isValidParam)
-        {
-            ExceptionsHelpers.ThrowNotFound();
-        }
-        
-        var found = await adminService.SetArchivedMuscleGroupAsync(id.GetValueOrDefault(), isArchived, context.CancellationToken);
+        var id = GetIdOrThrowNotFound(context);
+
+        var found = await adminService.SetArchivedMuscleGroupAsync(id, isArchived, context.CancellationToken);
         
         if (found)
         {
@@ -90,6 +92,17 @@ public class AdminEndpoints(AdminService adminService,
         {
             ExceptionsHelpers.ThrowNotFound();
         }
+    }
+
+    private static Guid GetIdOrThrowNotFound(HttpContext context)
+    {
+        if (!Router.Router.TryGetGuidParameter(context.Request.RouteParameters,
+                "id", out var id))
+        {
+            ExceptionsHelpers.ThrowNotFound();
+        }
+
+        return id.GetValueOrDefault();
     }
 
     private async Task ValidateMuscleGroupAsync(HttpContext context, MuscleGroupRequest muscleGroup)

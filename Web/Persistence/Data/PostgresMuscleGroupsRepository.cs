@@ -33,6 +33,31 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
         return muscleGroups;
     }
 
+    public async Task<MuscleGroup?> GetByIdAsync(Guid id, CancellationToken ct)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand(
+            "SELECT * FROM public.muscle_groups WHERE id = @id", connection);
+
+        command.Parameters.AddWithValue("id", id);
+
+        await using var reader = await command.ExecuteReaderAsync(ct);
+
+        if (!await reader.ReadAsync(ct)) return null;
+
+        var imagePathOrdinal = reader.GetOrdinal("image_path");
+
+        return new MuscleGroup
+        {
+            Id = reader.GetGuid(reader.GetOrdinal("id")),
+            Title = reader.GetString(reader.GetOrdinal("title")),
+            Description = reader.GetString(reader.GetOrdinal("description")),
+            ImagePath = !reader.IsDBNull(imagePathOrdinal)
+                ? reader.GetString(imagePathOrdinal) : null,
+            IsArchived = reader.GetBoolean(reader.GetOrdinal("is_archived"))
+        };
+    }
+
     public async Task<Guid> CreateAsync(MuscleGroup muscleGroup, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);

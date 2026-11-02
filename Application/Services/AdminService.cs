@@ -10,6 +10,11 @@ public class AdminService(IMuscleGroupsRepository muscleGroupsRepository)
         return await muscleGroupsRepository.GetAllAsync(ct);
     }
 
+    public async Task<MuscleGroup?> GetMuscleGroupByIdAsync(Guid id, CancellationToken ct)
+    {
+        return await muscleGroupsRepository.GetByIdAsync(id, ct);
+    }
+
     public async Task<Guid> CreateMuscleGroupAsync(MuscleGroup muscleGroup, CancellationToken ct)
     {
         return await muscleGroupsRepository.CreateAsync(muscleGroup, ct);
