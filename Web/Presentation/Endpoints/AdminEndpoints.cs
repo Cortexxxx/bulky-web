@@ -15,7 +15,7 @@ public class AdminEndpoints(AdminService adminService,
     public async Task GetAllMuscleGroupsEndpoint(HttpContext context)
     {
         var muscleGroups = await adminService.GetAllMuscleGroupsAsync(context.CancellationToken);
-        context.Response.WriteJson(muscleGroups);
+        context.Response.WriteJson(muscleGroups.Select(mg => mg.ToResponse()));
     }
 
     public async Task GetMuscleGroupByIdEndpoint(HttpContext context)
@@ -27,7 +27,7 @@ public class AdminEndpoints(AdminService adminService,
 
         if (muscleGroup is null) ExceptionsHelpers.ThrowNotFound();
 
-        context.Response.WriteJson(muscleGroup);
+        context.Response.WriteJson(muscleGroup.Value.ToResponse());
     }
 
     public async Task CreateMuscleGroupEndpoint(HttpContext context)

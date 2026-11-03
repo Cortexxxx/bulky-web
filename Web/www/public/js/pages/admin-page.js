@@ -99,6 +99,7 @@ async function setupCreateForm() {
         await handleSubmit(errorBox, async () => await createMuscle(title, description), "/admin")
     });
 }
+
 // тут не работает нормально система. каждый раз при выборе элемента добавляется новый обработчик но старый не пропадает
 async function setupEditForm(muscleId) {
     const editForm = document.getElementById("muscle-group-edit-form");

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Domain.Models.Auth;
 using Web.Presentation.Router;
 
@@ -6,7 +7,10 @@ namespace Web.Presentation.Http;
 
 public static class WebHelpers
 {
-    private static readonly JsonSerializerOptions? JsonSerializerOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web)
+    {
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+    };
     
     public static string[] GetPathParts(string path) => path
             .Replace('\\', '/')
@@ -14,7 +18,7 @@ public static class WebHelpers
             .Where(p => !string.IsNullOrWhiteSpace(p))
             .ToArray();
 
-    public static JsonSerializerOptions? GetJsonSerializerOptions() => JsonSerializerOptions;
+    public static JsonSerializerOptions? GetJsonSerializerOptions() => Options;
     
     public static Role GetRoleByString(string stringRole)
     {
@@ -37,7 +41,4 @@ public static class WebHelpers
 
         return request.Route.RouteKind;
     }
-    
-    
-    
 }
