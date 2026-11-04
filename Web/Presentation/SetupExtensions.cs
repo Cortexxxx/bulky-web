@@ -9,6 +9,10 @@ namespace Web.Presentation;
 
 public static class SetupExtensions
 {
+    private static readonly AuthRequirements GuestsOnly = new(AuthMode.GuestsOnly);
+    private static readonly AuthRequirements AuthorizedOnly = new(AuthMode.Required);
+    private static readonly AuthRequirements AdminOnly = new(AuthMode.Required, Role.Admin);
+
     public static void Setup(this Middleware.Middleware middleware, Router.Router router, AuthService authService)
     {
         middleware.UseErrorMiddleware();
@@ -24,57 +28,73 @@ public static class SetupExtensions
     public static void MapPages(this Router.Router router)
     {
         var pagesEndpoints = new PagesEndpoints();
-        var guestsOnly = new AuthRequirements(AuthMode.GuestsOnly);
-        var authorizedOnly = new AuthRequirements(AuthMode.Required);
-        var adminOnly = authorizedOnly with {RequiredRole = Role.Admin};
-        
+
         router.Map(HttpMethod.Get, "", context =>
-            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, guestsOnly);
-        router.Map(HttpMethod.Get, "home", context => 
-            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, guestsOnly);
-        router.Map(HttpMethod.Get, "login", context => 
-            pagesEndpoints.GetPage(context, "login.html"), RouteKind.Page, guestsOnly);
-        
-        router.Map(HttpMethod.Get, "dashboard/account", context => 
-            pagesEndpoints.GetPage(context, "dashboard/account.html"), RouteKind.Page, authorizedOnly);
-        router.Map(HttpMethod.Get, "dashboard/workout", context => 
-            pagesEndpoints.GetPage(context, "dashboard/workout.html"), RouteKind.Page, authorizedOnly);
-        router.Map(HttpMethod.Get, "dashboard/history", context => 
-            pagesEndpoints.GetPage(context, "dashboard/history.html"), RouteKind.Page, authorizedOnly);
-        router.Map(HttpMethod.Get, "dashboard/analytics", context => 
-            pagesEndpoints.GetPage(context, "dashboard/analytics.html"), RouteKind.Page, authorizedOnly);
-        
-        router.Map(HttpMethod.Get, "admin", context => 
-            pagesEndpoints.GetPage(context, "admin/admin.html"), RouteKind.Page, adminOnly);
+            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, GuestsOnly);
+        router.Map(HttpMethod.Get, "home", context =>
+            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, GuestsOnly);
+        router.Map(HttpMethod.Get, "login", context =>
+            pagesEndpoints.GetPage(context, "login.html"), RouteKind.Page, GuestsOnly);
+
+        router.Map(HttpMethod.Get, "dashboard/account", context =>
+            pagesEndpoints.GetPage(context, "dashboard/account.html"), RouteKind.Page, AuthorizedOnly);
+        router.Map(HttpMethod.Get, "dashboard/workout", context =>
+            pagesEndpoints.GetPage(context, "dashboard/workout.html"), RouteKind.Page, AuthorizedOnly);
+        router.Map(HttpMethod.Get, "dashboard/history", context =>
+            pagesEndpoints.GetPage(context, "dashboard/history.html"), RouteKind.Page, AuthorizedOnly);
+        router.Map(HttpMethod.Get, "dashboard/analytics", context =>
+            pagesEndpoints.GetPage(context, "dashboard/analytics.html"), RouteKind.Page, AuthorizedOnly);
+
+        router.Map(HttpMethod.Get, "admin", context =>
+            pagesEndpoints.GetPage(context, "admin/admin.html"), RouteKind.Page, AdminOnly);
     }
 
     public static void MapAuthApi(this Router.Router router, AuthService authService,
         RegisterRequestValidator registerRequestValidator)
     {
         var authEndpoints = new AuthEndpoints(registerRequestValidator, authService);
-        router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterEndpointAsync, RouteKind.Api);
-        router.Map(HttpMethod.Post, "api/auth/login", authEndpoints.LoginEndpointAsync, RouteKind.Api);
-        router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeEndpointAsync, RouteKind.Api, new AuthRequirements(AuthMode.Required));
+        router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterUserAsync, RouteKind.Api);
+        router.Map(HttpMethod.Post, "api/auth/login", authEndpoints.LoginUserAsync, RouteKind.Api);
+        router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeAsync, RouteKind.Api, AuthorizedOnly);
     }
 
-    public static void MapMuscleGroupsApi(this Router.Router router, AdminService adminService,
+    public static void MapMuscleGroupsApi(this Router.Router router, MusclesService musclesService,
         MuscleGroupRequestValidator muscleGroupRequestValidator)
     {
-        var adminEndpoints = new AdminEndpoints(adminService, muscleGroupRequestValidator);
+        var musclesEndpoints = new MusclesEndpoints(musclesService, muscleGroupRequestValidator);
         const RouteKind kind = RouteKind.Api;
-        var adminRequirements = new AuthRequirements(AuthMode.Required, Role.Admin);
-        
-        router.Map(HttpMethod.Get, "api/muscle_groups", 
-            adminEndpoints.GetAllMuscleGroupsEndpoint, kind, new AuthRequirements(AuthMode.Required));
+
+        router.Map(HttpMethod.Get, "api/muscle_groups",
+            musclesEndpoints.GetAllMuscleGroupsAsync, kind, AuthorizedOnly);
         router.Map(HttpMethod.Get, "api/muscle_groups/{id}",
-            adminEndpoints.GetMuscleGroupByIdEndpoint, kind, new AuthRequirements(AuthMode.Required));
+            musclesEndpoints.GetMuscleGroupByIdAsync, kind, AuthorizedOnly);
         router.Map(HttpMethod.Post, "api/muscle_groups",
-            adminEndpoints.CreateMuscleGroupEndpoint, kind, adminRequirements);
-        router.Map(HttpMethod.Put, "api/muscle_groups/{id}", 
-            adminEndpoints.UpdateMuscleGroupEndpoint, kind, adminRequirements);
-        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/archive", 
-            adminEndpoints.ArchiveMuscleGroupEndpoint, kind, adminRequirements);
-        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/unarchive", 
-            adminEndpoints.UnarchiveMuscleGroupEndpoint, kind, adminRequirements);
+            musclesEndpoints.CreateMuscleGroupAsync, kind, AdminOnly);
+        router.Map(HttpMethod.Put, "api/muscle_groups/{id}",
+            musclesEndpoints.UpdateMuscleGroupAsync, kind, AdminOnly);
+        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/archive",
+            musclesEndpoints.ArchiveMuscleGroupAsync, kind, AdminOnly);
+        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/unarchive",
+            musclesEndpoints.UnarchiveMuscleGroupAsync, kind, AdminOnly);
+    }
+    
+    public static void MapExercisesApi(this Router.Router router, ExercisesService exercisesService,
+        ExerciseRequestValidator exerciseRequestValidator)
+    {
+        const RouteKind api = RouteKind.Api;
+        var exercisesEndpoints = new ExercisesEndpoints(exercisesService, exerciseRequestValidator);
+
+        router.Map(HttpMethod.Get, "api/exercises",
+            exercisesEndpoints.GetAllExercisesAsync, api, AuthorizedOnly);
+        router.Map(HttpMethod.Get, "api/exercises/{id}",
+            exercisesEndpoints.GetExerciseByIdAsync, api, AuthorizedOnly);
+        router.Map(HttpMethod.Post, "api/exercises",
+            exercisesEndpoints.CreateExerciseAsync, api, AdminOnly);
+        router.Map(HttpMethod.Put, "api/exercises/{id}",
+            exercisesEndpoints.UpdateExerciseAsync, api, AdminOnly);
+        router.Map(HttpMethod.Post, "api/exercises/{id}/archive",
+            exercisesEndpoints.ArchiveExerciseAsync, api, AdminOnly);
+        router.Map(HttpMethod.Post, "api/exercises/{id}/unarchive",
+            exercisesEndpoints.UnarchiveExerciseAsync, api, AdminOnly);
     }
 }

@@ -1,5 +1,5 @@
 using Domain.Models.Auth;
 
-namespace Web.Presentation.DTOs;
+namespace Web.Presentation.DTOs.Auth;
 
 public record UserResponse(Guid Id, string Email, Role Role, DateTime CreatedAt);

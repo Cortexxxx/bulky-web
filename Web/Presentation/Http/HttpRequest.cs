@@ -52,6 +52,11 @@ public class HttpRequest
         }
     }
 
+    public Cookie? GetCookie(string name)
+    {
+        return _request.Cookies[name];
+    }
+
     private async Task<byte[]> ReadBodyAsync(CancellationToken ct)
     {
         if (_bodyBytes != null) return _bodyBytes;
@@ -81,8 +86,4 @@ public class HttpRequest
         return _bodyBytes;
     }
 
-    public Cookie? GetCookie(string name)
-    {
-        return _request.Cookies[name];
-    }
 }

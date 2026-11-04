@@ -16,6 +16,7 @@ public static class ErrorMiddleware
         {"forbidden", "www/pages/error-pages/forbidden.html"},
     };
     private const string DefaultExceptionText = "Something went wrong";
+    
     public static void UseErrorMiddleware(this Middleware middleware)
         {
             middleware.AddElement(async (context, next) =>
@@ -69,5 +70,5 @@ public static class ErrorMiddleware
                     Console.WriteLine($"Error is handled:\n {e}");
                 }
             });
-        }
-    }
+        } 
+}

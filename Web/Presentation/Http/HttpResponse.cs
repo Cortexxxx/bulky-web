@@ -12,6 +12,7 @@ public class HttpResponse
     {
         _httpListenerResponse = httpListenerResponse;
         Headers = [];
+        SetContentLength(0);
     }
 
     public Dictionary<string, string> Headers { get; private init; }

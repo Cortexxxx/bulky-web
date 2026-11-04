@@ -1,6 +1,6 @@
-using System.Data;
 using System.Data.Common;
 using Application.Abstractions;
+using Application.Exceptions;
 using Domain.Models.Workouts;
 using Npgsql;
 using NpgsqlTypes;
@@ -28,7 +28,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         while (await reader.ReadAsync(ct))
         {
             var exerciseId = reader.GetGuid(columns.Id);
-            var group = await ReadMuscleGroupAsync(reader, columns, exerciseId, ct);
+            var group = ReadMuscleGroupAsync(reader, columns, exerciseId);
 
             if (exercises.TryGetValue(exerciseId, out var exercise))
             {
@@ -39,17 +39,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
             }
             else
             {
-                exercises[exerciseId] = new Exercise
-                {
-                    Id = exerciseId,
-                    Title = reader.GetString(columns.Title),
-                    Description = reader.GetString(columns.Description),
-                    ImagePath = await reader.IsDBNullAsync(columns.ImagePath, ct)
-                        ? null : reader.GetString(columns.ImagePath),
-                    IsArchived = reader.GetBoolean(columns.IsArchived),
-                    MuscleGroups = group == null ? [] : [group.Value]
-                };
-
+                exercises[exerciseId] = CreateExercise(reader, columns, group, exerciseId);
             }
         }
 
@@ -75,21 +65,13 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         if (!isRead) return null;
         
         var columns = Columns.From(reader);
-        var group = await ReadMuscleGroupAsync(reader, columns, id, ct);
+        var group = ReadMuscleGroupAsync(reader, columns, id);
 
-        var exercise = new Exercise
-        {
-            Id = id,
-            Title = reader.GetString(columns.Title),
-            Description = reader.GetString(columns.Description),
-            ImagePath = reader.GetString(columns.ImagePath),
-            IsArchived = reader.GetBoolean(columns.IsArchived),
-            MuscleGroups = group == null ? [] : [group.Value]
-        };
+        var exercise = CreateExercise(reader, columns, group, id);
 
         while (await reader.ReadAsync(ct))
         {
-            group = await ReadMuscleGroupAsync(reader, columns, id, ct);
+            group = ReadMuscleGroupAsync(reader, columns, id);
             
             if (group == null)
             {
@@ -102,7 +84,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         return exercise;
     }
 
-    public async Task<Guid> CreateAsync(Exercise exercise, CancellationToken ct)
+    public async Task CreateAsync(Exercise exercise, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var transaction = await connection.BeginTransactionAsync(ct);
@@ -112,78 +94,145 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
             VALUES (@id, @title, @description, @image_path)
             """, connection, transaction);
 
-        var id = exercise.Id;
-        createExerciseCommand.Parameters.AddWithValue("id", id);
-        createExerciseCommand.Parameters.AddWithValue("title", exercise.Title);
-        createExerciseCommand.Parameters.AddWithValue("description", exercise.Description);
-        createExerciseCommand.Parameters.Add(new NpgsqlParameter("image_path", NpgsqlDbType.Varchar)
+        AddExerciseParameters(exercise, createExerciseCommand);
+
+        try
         {
-            Value = (object?)exercise.ImagePath ?? DBNull.Value
-        });
-        
-        await createExerciseCommand.ExecuteNonQueryAsync(ct);
-
-        await using var createExerciseMuscles = new NpgsqlCommand(
-            """
-            INSERT INTO public.exercise_muscle_groups(exercise_id, muscle_group_id, role)
-            SELECT @exercise_id, m.muscle_id, m.role
-            FROM unnest(@muscle_ids, @roles) as m(muscle_id, role)
-            """, connection, transaction);
-
-        var muscleIds = exercise.MuscleGroups.Select(mg => mg.MuscleGroupId).ToArray();
-        var roles = exercise.MuscleGroups.Select(mg => mg.Role.ToString().ToLowerInvariant()).ToArray();
-        
-        createExerciseMuscles.Parameters.AddWithValue("exercise_id", id);
-        createExerciseMuscles.Parameters.Add(new NpgsqlParameter
+            await createExerciseCommand.ExecuteNonQueryAsync(ct);
+        }
+        catch (PostgresException e) when(e.SqlState == PostgresErrorCodes.UniqueViolation)
         {
-            ParameterName = "muscle_ids",
-            NpgsqlDbType = NpgsqlDbType.Array | NpgsqlDbType.Uuid,
-            Value = muscleIds
-        });
-        
-        createExerciseMuscles.Parameters.Add(new NpgsqlParameter
-        {
-            ParameterName = "roles",
-            NpgsqlDbType = NpgsqlDbType.Array | NpgsqlDbType.Varchar,
-            Value = roles
-        });
-
-        await createExerciseMuscles.ExecuteNonQueryAsync(ct);
-        await transaction.CommitAsync(ct);
-        
-        return id;
-    }
-
-    public Task<bool> UpdateAsync(Exercise muscleGroup, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> SetArchivedAsync(Guid id, bool isArchived, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
-    private static async Task<ExerciseMuscleGroup?> ReadMuscleGroupAsync(
-        DbDataReader reader, Columns columns, Guid exerciseId, CancellationToken ct)
-    {
-        if (await reader.IsDBNullAsync(columns.MuscleGroupId, ct))
-        {
-            return null;
+            throw new ExerciseExistsException("Exercise is already exists!", e);
         }
 
-        return new ExerciseMuscleGroup
+        await CreateExerciseMuscles(connection, transaction, exercise, ct);
+        await transaction.CommitAsync(ct);
+        
+    }
+
+    public async Task<bool> UpdateAsync(Exercise exercise, CancellationToken ct)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+        await using var updateExerciseCommand = new NpgsqlCommand(
+            """
+            UPDATE public.exercises
+            SET (title, description, image_path) = (@title, @description, @image_path)
+            WHERE id = @id
+            """, connection, transaction);
+
+        var id = exercise.Id;
+        AddExerciseParameters(exercise, updateExerciseCommand);
+
+        var found = await updateExerciseCommand.ExecuteNonQueryAsync(ct) != 0;
+
+        await using var deleteAllExerciseMuscles = new NpgsqlCommand(
+            "DELETE FROM public.exercise_muscle_groups WHERE exercise_id = @id", connection, transaction);
+
+        deleteAllExerciseMuscles.Parameters.AddWithValue("id", id);
+        await deleteAllExerciseMuscles.ExecuteNonQueryAsync(ct);
+
+        await CreateExerciseMuscles(connection, transaction, exercise, ct);
+        
+        await transaction.CommitAsync(ct);
+
+        return found;
+    }
+
+    public async Task<bool> SetArchivedAsync(Guid id, bool isArchived, CancellationToken ct)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand(
+            """
+            UPDATE public.exercises
+            SET is_archived = @is_archived 
+            WHERE id = @id
+            """, connection);
+
+        command.Parameters.AddWithValue("is_archived", isArchived);
+        command.Parameters.AddWithValue("id", id);
+        
+        return await command.ExecuteNonQueryAsync(ct) != 0;
+    }
+
+    private static ExerciseMuscleGroup? ReadMuscleGroupAsync(
+        DbDataReader reader, Columns columns, Guid exerciseId)
+    {
+        return reader.IsDBNull(columns.MuscleGroupId) ? null : new ExerciseMuscleGroup
         {
             ExerciseId = exerciseId,
             MuscleGroupId = reader.GetGuid(columns.MuscleGroupId),
             Role = Enum.Parse<MuscleGroupRole>(reader.GetString(columns.Role), ignoreCase: true)
         };
     }
+    
+    private static async Task CreateExerciseMuscles(NpgsqlConnection connection, NpgsqlTransaction transaction,
+        Exercise exercise, CancellationToken ct)
+    {
+        await using var createExerciseMuscles = new NpgsqlCommand(
+            """
+            INSERT INTO public.exercise_muscle_groups(exercise_id, muscle_group_id, role)
+            SELECT @exercise_id, m.muscle_id, m.role
+            FROM unnest(@muscle_ids, @roles) as m(muscle_id, role)
+            """, connection, transaction);
+        
+        var muscleIds = exercise.MuscleGroups.Select(mg => mg.MuscleGroupId).ToArray();
+        var roles = exercise.MuscleGroups.Select(mg => mg.Role.ToString().ToLowerInvariant()).ToArray();
+        
+        createExerciseMuscles.Parameters.AddWithValue("exercise_id", exercise.Id);
+        createExerciseMuscles.Parameters.Add(new NpgsqlParameter("muscle_ids", 
+            NpgsqlDbType.Array | NpgsqlDbType.Uuid)
+        {
+            Value = muscleIds
+        });
+        
+        createExerciseMuscles.Parameters.Add(new NpgsqlParameter("roles", 
+            NpgsqlDbType.Array | NpgsqlDbType.Varchar)
+        {
+            Value = roles
+        });
+        
+        try
+        {
+            await createExerciseMuscles.ExecuteNonQueryAsync(ct);
+        }
+        catch (PostgresException e) when(e.SqlState == PostgresErrorCodes.ForeignKeyViolation)
+        {
+            throw new UnknownMuscleGroupException("Unknown muscle group!", e);
+        }
 
+    }
+    
+    private static Exercise CreateExercise(NpgsqlDataReader reader, 
+        Columns columns, ExerciseMuscleGroup? group, Guid exerciseId)
+    {
+        return new Exercise
+        {
+            Id = exerciseId,
+            Title = reader.GetString(columns.Title),
+            Description = reader.GetString(columns.Description),
+            ImagePath = reader.IsDBNull(columns.ImagePath)
+                ? null : reader.GetString(columns.ImagePath),
+            IsArchived = reader.GetBoolean(columns.IsArchived),
+            MuscleGroups = group == null ? [] : [group.Value]
+        };
+    }
+    
+    private static void AddExerciseParameters(Exercise exercise, NpgsqlCommand command)
+    {
+        command.Parameters.AddWithValue("id", exercise.Id);
+        command.Parameters.AddWithValue("title", exercise.Title);
+        command.Parameters.AddWithValue("description", exercise.Description);
+        command.Parameters.Add(new NpgsqlParameter("image_path", NpgsqlDbType.Varchar)
+        {
+            Value = (object?)exercise.ImagePath ?? DBNull.Value
+        });
+    }
+    
     private readonly record struct Columns(
         int Id, int Title, int Description, int ImagePath, int IsArchived, int MuscleGroupId, int Role)
     {
-        public static Columns From(DbDataReader reader) => new(
+        public static Columns From(NpgsqlDataReader reader) => new(
             reader.GetOrdinal("id"),
             reader.GetOrdinal("title"),
             reader.GetOrdinal("description"),

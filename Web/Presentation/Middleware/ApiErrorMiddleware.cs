@@ -32,7 +32,17 @@ public static class ApiErrorMiddleware
             catch (MuscleGroupExistsException)
             {
                 context.Response.StatusCode = HttpStatusCode.Conflict;
-                context.Response.WriteJson(new { email = (string[]) ["muscle_exists"] });
+                context.Response.WriteJson(new { muscle_group = (string[]) ["muscle_group_exists"] });
+            }
+            catch (ExerciseExistsException)
+            {
+                context.Response.StatusCode = HttpStatusCode.Conflict;
+                context.Response.WriteJson(new { exercise = (string[]) ["exercise_exists"] });
+            }
+            catch (UnknownMuscleGroupException)
+            {
+                context.Response.StatusCode = HttpStatusCode.BadRequest;
+                context.Response.WriteJson(new { error = (string[]) ["unknown_muscle_group"] });
             }
             catch (ValidationException e)
             {

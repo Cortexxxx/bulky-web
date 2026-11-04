@@ -1,3 +1,3 @@
 namespace Domain.Models.Workouts;
 
-public record ExerciseMuscle(Guid MuscleId, MuscleGroupRole MuscleRole);
+public record ExerciseMuscle(Guid MuscleGroupId, MuscleGroupRole MuscleGroupRole);

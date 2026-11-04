@@ -1,3 +1,4 @@
+using System.Data.Common;
 using Application.Abstractions;
 using Application.Exceptions;
 using Domain.Models.Workouts;
@@ -15,19 +16,11 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
 
         var muscleGroups = new List<MuscleGroup>();
         await using var reader = await command.ExecuteReaderAsync(ct);
-        var imagePathOrdinal = reader.GetOrdinal("image_path");
-        
+        var columns = Columns.From(reader);
+
         while (await reader.ReadAsync(ct))
         {
-            muscleGroups.Add(new MuscleGroup
-            {
-                Id = reader.GetGuid(reader.GetOrdinal("id")),
-                Title = reader.GetString(reader.GetOrdinal("title")),
-                Description = reader.GetString(reader.GetOrdinal("description")),
-                ImagePath = !reader.IsDBNull(imagePathOrdinal) 
-                    ? reader.GetString(imagePathOrdinal) : null,
-                IsArchived = reader.GetBoolean(reader.GetOrdinal("is_archived"))
-            });
+            muscleGroups.Add(CreateMuscleGroup(reader, columns));
         }
 
         return muscleGroups;
@@ -45,17 +38,7 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
 
         if (!await reader.ReadAsync(ct)) return null;
 
-        var imagePathOrdinal = reader.GetOrdinal("image_path");
-
-        return new MuscleGroup
-        {
-            Id = reader.GetGuid(reader.GetOrdinal("id")),
-            Title = reader.GetString(reader.GetOrdinal("title")),
-            Description = reader.GetString(reader.GetOrdinal("description")),
-            ImagePath = !reader.IsDBNull(imagePathOrdinal)
-                ? reader.GetString(imagePathOrdinal) : null,
-            IsArchived = reader.GetBoolean(reader.GetOrdinal("is_archived"))
-        };
+        return CreateMuscleGroup(reader, Columns.From(reader));
     }
 
     public async Task<Guid> CreateAsync(MuscleGroup muscleGroup, CancellationToken ct)
@@ -65,13 +48,7 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
             "INSERT INTO public.muscle_groups (title, description, image_path) " +
             "VALUES (@title, @description, @image_path) RETURNING id", connection);
         
-        command.Parameters.AddWithValue("title", muscleGroup.Title);
-        command.Parameters.AddWithValue("description", muscleGroup.Description);
-        
-        command.Parameters.Add(new NpgsqlParameter("image_path", NpgsqlDbType.Varchar)
-        {
-            Value = (object?)muscleGroup.ImagePath ?? DBNull.Value
-        });
+        AddDetailsParameters(muscleGroup, command);
 
         object? guidObj;
         
@@ -79,7 +56,7 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
         {
             guidObj = await command.ExecuteScalarAsync(ct);
         }
-        catch (PostgresException e) when(e.ErrorCode == 23505)
+        catch (PostgresException e) when(e.SqlState == PostgresErrorCodes.UniqueViolation)
         {
             throw new MuscleGroupExistsException("Muscle group is already exists", e);
         }
@@ -96,13 +73,7 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
             "WHERE id = @id", connection);
         
         command.Parameters.AddWithValue("id", muscleGroup.Id);
-        command.Parameters.AddWithValue("title", muscleGroup.Title);
-        command.Parameters.AddWithValue("description", muscleGroup.Description);
-        
-        command.Parameters.Add(new NpgsqlParameter("image_path", NpgsqlDbType.Varchar)
-        {
-            Value = (object?)muscleGroup.ImagePath ?? DBNull.Value
-        });
+        AddDetailsParameters(muscleGroup, command);
 
         return await command.ExecuteNonQueryAsync(ct) != 0;
     }
@@ -118,5 +89,39 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
         command.Parameters.AddWithValue("is_archived", isArchived);
 
         return await command.ExecuteNonQueryAsync(ct) != 0;
+    }
+    
+    private static MuscleGroup CreateMuscleGroup(DbDataReader reader, Columns columns)
+    {
+        return new MuscleGroup
+        {
+            Id = reader.GetGuid(columns.Id),
+            Title = reader.GetString(columns.Title),
+            Description = reader.GetString(columns.Description),
+            ImagePath = !reader.IsDBNull(columns.ImagePath)
+                ? reader.GetString(columns.ImagePath) : null,
+            IsArchived = reader.GetBoolean(columns.IsArchived)
+        };
+    }
+    
+    private static void AddDetailsParameters(MuscleGroup muscleGroup, NpgsqlCommand command)
+    {
+        command.Parameters.AddWithValue("title", muscleGroup.Title);
+        command.Parameters.AddWithValue("description", muscleGroup.Description);
+        
+        command.Parameters.Add(new NpgsqlParameter("image_path", NpgsqlDbType.Varchar)
+        {
+            Value = (object?)muscleGroup.ImagePath ?? DBNull.Value
+        });
+    }
+
+    private readonly record struct Columns(int Id, int Title, int Description, int ImagePath, int IsArchived)
+    {
+        public static Columns From(DbDataReader reader) => new(
+            reader.GetOrdinal("id"),
+            reader.GetOrdinal("title"),
+            reader.GetOrdinal("description"),
+            reader.GetOrdinal("image_path"),
+            reader.GetOrdinal("is_archived"));
     }
 }

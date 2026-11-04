@@ -1,5 +1,6 @@
 using FluentValidation;
 using Web.Presentation.DTOs;
+using Web.Presentation.DTOs.Auth;
 
 namespace Web.Presentation.Validators;
 

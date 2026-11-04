@@ -18,18 +18,23 @@ Console.WriteLine(prefix);
 httpListener.Prefixes.Add(prefix);
 httpListener.Start();
 
+
+// Dependencies
+
 var appCts = new CancellationTokenSource();
 var dataSource = db.Build();
 var authService = new AuthService(new PostgresUserRepository(dataSource), 
     new PostgresSessionRepository(dataSource), new PasswordHasher());
-var adminService = new AdminService(new PostgresMuscleGroupsRepository(dataSource));
+var musclesService = new MusclesService(new PostgresMuscleGroupsRepository(dataSource));
+var exercisesService = new ExercisesService(new PostgresExercisesRepository(dataSource));
 
 // Routing
 
 var router = new Router();
 router.MapPages();
 router.MapAuthApi(authService, new RegisterRequestValidator());
-router.MapMuscleGroupsApi(adminService, new MuscleGroupRequestValidator());
+router.MapMuscleGroupsApi(musclesService, new MuscleGroupRequestValidator());
+router.MapExercisesApi(exercisesService, new ExerciseRequestValidator());
 router.Initialize();
 
 // Middleware

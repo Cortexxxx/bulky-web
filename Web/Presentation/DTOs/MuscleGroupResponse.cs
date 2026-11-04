@@ -1,6 +1,6 @@
 namespace Web.Presentation.DTOs;
 
-public class MuscleGroupResponse
+public record MuscleGroupResponse
 {
     public Guid Id { get; init; }
     public string Title { get; init; }
