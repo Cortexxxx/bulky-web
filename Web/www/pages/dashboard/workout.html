@@ -12,9 +12,196 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 {{header}}
-<main class="container flex-grow-1 py-5">
-    <h1 class="h3 mb-4">Workout</h1>
+<main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+
+    <!-- Старт: виден, пока нет активной тренировки -->
+    <!-- TODO: на время вёрстки панели start скрыт, а panel показан; JS потом будет переключать d-none -->
+    <section id="workout-start" class="workout-start d-none">
+        <button type="button" id="create-workout-btn" class="header-btn header-btn-primary workout-add-btn"
+                aria-label="Create workout" title="Create workout">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor"
+                 stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+        </button>
+    </section>
+
+    <!-- Панель тренировки: показывается вместо кнопки, когда тренировка создана -->
+    <section id="workout-panel" class="workout-panel w-100">
+
+        <header class="workout-header">
+            <div class="workout-heading">
+                <span class="workout-badge">Current workout</span>
+                <h1 id="workout-title" class="workout-title">Push day</h1>
+            </div>
+            <div class="workout-header-actions">
+                <button type="button" id="delete-workout-btn" class="header-btn header-btn-ghost header-btn-sm"
+                        data-confirm-action="delete"
+                        data-confirm-title="Delete workout?"
+                        data-confirm-text="The workout and all its sets will be permanently deleted."
+                        data-confirm-label="Delete"
+                        data-confirm-tone="danger">
+                    Delete
+                </button>
+                <button type="button" id="finish-workout-btn" class="header-btn header-btn-primary header-btn-sm"
+                        data-confirm-action="finish"
+                        data-confirm-title="Finish workout?"
+                        data-confirm-text="The workout will be saved to your history and the timer will stop."
+                        data-confirm-label="Finish"
+                        data-confirm-tone="primary">
+                    Finish
+                </button>
+                <span id="workout-timer" class="workout-timer" aria-label="Workout duration">00:00</span>
+            </div>
+        </header>
+
+        <!-- Упражнения тренировки -->
+        <div id="exercise-list" class="exercise-list">
+
+            <article class="exercise-card">
+                <header class="exercise-header">
+                    <span class="exercise-number">1</span>
+                    <h2 class="exercise-name">Bench press</h2>
+                </header>
+
+                <div class="sets">
+                    <div class="set-row set-row-head" aria-hidden="true">
+                        <span>Set</span>
+                        <span>Weight, kg</span>
+                        <span>Reps</span>
+                    </div>
+
+                    <div class="set-row">
+                        <span class="set-number">1</span>
+                        <input type="number" class="form-control set-input" inputmode="decimal" min="0" step="any"
+                               placeholder="0" aria-label="Weight, set 1">
+                        <input type="number" class="form-control set-input" inputmode="numeric" min="0" step="1"
+                               placeholder="0" aria-label="Reps, set 1">
+                    </div>
+                    <div class="set-row">
+                        <span class="set-number">2</span>
+                        <input type="number" class="form-control set-input" inputmode="decimal" min="0" step="any"
+                               placeholder="0" aria-label="Weight, set 2">
+                        <input type="number" class="form-control set-input" inputmode="numeric" min="0" step="1"
+                               placeholder="0" aria-label="Reps, set 2">
+                    </div>
+                    <div class="set-row">
+                        <span class="set-number">3</span>
+                        <input type="number" class="form-control set-input" inputmode="decimal" min="0" step="any"
+                               placeholder="0" aria-label="Weight, set 3">
+                        <input type="number" class="form-control set-input" inputmode="numeric" min="0" step="1"
+                               placeholder="0" aria-label="Reps, set 3">
+                    </div>
+                </div>
+
+                <!-- Добавить подход: маленький круглый плюс -->
+                <button type="button" class="header-btn header-btn-primary add-set-btn"
+                        aria-label="Add set" title="Add set">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                </button>
+            </article>
+
+        </div>
+
+        <!-- Добавить упражнение: широкая пунктирная полоса, всегда после всех упражнений -->
+        <button type="button" id="add-exercise-btn" class="header-btn header-btn-primary add-exercise-btn"
+                aria-label="Add exercise" title="Add exercise">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor"
+                 stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+        </button>
+
+    </section>
+
 </main>
+
+<!-- Окно создания тренировки: showModal() / close() -->
+<dialog id="create-workout-dialog" class="app-dialog" aria-labelledby="create-workout-dialog-title">
+    <header class="app-dialog-header">
+        <h2 id="create-workout-dialog-title" class="app-dialog-title">New workout</h2>
+        <form method="dialog">
+            <button type="submit" class="header-btn header-btn-neutral dialog-close" aria-label="Close" title="Close">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18"/>
+                </svg>
+            </button>
+        </form>
+    </header>
+
+    <form id="create-workout-form" method="dialog" class="app-dialog-body">
+        <div class="form-floating mb-4">
+            <input type="text" class="form-control" id="workout-title-input" name="title"
+                   placeholder="Workout name" maxlength="100" autocomplete="off">
+            <label for="workout-title-input">Workout name (optional)</label>
+        </div>
+
+        <div class="dialog-actions">
+            <button type="submit" value="cancel" formnovalidate class="header-btn header-btn-neutral">Cancel</button>
+            <button type="submit" value="start" class="header-btn header-btn-primary">Start</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Окно подтверждения: общее для «Finish» и «Delete».
+     Заголовок, текст и подпись кнопки берутся из data-confirm-* кнопки, которая его открыла;
+     у кнопки подтверждения класс меняется под data-confirm-tone (primary -> header-btn-primary, danger -> header-btn-ghost). -->
+<dialog id="confirm-dialog" class="app-dialog app-dialog-sm" aria-labelledby="confirm-dialog-title">
+    <form method="dialog" class="app-dialog-body">
+        <h2 id="confirm-dialog-title" class="app-dialog-title mb-2">Are you sure?</h2>
+        <p id="confirm-dialog-text" class="confirm-text">This action cannot be undone.</p>
+
+        <div class="dialog-actions">
+            <button type="submit" value="cancel" class="header-btn header-btn-neutral">Cancel</button>
+            <button type="submit" value="confirm" id="confirm-dialog-submit"
+                    class="header-btn header-btn-primary">Confirm</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Окно выбора упражнения: поиск + список по группам мышц -->
+<dialog id="add-exercise-dialog" class="app-dialog" aria-labelledby="add-exercise-dialog-title">
+    <header class="app-dialog-header">
+        <h2 id="add-exercise-dialog-title" class="app-dialog-title">Add exercise</h2>
+        <form method="dialog">
+            <button type="submit" class="header-btn header-btn-neutral dialog-close" aria-label="Close" title="Close">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18"/>
+                </svg>
+            </button>
+        </form>
+    </header>
+
+    <div class="app-dialog-body">
+        <input type="search" id="exercise-search" class="form-control mb-3"
+               placeholder="Search exercise" autocomplete="off" aria-label="Search exercise">
+
+        <!-- Тестовые данные: потом список наполнит JS -->
+        <div id="exercise-picker" class="exercise-picker">
+            <section class="picker-group">
+                <h3 class="picker-group-title">Chest</h3>
+                <button type="button" class="picker-item" data-exercise-id="1">Bench press</button>
+                <button type="button" class="picker-item" data-exercise-id="2">Incline dumbbell press</button>
+                <button type="button" class="picker-item" data-exercise-id="3">Cable fly</button>
+            </section>
+            <section class="picker-group">
+                <h3 class="picker-group-title">Back</h3>
+                <button type="button" class="picker-item" data-exercise-id="4">Pull-up</button>
+                <button type="button" class="picker-item" data-exercise-id="5">Barbell row</button>
+            </section>
+            <section class="picker-group">
+                <h3 class="picker-group-title">Legs</h3>
+                <button type="button" class="picker-item" data-exercise-id="6">Squat</button>
+                <button type="button" class="picker-item" data-exercise-id="7">Romanian deadlift</button>
+            </section>
+        </div>
+    </div>
+</dialog>
 
 </body>
 </html>

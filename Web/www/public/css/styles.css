@@ -148,6 +148,345 @@ body {
     cursor: pointer;
 }
 
+/* Квадратная кнопка «создать тренировку» с плюсом по центру */
+.workout-add-btn {
+    width: 9rem;
+    height: 9rem;
+    padding: 0;
+    border-radius: 1.75rem;
+    color: var(--bulky-muted);
+}
+
+.workout-add-btn:hover {
+    color: var(--bulky-accent);
+}
+
+.workout-add-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.workout-add-btn:hover svg {
+    transform: rotate(90deg);
+}
+
+/* ---------- Окна (<dialog>) ---------- */
+
+.header-btn-neutral {
+    --ring-color: var(--bulky-ink);
+}
+
+.app-dialog {
+    width: min(30rem, calc(100% - 2rem));
+    max-height: min(85vh, 40rem);
+    padding: 0;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.5rem;
+    background-color: #fff;
+    color: var(--bulky-ink);
+    box-shadow: 0 2rem 4rem -1rem rgba(20, 24, 31, 0.3);
+    overflow: hidden;
+}
+
+.app-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    animation: dialog-in 0.2s ease;
+}
+
+.app-dialog::backdrop {
+    background-color: rgba(20, 24, 31, 0.45);
+    backdrop-filter: blur(3px);
+}
+
+@keyframes dialog-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.app-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem 0;
+}
+
+.app-dialog-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.app-dialog-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.dialog-close {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: 50%;
+    color: var(--bulky-muted);
+}
+
+.app-dialog-sm {
+    width: min(26rem, calc(100% - 2rem));
+}
+
+.confirm-text {
+    margin-bottom: 1.5rem;
+    color: var(--bulky-muted);
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Список выбора упражнения */
+.exercise-picker {
+    overflow-y: auto;
+    max-height: 50vh;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
+}
+
+.picker-group + .picker-group {
+    margin-top: 1rem;
+}
+
+.picker-group-title {
+    margin: 0 0 0.35rem;
+    padding: 0 0.75rem;
+    color: var(--bulky-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.picker-item {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: transparent;
+    color: var(--bulky-ink);
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.picker-item:hover,
+.picker-item:focus-visible {
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    outline: none;
+}
+
+/* ---------- Панель тренировки ---------- */
+
+.workout-panel {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-height: 100%;
+    padding: 1.75rem;
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.5rem;
+    box-shadow: 0 1px 3px rgba(20, 24, 31, 0.05);
+}
+
+.workout-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.workout-heading {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
+/* Метка «текущая тренировка»: строгий текст без фона и рамки */
+.workout-badge {
+    color: var(--bulky-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.workout-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.workout-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Компактный вариант кнопки */
+.header-btn-sm {
+    height: 2.75rem;
+    padding: 0 1.35rem;
+    border-radius: 999px;
+    font-size: 1rem;
+}
+
+.workout-timer {
+    display: inline-flex;
+    align-items: center;
+    height: 2.75rem;
+    padding: 0 1.1rem;
+    border: 1px solid #e3e6eb;
+    border-radius: 999px;
+    background-color: #f8f9fb;
+    color: var(--bulky-accent-dark);
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+}
+
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.exercise-card {
+    padding: 1.25rem;
+    background-color: #f8f9fb;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.25rem;
+}
+
+.exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.1rem;
+}
+
+.exercise-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.exercise-name {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.sets {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.set-row {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 1fr;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.set-row-head {
+    color: var(--bulky-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.set-row-head span:not(:first-child) {
+    text-align: center;
+}
+
+.set-number {
+    color: var(--bulky-muted);
+    font-weight: 700;
+    text-align: center;
+}
+
+.set-input {
+    text-align: center;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    -moz-appearance: textfield;
+}
+
+.set-input::-webkit-outer-spin-button,
+.set-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Добавить подход: маленький круглый плюс */
+.add-set-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-top: 0.9rem;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #fff;
+    color: var(--bulky-muted);
+}
+
+.add-set-btn:hover {
+    color: var(--bulky-accent);
+}
+
+/* Добавить упражнение: широкая пунктирная полоса */
+.add-exercise-btn {
+    width: 100%;
+    height: 4rem;
+    padding: 0;
+    border-style: dashed;
+    border-radius: 1rem;
+    color: var(--bulky-muted);
+}
+
+.add-exercise-btn:hover {
+    color: var(--bulky-accent);
+}
+
 /* Logout: алая линия, приглушённый текст в покое */
 .header-btn-ghost {
     color: var(--bulky-muted);
