@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using Application.Services;
 using Npgsql;
+using Persistence;
+using Persistence.Data;
 using Web.Persistence;
 using Web.Persistence.Data;
 using Web.Presentation.Middleware;
@@ -46,6 +48,11 @@ middleware.Build();
 // App cycle
 
 var app = new App(middleware);
+
+Console.CancelKeyPress += async (_, _) =>
+{
+    await appCts.CancelAsync();
+};
 
 while (httpListener.IsListening || appCts.IsCancellationRequested)
 {

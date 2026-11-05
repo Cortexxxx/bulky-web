@@ -4,9 +4,9 @@ using Application.Exceptions;
 using Domain.Models.Auth;
 using Npgsql;
 using NpgsqlTypes;
-using Web.Presentation.Http;
+using Web.Persistence.Data;
 
-namespace Web.Persistence.Data;
+namespace Persistence.Data;
 
 public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserRepository
 {
@@ -45,7 +45,7 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
         {
             Id = reader.GetGuid(reader.GetOrdinal("id")),
             Email = reader.GetString(reader.GetOrdinal("email")),
-            Role = WebHelpers.GetRoleByString(reader.GetString(reader.GetOrdinal("role"))),
+            Role = Enum.Parse<Role>(reader.GetString(reader.GetOrdinal("role"))),
             PasswordHash = reader.GetString(reader.GetOrdinal("password_hash")),
             PasswordSalt = reader.GetString(reader.GetOrdinal("password_salt")),
             CreatedAt =  reader.GetDateTime(reader.GetOrdinal("created_at"))

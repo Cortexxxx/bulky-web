@@ -5,7 +5,7 @@ using Domain.Models.Workouts;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Web.Persistence.Data;
+namespace Persistence.Data;
 
 public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercisesRepository
 {

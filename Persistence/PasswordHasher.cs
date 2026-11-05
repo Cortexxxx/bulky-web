@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using Application.Abstractions;
 
-namespace Web.Persistence;
+namespace Persistence;
 
 public class PasswordHasher : IPasswordHasher
 {

@@ -21,16 +21,6 @@ public static class WebHelpers
             .ToArray();
 
     public static JsonSerializerOptions? GetJsonSerializerOptions() => Options;
-    
-    public static Role GetRoleByString(string stringRole)
-    {
-        return stringRole switch
-        {
-            "user" => Role.User,
-            "admin" => Role.Admin,
-            _ => throw new ArgumentException("Unknown role or incorrect format", nameof(stringRole))
-        };
-    }
 
     public static async Task ValidateRequestAsync<T>(
         IValidator<T> validator, T request, string errorMessage, CancellationToken ct)
