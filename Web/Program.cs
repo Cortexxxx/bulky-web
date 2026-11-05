@@ -43,6 +43,10 @@ var middleware = new Middleware();
 middleware.Setup(router, authService);
 middleware.Build();
 
+// Startup
+
+await authService.DeleteExpiredSessionsAsync(appCts.Token);
+
 // App cycle
 
 var app = new App(middleware);

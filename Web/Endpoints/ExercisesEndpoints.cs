@@ -12,7 +12,7 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
     public async Task GetAllExercisesAsync(bool includeArchived, HttpContext context)
     {
         var exercises = await exercisesService.GetAllAsync(includeArchived, context.CancellationToken);
-        context.Response.WriteJson(exercises);
+        context.Response.WriteJson(exercises.Select(e => e.ToResponse()).ToList());
     }
 
     public async Task GetExerciseByIdAsync(bool includeArchived, HttpContext context)
@@ -23,7 +23,7 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
 
         if (exercise == null) ExceptionsHelpers.ThrowNotFound();
 
-        context.Response.WriteJson(exercise);
+        context.Response.WriteJson(exercise.ToResponse());
     }
     
     public async Task CreateExerciseAsync(HttpContext context)

@@ -1,5 +1,7 @@
+using Domain.Models.Auth;
 using Domain.Models.Workouts;
 using Web.DTOs;
+using Web.DTOs.Auth;
 
 namespace Web;
 
@@ -42,5 +44,9 @@ public static class MappingExtensions
             IsArchived = exercise.IsArchived,
             MuscleGroups = exercise.MuscleGroups.Select(m => m.ToResponse()).ToList()
         };
+    }
+    public static SessionResponse ToResponse(this Session session)
+    {
+        return new SessionResponse(session.Id, session.CreatedAt, session.ExpiresAt);
     }
 }

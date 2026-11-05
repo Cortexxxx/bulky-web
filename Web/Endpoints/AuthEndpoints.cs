@@ -1,6 +1,5 @@
 using System.Net;
 using Application.Services;
-using Web.DTOs;
 using Web.DTOs.Auth;
 using Web.Exceptions;
 using Web.Http;
@@ -31,7 +30,6 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         var user = context.Request.UserClaims;
         if (user == null) ExceptionsHelpers.ThrowUnauthorized();
         context.Response.WriteJson(user);
-        context.Response.StatusCode = HttpStatusCode.OK;
     }
 
     public async Task LoginUserAsync(HttpContext context)
@@ -46,6 +44,42 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         SetTokenCookie(context, token);
     }
 
+    public async Task LogoutAsync(HttpContext context)
+    {
+        var token = context.Request.GetCookie("token");
+        
+        if (token != null)
+        {
+            await authService.LogoutAsync(token.Value, context.CancellationToken);
+        }
+
+        FillLogoutResponse(context);
+    }
+
+    public async Task FullLogoutAsync(HttpContext context)
+    {
+        if (context.Request.UserClaims == null) ExceptionsHelpers.ThrowUnauthorized();
+        
+        await authService.FullLogoutAsync(context.Request.UserClaims.Id, context.CancellationToken);
+        FillLogoutResponse(context);
+    }
+
+    public async Task GetSessionsAsync(HttpContext context)
+    {
+        if (context.Request.UserClaims == null) ExceptionsHelpers.ThrowUnauthorized();
+
+        var sessions = await authService.GetUserSessionsAsync(context.Request.UserClaims.Id, context.CancellationToken);
+        
+        context.Response.WriteJson(sessions.Select(s => s.ToResponse()).ToList());
+    }
+
+    private static void FillLogoutResponse(HttpContext context)
+    {
+        SetTokenCookie(context, "");
+        context.Response.StatusCode = HttpStatusCode.NoContent;
+        context.Response.SetContentLength(0);
+    }
+    
     private static void SetTokenCookie(HttpContext context, string token)
     {
         context.Response.SetCookie("token", token, new CookieOptions

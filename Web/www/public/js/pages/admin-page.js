@@ -15,6 +15,7 @@ import {
     updateExercise
 } from "../api/exercise-api.js";
 import {handleSubmit} from "../shared/http.js";
+import {logout} from "../api/auth-api.js";
 
 const selected = {muscle: null, exercise: null};
 
@@ -50,7 +51,7 @@ for (const entity of Object.keys(entities)) {
     setupForm(entity, 'edit');
 }
 await renderMuscleBoxes();
-
+await setupLogout();
 
 // lists
 
@@ -238,4 +239,13 @@ function getSelectedMuscles(box) {
     }
 
     return result;
+}
+
+async function setupLogout() {
+    const logoutButton = document.getElementById("logout-btn");
+    
+    logoutButton.addEventListener('click', async () => {
+        await logout();
+        location.replace('/');
+    })
 }

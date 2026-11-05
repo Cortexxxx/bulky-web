@@ -70,6 +70,281 @@ body {
     color: var(--bulky-ink);
 }
 
+/* ---------- Кнопки в хедере главной ---------- */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s,
+    box-shadow 0.2s, transform 0.2s;
+}
+
+.header-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.3);
+}
+
+/* Контурные кнопки: светло-серая обводка; на hover цветная линия «обегает» контур по кругу.
+   Угол заливки анимируется через зарегистрированное свойство --ring-angle. */
+@property --ring-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
+.header-btn {
+    position: relative;
+    background-color: transparent;
+    border-color: #d5d9e0;
+    color: var(--bulky-ink);
+    --ring-color: var(--bulky-accent);
+}
+
+/* Кольцо поверх обводки: видна только полоска толщиной в border */
+.header-btn::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    background: conic-gradient(var(--ring-color) var(--ring-angle), transparent var(--ring-angle));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    transition: --ring-angle 0.6s ease;
+    pointer-events: none;
+}
+
+.header-btn:hover::before,
+.header-btn:focus-visible::before {
+    --ring-angle: 360deg;
+}
+
+.header-btn:hover {
+    color: var(--ring-color);
+}
+
+/* Крупный вариант: Get started, кнопки отправки форм */
+.header-btn-lg {
+    padding: 0.85rem 2.25rem;
+    font-size: 1.05rem;
+    border-radius: 0.85rem;
+    cursor: pointer;
+}
+
+/* Logout: алая линия, приглушённый текст в покое */
+.header-btn-ghost {
+    color: var(--bulky-muted);
+    --ring-color: #dc3545;
+}
+
+.header-btn-ghost:focus-visible {
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+}
+
+/* ---------- Футер ---------- */
+
+.site-footer {
+    margin-top: auto;
+    background-color: #fff;
+    border-top: 1px solid #e3e6eb;
+    padding: 2rem 0 1.5rem;
+}
+
+.site-footer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.site-footer-brand {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
+}
+
+.site-footer-logo {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--bulky-ink);
+}
+
+.site-footer-logo span {
+    color: var(--bulky-accent);
+}
+
+.site-footer-tagline {
+    color: var(--bulky-muted);
+    font-size: 0.95rem;
+}
+
+.site-footer-link {
+    position: relative;
+    padding-bottom: 2px;
+    color: var(--bulky-muted);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.site-footer-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1.5px;
+    background-color: var(--bulky-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+}
+
+.site-footer-link:hover {
+    color: var(--bulky-ink);
+}
+
+.site-footer-link:hover::after {
+    transform: scaleX(1);
+}
+
+.site-footer-bottom {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    color: var(--bulky-muted);
+    font-size: 0.85rem;
+}
+
+.site-footer-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: #c2c8d1;
+}
+
+/* ---------- Блоки главной страницы ---------- */
+
+.section-eyebrow {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    color: var(--bulky-accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.section-title {
+    font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.feature-card {
+    padding: 1.75rem;
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.25rem;
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.feature-card:hover {
+    border-color: rgba(14, 124, 102, 0.45);
+    box-shadow: 0 1rem 2rem -1rem rgba(14, 124, 102, 0.25);
+    transform: translateY(-2px);
+}
+
+.feature-index {
+    display: block;
+    margin-bottom: 1.25rem;
+    color: var(--bulky-accent);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.step {
+    text-align: center;
+    padding: 0 0.5rem;
+}
+
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1.1rem;
+    border: 1.5px solid #d5d9e0;
+    border-radius: 50%;
+    background-color: #fff;
+    color: var(--bulky-accent);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.cta-card {
+    padding: 3.5rem 1.5rem;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.5rem;
+    background:
+            radial-gradient(40rem 18rem at 85% -20%, rgba(14, 124, 102, 0.10), transparent 60%),
+            radial-gradient(30rem 16rem at 0% 120%, rgba(14, 124, 102, 0.07), transparent 60%),
+            #fff;
+}
+
+/* Строки графика по группам мышц */
+.muscle-label,
+.muscle-value {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 13px;
+    transition: fill 0.3s ease;
+}
+
+.muscle-label {
+    fill: var(--bulky-muted);
+}
+
+.muscle-value {
+    fill: var(--bulky-muted);
+    text-anchor: end;
+    font-weight: 600;
+}
+
+.muscle-row:hover .chart-bar {
+    fill: var(--bulky-accent);
+}
+
+.muscle-row:hover .muscle-label,
+.muscle-row:hover .muscle-value {
+    fill: var(--bulky-ink);
+}
+
 /* ---------- Кнопки навигации дашборда ---------- */
 
 .dashboard-nav-btn {
@@ -174,6 +449,32 @@ body {
     color: var(--bulky-accent-dark);
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+/* Столбцы графика-иллюстрации: блёклые, на hover плавно насыщаются */
+.chart-hit {
+    fill: transparent;
+}
+
+.chart-bar {
+    fill: #bfe0d6;
+    transition: fill 0.3s ease;
+}
+
+.chart-label {
+    fill: var(--bulky-muted);
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 13px;
+    text-anchor: middle;
+    transition: fill 0.3s ease;
+}
+
+.chart-day:hover .chart-bar {
+    fill: var(--bulky-accent);
+}
+
+.chart-day:hover .chart-label {
+    fill: var(--bulky-ink);
 }
 
 .hero-art {

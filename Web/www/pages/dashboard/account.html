@@ -25,23 +25,23 @@
                              class="rounded-circle bg-success-subtle text-success-emphasis fw-bold fs-3 d-flex align-items-center justify-content-center flex-shrink-0"
                              style="width: 56px; height: 56px" aria-hidden="true">?</div>
                         <div>
-                            <div id="account-email-title" class="fw-semibold fs-5">user@example.com</div>
-                            <span class="badge text-bg-primary" id="account-role">User</span>
+                            <div id="account-email-title" class="fw-semibold fs-5"></div>
+                            <span class="badge text-bg-primary" id="account-role"></span>
                         </div>
                     </div>
 
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between gap-3 px-0 py-3">
                             <span class="text-secondary">Email</span>
-                            <span class="fw-semibold text-break" id="account-email">user@example.com</span>
+                            <span class="fw-semibold text-break" id="account-email"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between gap-3 px-0 py-3">
                             <span class="text-secondary">Registered</span>
-                            <span class="fw-semibold" id="account-registered">01 Jan 2025</span>
+                            <span class="fw-semibold" id="account-registered"></span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between gap-3 px-0 py-3">
                             <span class="text-secondary">Active sessions</span>
-                            <span class="fw-semibold" id="account-sessions">1</span>
+                            <span class="fw-semibold" id="account-sessions"></span>
                         </li>
                     </ul>
                 </div>
@@ -70,13 +70,14 @@
                 <section class="card shadow-sm rounded-4">
                     <div class="card-body p-4">
                         <h2 class="h6 text-secondary text-uppercase mb-3">Session</h2>
-                        <button type="button" id="logout-btn" class="btn btn-outline-danger w-100">Log out</button>
+                        <button type="button" id="logout-btn" class="header-btn header-btn-ghost w-100">Log out</button>
+                        <a href="/admin" id="admin-panel-btn" class="header-btn header-btn-primary w-100 mt-3 d-none">Admin panel</a>
                     </div>
                 </section>
             </div>
         </div>
     </div>
 </main>
-
+<script type="module" src="/js/pages/account-page.js"></script>
 </body>
 </html>

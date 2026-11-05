@@ -48,8 +48,8 @@ public static class ErrorMiddleware
                             ErrorPages.TryGetValue(e.Error, out var path);
 
                             response.WriteBody(
-                                path != null && File.Exists(path) 
-                                    ? await File.ReadAllBytesAsync(path) 
+                                path != null && File.Exists(path)
+                                    ? Encoding.UTF8.GetBytes(await PageRenderer.RenderFileAsync(path))
                                     : Encoding.UTF8.GetBytes(DefaultExceptionText), ".html");
                             break;
                         case RouteKind.Api:
@@ -64,9 +64,9 @@ public static class ErrorMiddleware
                     response.StatusCode = HttpStatusCode.InternalServerError;
                     response.WriteBody(ErrorPages.TryGetValue("server_error", out var path) 
                                        && File.Exists(path) 
-                            ? await File.ReadAllBytesAsync(path) 
+                            ? Encoding.UTF8.GetBytes(await PageRenderer.RenderFileAsync(path))
                             : Encoding.UTF8.GetBytes(DefaultExceptionText), ".html");
-                    
+
                     Console.WriteLine($"Error is handled:\n {e}");
                 }
             });

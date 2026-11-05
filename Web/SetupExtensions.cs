@@ -10,6 +10,7 @@ namespace Web;
 public static class SetupExtensions
 {
     private static readonly AuthRequirements GuestsOnly = new(AuthMode.GuestsOnly);
+    private static readonly AuthRequirements Public = new(AuthMode.Public);
     private static readonly AuthRequirements AuthorizedOnly = new(AuthMode.Required);
     private static readonly AuthRequirements AdminOnly = new(AuthMode.Required, Role.Admin);
 
@@ -30,9 +31,9 @@ public static class SetupExtensions
         var pagesEndpoints = new PagesEndpoints();
 
         router.Map(HttpMethod.Get, "", context =>
-            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, GuestsOnly);
+            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, Public);
         router.Map(HttpMethod.Get, "home", context =>
-            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, GuestsOnly);
+            pagesEndpoints.GetPage(context, "home.html"), RouteKind.Page, Public);
         router.Map(HttpMethod.Get, "login", context =>
             pagesEndpoints.GetPage(context, "login.html"), RouteKind.Page, GuestsOnly);
 
@@ -56,6 +57,9 @@ public static class SetupExtensions
         router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterUserAsync, RouteKind.Api);
         router.Map(HttpMethod.Post, "api/auth/login", authEndpoints.LoginUserAsync, RouteKind.Api);
         router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeAsync, RouteKind.Api, AuthorizedOnly);
+        router.Map(HttpMethod.Post, "api/auth/logout", authEndpoints.LogoutAsync, RouteKind.Api, AuthorizedOnly);
+        router.Map(HttpMethod.Post, "api/auth/logoutall", authEndpoints.FullLogoutAsync, RouteKind.Api, AuthorizedOnly);
+        router.Map(HttpMethod.Get, "api/auth/sessions", authEndpoints.GetSessionsAsync, RouteKind.Api, AuthorizedOnly);
     }
 
     public static void MapMuscleGroupsApi(this Router router, MusclesService musclesService,

@@ -75,4 +75,35 @@ public class AuthService
         var user = await _userRepository.GetUserByIdAsync(userId, ct);
         return user;
     }
+
+    public async Task DeleteExpiredSessionsAsync(CancellationToken ct)
+    {
+        await _sessionRepository.DeleteExpiredSessionsAsync(ct);
+    }
+
+    public async Task LogoutAsync(string token, CancellationToken ct)
+    {
+        Session? session;
+        
+        try
+        {
+            session = await GetUserSessionAsync(token, ct);
+        }
+        catch (NoActiveSessionsException)
+        {
+            return;
+        }
+
+        await _sessionRepository.DeleteSessionByIdAsync(session.Value.Id, ct);
+    }
+
+    public async Task<IEnumerable<Session>> GetUserSessionsAsync(Guid userId, CancellationToken ct)
+    {
+        return await _sessionRepository.GetUserSessionsAsync(userId, ct);
+    }
+
+    public async Task FullLogoutAsync(Guid userId, CancellationToken ct)
+    {
+        await _sessionRepository.DeleteUserSessionsAsync(userId, ct);
+    }
 }
