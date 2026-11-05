@@ -1,11 +1,11 @@
 using System.Data.Common;
+using Application;
 using Application.Abstractions;
-using Application.Exceptions;
 using Domain.Models.Workouts;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Web.Persistence.Data;
+namespace Persistence.Data;
 
 public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMuscleGroupsRepository
 {

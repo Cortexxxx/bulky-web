@@ -3,7 +3,7 @@ using Domain.Models.Auth;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Web.Persistence.Data;
+namespace Persistence.Data;
 
 public class PostgresSessionRepository(NpgsqlDataSource dataSource) : ISessionRepository
 {

@@ -1,6 +1,6 @@
-using Web.Presentation.Router;
+using Web.Routing;
 
-namespace BulkyTests;
+namespace Tests;
 
 public class RouterTests
 {

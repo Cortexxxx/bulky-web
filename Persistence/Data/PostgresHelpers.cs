@@ -2,7 +2,7 @@ using System.Data;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Web.Persistence.Data;
+namespace Persistence.Data;
 
 public static class PostgresHelpers
 {

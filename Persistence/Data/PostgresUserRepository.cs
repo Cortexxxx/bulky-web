@@ -1,10 +1,10 @@
 using System.Data.Common;
+using Application;
 using Application.Abstractions;
-using Application.Exceptions;
 using Domain.Models.Auth;
 using Npgsql;
 using NpgsqlTypes;
-using Web.Persistence.Data;
+using Persistence.Data;
 
 namespace Persistence.Data;
 

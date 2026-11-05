@@ -3,18 +3,16 @@ using Application.Services;
 using Npgsql;
 using Persistence;
 using Persistence.Data;
-using Web.Persistence;
-using Web.Persistence.Data;
-using Web.Presentation.Middleware;
-using Web.Presentation.Router;
-using Web.Presentation.Validators;
-using Web.Presentation;
+using Web.Pipeline;
+using Web.Routing;
+using Web.Validators;
+using Web;
 
 var httpListener = new HttpListener();
-var prefix = Environment.GetEnvironmentVariable("PREFIX") 
-             ?? throw new Exception("Environment variable 'PREFIX' is not set");
-var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable("BULKY_DB_CONNECTION")
-                                     ?? throw new Exception("Environment variable 'BULKY_DB_CONNECTION' is not set"));
+var prefix = Environment.GetEnvironmentVariable(EnvironmentVariables.Prefix)
+             ?? throw new Exception($"Environment variable '{EnvironmentVariables.Prefix}' is not set");
+var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable(EnvironmentVariables.DbConnection)
+                                     ?? throw new Exception($"Environment variable '{EnvironmentVariables.DbConnection}' is not set"));
 Console.WriteLine(prefix);
 
 httpListener.Prefixes.Add(prefix);
