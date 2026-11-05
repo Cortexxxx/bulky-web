@@ -43,7 +43,7 @@ CREATE TABLE public.workouts (
     user_id uuid NOT NULL REFERENCES public.users ON DELETE CASCADE,
     title varchar(256) NOT NULL,
     started_at timestamptz NOT NULL DEFAULT now(),
-    ended_at timestamptz CHECK ( started_at < workouts.ended_at ),
+    ended_at timestamptz CHECK ( started_at < workouts.ended_at )
 );
 
 CREATE TABLE public.workout_exercises(
