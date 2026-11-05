@@ -9,7 +9,7 @@ namespace Web.Persistence.Data;
 
 public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercisesRepository
 {
-    public async Task<IEnumerable<Exercise>> GetAllAsync(bool showArchived, CancellationToken ct)
+    public async Task<IEnumerable<Exercise>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
@@ -17,8 +17,11 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
             SELECT exercise.*, exercise_muscle_group.muscle_group_id as muscle_group_id, exercise_muscle_group.role
             FROM public.exercises as exercise
             LEFT JOIN public.exercise_muscle_groups exercise_muscle_group on exercise.id = exercise_muscle_group.exercise_id
+            WHERE @include_archived OR NOT exercise.is_archived
             ORDER BY exercise.title;
             """, connection);
+
+        command.Parameters.AddWithValue("include_archived", includeArchived);
 
         var exercises = new Dictionary<Guid, Exercise>();
         await using var reader = await command.ExecuteReaderAsync(ct);
@@ -46,7 +49,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         return exercises.Values;
     }
 
-    public async Task<Exercise?> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<Exercise?> GetByIdAsync(bool includeArchived, Guid id, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
@@ -54,11 +57,12 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
             SELECT exercise.*, exercise_muscle_group.muscle_group_id as muscle_group_id, exercise_muscle_group.role
             FROM public.exercises as exercise
             LEFT JOIN public.exercise_muscle_groups exercise_muscle_group on exercise.id = exercise_muscle_group.exercise_id
-            WHERE exercise.id = @id
+            WHERE exercise.id = @id AND (@include_archived OR NOT exercise.is_archived)
             ORDER BY exercise_muscle_group.muscle_group_id;
             """, connection);
 
         command.Parameters.AddWithValue("id", id);
+        command.Parameters.AddWithValue("include_archived", includeArchived);
         
         await using var reader = await command.ExecuteReaderAsync(ct);
         var isRead = await reader.ReadAsync(ct);

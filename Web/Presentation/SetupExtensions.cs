@@ -63,11 +63,21 @@ public static class SetupExtensions
     {
         var musclesEndpoints = new MusclesEndpoints(musclesService, muscleGroupRequestValidator);
         const RouteKind kind = RouteKind.Api;
-
+        
         router.Map(HttpMethod.Get, "api/muscle_groups",
-            musclesEndpoints.GetAllMuscleGroupsAsync, kind, AuthorizedOnly);
+            context => musclesEndpoints.GetAllMuscleGroupsAsync(false, context), kind, 
+            AuthorizedOnly);
         router.Map(HttpMethod.Get, "api/muscle_groups/{id}",
-            musclesEndpoints.GetMuscleGroupByIdAsync, kind, AuthorizedOnly);
+            context => musclesEndpoints.GetMuscleGroupByIdAsync(false, context), kind, 
+            AuthorizedOnly);
+        
+        router.Map(HttpMethod.Get, "api/admin/muscle_groups",
+            context => musclesEndpoints.GetAllMuscleGroupsAsync(true, context), kind, 
+            AdminOnly);
+        router.Map(HttpMethod.Get, "api/admin/muscle_groups/{id}",
+            context => musclesEndpoints.GetMuscleGroupByIdAsync(true, context), kind, 
+            AdminOnly);
+        
         router.Map(HttpMethod.Post, "api/muscle_groups",
             musclesEndpoints.CreateMuscleGroupAsync, kind, AdminOnly);
         router.Map(HttpMethod.Put, "api/muscle_groups/{id}",
@@ -85,9 +95,14 @@ public static class SetupExtensions
         var exercisesEndpoints = new ExercisesEndpoints(exercisesService, exerciseRequestValidator);
 
         router.Map(HttpMethod.Get, "api/exercises",
-            exercisesEndpoints.GetAllExercisesAsync, api, AuthorizedOnly);
+            context => exercisesEndpoints.GetAllExercisesAsync(false, context), api, AuthorizedOnly);
         router.Map(HttpMethod.Get, "api/exercises/{id}",
-            exercisesEndpoints.GetExerciseByIdAsync, api, AuthorizedOnly);
+            context => exercisesEndpoints.GetExerciseByIdAsync(false, context), api, AuthorizedOnly);
+
+        router.Map(HttpMethod.Get, "api/admin/exercises",
+            context => exercisesEndpoints.GetAllExercisesAsync(true, context), api, AdminOnly);
+        router.Map(HttpMethod.Get, "api/admin/exercises/{id}",
+            context => exercisesEndpoints.GetExerciseByIdAsync(true, context), api, AdminOnly);
         router.Map(HttpMethod.Post, "api/exercises",
             exercisesEndpoints.CreateExerciseAsync, api, AdminOnly);
         router.Map(HttpMethod.Put, "api/exercises/{id}",

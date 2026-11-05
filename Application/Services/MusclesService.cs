@@ -5,14 +5,14 @@ namespace Application.Services;
 
 public class MusclesService(IMuscleGroupsRepository muscleGroupsRepository)
 {
-    public async Task<IEnumerable<MuscleGroup>> GetAllAsync(CancellationToken ct)
+    public async Task<IEnumerable<MuscleGroup>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
-        return await muscleGroupsRepository.GetAllAsync(ct);
+        return await muscleGroupsRepository.GetAllAsync(includeArchived, ct);
     }
 
-    public async Task<MuscleGroup?> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<MuscleGroup?> GetByIdAsync(bool includeArchived, Guid id, CancellationToken ct)
     {
-        return await muscleGroupsRepository.GetByIdAsync(id, ct);
+        return await muscleGroupsRepository.GetByIdAsync(includeArchived, id, ct);
     }
 
     public async Task<Guid> CreateAsync(MuscleGroup muscleGroup, CancellationToken ct)

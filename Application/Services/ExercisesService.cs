@@ -5,15 +5,14 @@ namespace Application.Services;
 
 public class ExercisesService(IExercisesRepository repository)
 {
-    public async Task<IEnumerable<Exercise>> GetAllAsync(CancellationToken ct)
+    public async Task<IEnumerable<Exercise>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
-        var exercises = await repository.GetAllAsync(true, ct);
-        return exercises;
+        return await repository.GetAllAsync(includeArchived, ct);
     }
 
-    public async Task<Exercise?> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<Exercise?> GetByIdAsync(bool includeArchived, Guid id, CancellationToken ct)
     {
-        return await repository.GetByIdAsync(id, ct);
+        return await repository.GetByIdAsync(includeArchived, id, ct);
     }
 
     public async Task<Guid> CreateAsync(string title, string description, string? imagePath, 

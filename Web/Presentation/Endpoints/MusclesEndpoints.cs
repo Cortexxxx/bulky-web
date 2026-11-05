@@ -11,17 +11,17 @@ namespace Web.Presentation.Endpoints;
 public class MusclesEndpoints(MusclesService musclesService, 
     MuscleGroupRequestValidator muscleGroupRequestValidator)
 {
-    public async Task GetAllMuscleGroupsAsync(HttpContext context)
+    public async Task GetAllMuscleGroupsAsync(bool includeArchived, HttpContext context)
     {
-        var muscleGroups = await musclesService.GetAllAsync(context.CancellationToken);
+        var muscleGroups = await musclesService.GetAllAsync(includeArchived, context.CancellationToken);
         context.Response.WriteJson(muscleGroups.Select(mg => mg.ToResponse()));
     }
 
-    public async Task GetMuscleGroupByIdAsync(HttpContext context)
+    public async Task GetMuscleGroupByIdAsync(bool includeArchived, HttpContext context)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);
 
-        var muscleGroup = await musclesService.GetByIdAsync(id,
+        var muscleGroup = await musclesService.GetByIdAsync(includeArchived, id,
             context.CancellationToken);
 
         if (muscleGroup is null) ExceptionsHelpers.ThrowNotFound();

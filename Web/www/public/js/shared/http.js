@@ -1,37 +1,32 @@
 import {defaultError, getErrorMessage} from "./error-messages.js";
 import {clearErrors, showErrors} from "./ui.js";
 
-export async function postData(path, body = "") {
-    const response = await fetch(path, {
-        method: "POST",
-        headers: {'Content-Type': 'application/json'},
-        body: body
-    });
+async function request(method, path, body) {
+    const options = {method};
 
-    return await handleResponse(response);
+    if (body !== undefined) {
+        options.headers = {'Content-Type': 'application/json'};
+        options.body = body;
+    }
+
+    return await handleResponse(await fetch(path, options));
 }
 
-export async function putData(path, body = "") {
-    const response = await fetch(path, {
-        method: "PUT",
-        headers: {'Content-Type': 'application/json'},
-        body: body
-    });
-
-    return await handleResponse(response);
+export function getData(path) {
+    return request("GET", path);
 }
 
-export async function getData(path) {
-    const response = await fetch(path, {
-        method: "GET"
-    });
+export function postData(path, body = "") {
+    return request("POST", path, body);
+}
 
-    return await handleResponse(response);
+export function putData(path, body = "") {
+    return request("PUT", path, body);
 }
 
 async function handleResponse(response) {
-    let responseBody = await getResponseBody(response);
-    
+    const responseBody = await getResponseBody(response);
+
     if (!response.ok) {
         throw new HttpError(response.status, responseBody);
     }
@@ -41,41 +36,30 @@ async function handleResponse(response) {
 
 async function getResponseBody(response) {
     try {
-        return JSON.parse(await response.text())
+        return JSON.parse(await response.text());
     } catch (e) {
         return null;
     }
 }
 
 export function handleErrors(exception) {
-    let errors;
+    if (exception instanceof HttpError && exception.body != null) {
+        return Object.values(exception.body).flat().map(getErrorMessage);
+    }
 
-    if (exception instanceof HttpError) {
-        if (exception.body != null) {
-            errors = Object.values(exception.body).flat().map(getErrorMessage);
-        } else {
-            errors = [defaultError]
-        }
-    }
-    else {
-        errors = [defaultError]
-    }
-    
-    return errors;
+    return [defaultError];
 }
 
-export async function handleSubmit(errorBox, callback, redirectPath = null){
+export async function handleSubmit(errorBox, callback, redirectPath = null) {
     try {
         clearErrors(errorBox);
         await callback();
+
         if (redirectPath !== null) {
             location.replace(redirectPath);
-
         }
-    }
-    catch (ex) {
-        const errors = handleErrors(ex);
-        showErrors(errorBox, errors);
+    } catch (ex) {
+        showErrors(errorBox, handleErrors(ex));
     }
 }
 

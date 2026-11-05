@@ -9,10 +9,15 @@ namespace Web.Persistence.Data;
 
 public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMuscleGroupsRepository
 {
-    public async Task<IEnumerable<MuscleGroup>> GetAllAsync(CancellationToken ct)
+    public async Task<IEnumerable<MuscleGroup>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
-        await using var command = new NpgsqlCommand("SELECT * FROM public.muscle_groups ORDER BY title", connection);
+        await using var command = new NpgsqlCommand("""
+                                                    SELECT * FROM public.muscle_groups 
+                                                    WHERE @include_archived OR NOT is_archived ORDER BY title
+                                                    """, connection);
+
+        command.Parameters.AddWithValue("include_archived", includeArchived);
 
         var muscleGroups = new List<MuscleGroup>();
         await using var reader = await command.ExecuteReaderAsync(ct);
@@ -26,13 +31,14 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
         return muscleGroups;
     }
 
-    public async Task<MuscleGroup?> GetByIdAsync(Guid id, CancellationToken ct)
+    public async Task<MuscleGroup?> GetByIdAsync(bool includeArchived, Guid id, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
-            "SELECT * FROM public.muscle_groups WHERE id = @id", connection);
+            "SELECT * FROM public.muscle_groups WHERE id = @id AND (@include_archived OR NOT is_archived)", connection);
 
         command.Parameters.AddWithValue("id", id);
+        command.Parameters.AddWithValue("include_archived", includeArchived);
 
         await using var reader = await command.ExecuteReaderAsync(ct);
 

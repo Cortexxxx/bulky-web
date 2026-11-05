@@ -1,34 +1,26 @@
 import {getData, postData, putData} from "../shared/http.js";
 
-export async function getAllMuscles() {
-    return await getData("/api/muscle_groups");
+export function getAllMuscles(includeArchived) {
+    return includeArchived ? getData("/api/admin/muscle_groups") : getData("/api/muscle_groups");
 }
 
-export async function getMuscleById(id) {
-    return await getData(`/api/muscle_groups/${id}`)
+export function getMuscleById(includeArchived, id) {
+    return includeArchived ? getData(`/api/admin/muscle_groups/${id}`) : getData(`/api/muscle_groups/${id}`);
 }
 
-export async function archiveMuscle(id) {
-    return await postData(`/api/muscle_groups/${id}/archive`);
+export function archiveMuscle(id) {
+    return postData(`/api/muscle_groups/${id}/archive`);
 }
 
-export async function unarchiveMuscle(id) {
-    return await postData(`/api/muscle_groups/${id}/unarchive`);
+export function unarchiveMuscle(id) {
+    return postData(`/api/muscle_groups/${id}/unarchive`);
 }
 
-export async function createMuscle(title, description) {
-    return await postData(`/api/muscle_groups`, buildMuscleRequestBody(title, description));
+// data: { title, description }
+export function createMuscle(data) {
+    return postData("/api/muscle_groups", JSON.stringify(data));
 }
 
-export async function updateMuscle(id, title, description) {
-    return await putData(`/api/muscle_groups/${id}`, buildMuscleRequestBody(title, description));
-}
-
-function buildMuscleRequestBody(title, description) {
-    return JSON.stringify(
-        {
-            title: title,
-            description: description
-        }
-    );
+export function updateMuscle(id, data) {
+    return putData(`/api/muscle_groups/${id}`, JSON.stringify(data));
 }

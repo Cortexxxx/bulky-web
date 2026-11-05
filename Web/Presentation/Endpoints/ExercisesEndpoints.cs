@@ -9,17 +9,17 @@ namespace Web.Presentation.Endpoints;
 
 public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseRequestValidator exerciseRequestValidator)
 {
-    public async Task GetAllExercisesAsync(HttpContext context)
+    public async Task GetAllExercisesAsync(bool includeArchived, HttpContext context)
     {
-        var exercises = await exercisesService.GetAllAsync(context.CancellationToken);
+        var exercises = await exercisesService.GetAllAsync(includeArchived, context.CancellationToken);
         context.Response.WriteJson(exercises);
     }
-    
-    public async Task GetExerciseByIdAsync(HttpContext context)
+
+    public async Task GetExerciseByIdAsync(bool includeArchived, HttpContext context)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);
 
-        var exercise = await exercisesService.GetByIdAsync(id, context.CancellationToken);
+        var exercise = await exercisesService.GetByIdAsync(includeArchived, id, context.CancellationToken);
 
         if (exercise == null) ExceptionsHelpers.ThrowNotFound();
 
