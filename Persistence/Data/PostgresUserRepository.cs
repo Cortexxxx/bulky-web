@@ -4,7 +4,6 @@ using Application.Abstractions;
 using Domain.Models.Auth;
 using Npgsql;
 using NpgsqlTypes;
-using Persistence.Data;
 
 namespace Persistence.Data;
 
@@ -45,7 +44,7 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
         {
             Id = reader.GetGuid(reader.GetOrdinal("id")),
             Email = reader.GetString(reader.GetOrdinal("email")),
-            Role = Enum.Parse<Role>(reader.GetString(reader.GetOrdinal("role"))),
+            Role = Enum.Parse<Role>(reader.GetString(reader.GetOrdinal("role")), ignoreCase:true),
             PasswordHash = reader.GetString(reader.GetOrdinal("password_hash")),
             PasswordSalt = reader.GetString(reader.GetOrdinal("password_salt")),
             CreatedAt =  reader.GetDateTime(reader.GetOrdinal("created_at"))

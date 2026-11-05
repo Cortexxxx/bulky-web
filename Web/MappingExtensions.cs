@@ -16,4 +16,31 @@ public static class MappingExtensions
             IsArchived = muscleGroup.IsArchived
         };
     }
+
+    public static ExerciseMuscleGroup ToDomain(this ExerciseMuscleDto exerciseMuscleDto)
+    {
+        return new ExerciseMuscleGroup
+        {
+            MuscleGroupId = exerciseMuscleDto.MuscleGroupId,
+            Role = exerciseMuscleDto.Role
+        };
+    }
+    
+    public static ExerciseMuscleDto ToResponse(this ExerciseMuscleGroup exerciseMuscleGroup)
+    {
+        return new ExerciseMuscleDto(exerciseMuscleGroup.MuscleGroupId, exerciseMuscleGroup.Role);
+    }
+    
+    public static ExerciseResponse ToResponse(this Exercise exercise)
+    {
+        return new ExerciseResponse
+        {
+            Id = exercise.Id,
+            Title = exercise.Title,
+            Description = exercise.Description,
+            ImagePath = exercise.ImagePath,
+            IsArchived = exercise.IsArchived,
+            MuscleGroups = exercise.MuscleGroups.Select(m => m.ToResponse()).ToList()
+        };
+    }
 }

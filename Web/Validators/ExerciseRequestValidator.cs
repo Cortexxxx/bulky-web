@@ -27,7 +27,7 @@ public class ExerciseRequestValidator : AbstractValidator<ExerciseRequest>
             .ChildRules(muscle =>
             {
                 muscle.RuleFor(m => m.MuscleGroupId).NotEmpty().WithErrorCode("empty_muscle_id");
-                muscle.RuleFor(m => m.MuscleGroupRole).IsInEnum().WithErrorCode("invalid_role");
+                muscle.RuleFor(m => m.Role).IsInEnum().WithErrorCode("invalid_role");
             });
     }
 }

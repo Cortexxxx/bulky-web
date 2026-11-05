@@ -31,8 +31,8 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
         var ct = context.CancellationToken;
         var normalizedRequest = await ReadValidatedRequestAsync(context, ct);
 
-        var id = await exercisesService.CreateAsync(normalizedRequest.Title,
-            normalizedRequest.Description, null, normalizedRequest.MuscleGroups, ct);
+        var id = await exercisesService.CreateAsync( normalizedRequest.Title, normalizedRequest.Description, 
+            null, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
 
         context.Response.WriteJson(id);
         context.Response.StatusCode = HttpStatusCode.Created;
@@ -46,7 +46,7 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
         var id = WebHelpers.GetIdOrThrowNotFound(context);
 
         var found = await exercisesService.UpdateAsync(id, normalizedRequest.Title, normalizedRequest.Description, 
-            null, normalizedRequest.MuscleGroups, ct);
+            null, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
 
         if (!found) ExceptionsHelpers.ThrowNotFound();
     }

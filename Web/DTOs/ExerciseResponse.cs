@@ -1,0 +1,13 @@
+using Domain.Models.Workouts;
+
+namespace Web.DTOs;
+
+public record ExerciseResponse
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; }
+    public string Description { get; init; }
+    public string? ImagePath { get; init; }
+    public bool IsArchived { get; init; }
+    public List<ExerciseMuscleDto> MuscleGroups { get; init; } = [];
+}

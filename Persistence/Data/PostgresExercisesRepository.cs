@@ -164,7 +164,6 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
     {
         return reader.IsDBNull(columns.MuscleGroupId) ? null : new ExerciseMuscleGroup
         {
-            ExerciseId = exerciseId,
             MuscleGroupId = reader.GetGuid(columns.MuscleGroupId),
             Role = Enum.Parse<MuscleGroupRole>(reader.GetString(columns.Role), ignoreCase: true)
         };

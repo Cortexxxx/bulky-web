@@ -233,7 +233,7 @@ function getSelectedMuscles(box) {
         const role = row.querySelector('input:checked').value;
 
         if (role !== 'none') {
-            result.push({muscleGroupId: row.dataset.muscleId, muscleGroupRole: role});
+            result.push({muscleGroupId: row.dataset.muscleId, role});
         }
     }
 
