@@ -2,6 +2,8 @@ using Domain.Models.Auth;
 using Domain.Models.Workouts;
 using Web.DTOs;
 using Web.DTOs.Auth;
+using Web.DTOs.Exercise;
+using Web.DTOs.MuscleGroup;
 
 namespace Web;
 

@@ -1,6 +1,7 @@
 using System.Net;
 using Application.Services;
 using Web.DTOs;
+using Web.DTOs.Exercise;
 using Web.Exceptions;
 using Web.Http;
 using Web.Validators;

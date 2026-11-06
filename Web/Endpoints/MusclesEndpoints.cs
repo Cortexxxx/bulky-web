@@ -2,6 +2,7 @@ using System.Net;
 using Application.Services;
 using Domain.Models.Workouts;
 using Web.DTOs;
+using Web.DTOs.MuscleGroup;
 using Web.Exceptions;
 using Web.Http;
 using Web.Validators;
