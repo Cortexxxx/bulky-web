@@ -1,8 +1,6 @@
 using System.Net;
 using Application.Services;
-using Web.DTOs;
 using Web.DTOs.Exercise;
-using Web.Exceptions;
 using Web.Http;
 using Web.Validators;
 
@@ -21,16 +19,14 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
         var id = WebHelpers.GetIdOrThrowNotFound(context);
 
         var exercise = await exercisesService.GetByIdAsync(includeArchived, id, context.CancellationToken);
-
-        if (exercise == null) ExceptionsHelpers.ThrowNotFound();
-
+        
         context.Response.WriteJson(exercise.ToResponse());
     }
     
     public async Task CreateExerciseAsync(HttpContext context)
     {
         var ct = context.CancellationToken;
-        var normalizedRequest = await ReadValidatedRequestAsync(context, ct);
+        var normalizedRequest = await ProceedExerciseRequestAsync(context, ct);
 
         var id = await exercisesService.CreateAsync( normalizedRequest.Title, normalizedRequest.Description, 
             null, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
@@ -38,18 +34,15 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
         context.Response.WriteJson(id);
         context.Response.StatusCode = HttpStatusCode.Created;
     }
-    
+
     public async Task UpdateExerciseAsync(HttpContext context)
     {
         var ct = context.CancellationToken;
-        var normalizedRequest = await ReadValidatedRequestAsync(context, ct);
-
+        var normalizedRequest = await ProceedExerciseRequestAsync(context, ct);
         var id = WebHelpers.GetIdOrThrowNotFound(context);
 
-        var found = await exercisesService.UpdateAsync(id, normalizedRequest.Title, normalizedRequest.Description, 
+        await exercisesService.UpdateAsync(id, normalizedRequest.Title, normalizedRequest.Description, 
             null, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
-
-        if (!found) ExceptionsHelpers.ThrowNotFound();
     }
     
     public async Task ArchiveExerciseAsync(HttpContext context) => await SetArchiveStatusAsync(context, true);
@@ -59,27 +52,13 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
     private async Task SetArchiveStatusAsync(HttpContext context, bool isArchived)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);
-        var found = await exercisesService.SetArchivedAsync(id, isArchived, context.CancellationToken);
-        if (!found) ExceptionsHelpers.ThrowNotFound();
+        await exercisesService.SetArchivedAsync(id, isArchived, context.CancellationToken);
     }
     
-    private async Task<ExerciseRequest> ReadValidatedRequestAsync(HttpContext context, CancellationToken ct)
+    private async Task<ExerciseRequest> ProceedExerciseRequestAsync(HttpContext context, CancellationToken ct)
     {
-        var exerciseRequest = await context.Request.ReadJsonAsync<ExerciseRequest>(ct);
-        var normalizedRequest = GetNormalizedRequest(exerciseRequest);
-
-        await WebHelpers.ValidateRequestAsync(exerciseRequestValidator, normalizedRequest,
-            "Incorrect exercise request", ct);
-
-        return normalizedRequest;
-    }
-    
-    private static ExerciseRequest GetNormalizedRequest(ExerciseRequest exerciseRequest)
-    {
-        return exerciseRequest with
-        {
-            Title = exerciseRequest.Title.Trim(),
-            Description = exerciseRequest.Description.Trim()
-        };
+        return await WebHelpers.ProceedRequestAsync<ExerciseRequest, ExerciseRequestValidator>(context,
+            exerciseRequestValidator, request => request with { Title = request.Title.Trim(), 
+                Description = request.Description.Trim()}, ct);
     }
 }

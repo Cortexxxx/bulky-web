@@ -51,7 +51,7 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
         }
         catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
         {
-            throw new EmailAlreadyExistsException("Email already exists", e);
+            throw new ConflictException("email_exists","Email already exists", e);
         }
 
         return (Guid)(guidObj ?? throw new InvalidOperationException("Not received UUID"));

@@ -42,7 +42,7 @@ public class AuthService
             return user.Value;
         }
 
-        throw new WrongEmailOrPasswordException("Wrong email or password");
+        throw new WrongEmailOrPasswordException();
     }
 
     public async Task<(Guid id, string token)> CreateUserSessionAsync(Guid userId, CancellationToken ct)
@@ -70,10 +70,9 @@ public class AuthService
         throw new NoActiveSessionsException();
     }
 
-    public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken ct)
+    public async Task<User> GetUserByIdAsync(Guid userId, CancellationToken ct)
     {
-        var user = await _userRepository.GetUserByIdAsync(userId, ct);
-        return user;
+        return await _userRepository.GetUserByIdAsync(userId, ct) ?? throw new NotFoundException("unknown_user");
     }
 
     public async Task DeleteExpiredSessionsAsync(CancellationToken ct)

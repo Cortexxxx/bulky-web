@@ -6,5 +6,5 @@ public class WebException(string message, HttpStatusCode statusCode, string erro
     : Exception(message, innerException: innerException)
 {
     public HttpStatusCode StatusCode { get; } = statusCode;
-    public string Error { get; set; } = error;
+    public string Error { get; } = error;
 }

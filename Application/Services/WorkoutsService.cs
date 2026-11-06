@@ -5,28 +5,31 @@ namespace Application.Services;
 
 public class WorkoutsService(IWorkoutsRepository workoutsRepository)
 {
-    public Task<Guid> CreateAsync(Guid userId, string title, CancellationToken ct)
+    public async Task<Guid> CreateAsync(Guid userId, string title, CancellationToken ct)
     {
-        return workoutsRepository.CreateAsync(userId, title, ct);
+        return await workoutsRepository.CreateAsync(userId, title, ct);
     }
 
-    public Task DeleteAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid userId, Guid id, CancellationToken ct)
     {
-        return workoutsRepository.DeleteAsync(id, ct);
+        await workoutsRepository.DeleteAsync(userId, id, ct);
     }
 
-    public Task<Workout?> GetCurrentAsync(Guid userId, CancellationToken ct)
+    public async Task<Workout?> GetCurrentAsync(Guid userId, CancellationToken ct)
     {
-        return workoutsRepository.GetCurrentAsync(userId, ct);
+        return await workoutsRepository.GetCurrentAsync(userId, ct);
     }
 
-    public Task<IEnumerable<Workout>> GetAllAsync(Guid userId, CancellationToken ct)
+    public async Task<IEnumerable<Workout>> GetAllAsync(Guid userId, CancellationToken ct)
     {
-        return workoutsRepository.GetAllAsync(userId, ct);
+        return await workoutsRepository.GetAllAsync(userId, ct);
     }
 
-    public Task<bool> EndCurrentAsync(Guid userId, CancellationToken ct)
+    public async Task EndCurrentAsync(Guid userId, CancellationToken ct)
     {
-        return workoutsRepository.EndCurrentAsync(userId, ct);
+        if (!await workoutsRepository.EndCurrentAsync(userId, ct))
+        {
+            throw new NotFoundException("no_current_workout");
+        }
     }
 }

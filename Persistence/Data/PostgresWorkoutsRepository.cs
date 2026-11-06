@@ -12,7 +12,7 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand("""
                                                     INSERT INTO public.workouts(user_id, title)
-                                                    VALUES (user_id = @user_id, title = @title)
+                                                    VALUES (@user_id, @title)
                                                     RETURNING id;
                                                     """, connection);
 
@@ -22,14 +22,15 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
         return (Guid)(await command.ExecuteScalarAsync(ct) ?? throw new InvalidOperationException("Not received UUID"));
     }
 
-    public async Task DeleteAsync(Guid id, CancellationToken ct)
+    public async Task DeleteAsync(Guid userId, Guid id, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand("""
                                                     DELETE FROM public.workouts
-                                                    WHERE id = @id;
+                                                    WHERE id = @id AND user_id = @user_id;
                                                     """, connection);
 
+        AddUserId(userId, command);
         command.Parameters.AddWithValue("id", id);
         await command.ExecuteNonQueryAsync(ct);
     }
@@ -44,10 +45,9 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
 
         AddUserId(userId, command);
 
-        var reader = await command.ExecuteReaderAsync(ct);
-        await reader.ReadAsync(ct);
+        await using var reader = await command.ExecuteReaderAsync(ct);
 
-        return CreateWorkout(reader);
+        return await reader.ReadAsync(ct) ? CreateWorkout(reader) : null;
     }
 
     public async Task<IEnumerable<Workout>> GetAllAsync(Guid userId, CancellationToken ct)
@@ -60,7 +60,7 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
         
         AddUserId(userId, command);
 
-        var reader = await command.ExecuteReaderAsync(ct);
+        await using var reader = await command.ExecuteReaderAsync(ct);
 
         var workouts = new List<Workout>();
         
@@ -86,7 +86,7 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
                                                     WHERE user_id = @user_id AND ended_at IS NULL;
                                                     """, connection);
 
-        command.Parameters.AddWithValue("user_id", userId);
+        AddUserId(userId, command);
         
         return await command.ExecuteNonQueryAsync(ct) != 0;
     }

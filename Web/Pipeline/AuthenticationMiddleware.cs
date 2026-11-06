@@ -41,11 +41,7 @@ public static class AuthenticationMiddleware
             return null;
         }
                 
-        var getUserResult = await authService.GetUserByIdAsync(session.UserId, ct);
-
-        if (getUserResult == null) return null;
-        
-        var user = getUserResult.Value;
+        var user = await authService.GetUserByIdAsync(session.UserId, ct);
         
         return new UserClaims
         {

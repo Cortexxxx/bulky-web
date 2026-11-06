@@ -1,9 +1,7 @@
 using System.Net;
 using Application.Services;
 using Domain.Models.Workouts;
-using Web.DTOs;
 using Web.DTOs.MuscleGroup;
-using Web.Exceptions;
 using Web.Http;
 using Web.Validators;
 
@@ -24,22 +22,18 @@ public class MusclesEndpoints(MusclesService musclesService,
 
         var muscleGroup = await musclesService.GetByIdAsync(includeArchived, id,
             context.CancellationToken);
-
-        if (muscleGroup is null) ExceptionsHelpers.ThrowNotFound();
-
-        context.Response.WriteJson(muscleGroup.Value.ToResponse());
+        
+        context.Response.WriteJson(muscleGroup.ToResponse());
     }
 
     public async Task CreateMuscleGroupAsync(HttpContext context)
     {
-        var muscleGroup = await ReadMuscleGroupAsync(context);
-        await WebHelpers.ValidateRequestAsync(muscleGroupRequestValidator, muscleGroup,
-            "Incorrect muscle group request", context.CancellationToken);
+        var normalizedRequest = await ProceedMuscleRequestAsync(context);
 
         var id = await musclesService.CreateAsync(new MuscleGroup
         {
-            Title = muscleGroup.Title,
-            Description = muscleGroup.Description,
+            Title = normalizedRequest.Title,
+            Description = normalizedRequest.Description,
             ImagePath = null
         }, context.CancellationToken);
             
@@ -50,20 +44,15 @@ public class MusclesEndpoints(MusclesService musclesService,
     public async Task UpdateMuscleGroupAsync(HttpContext context)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);
-        var muscleGroup = await ReadMuscleGroupAsync(context);
-        await WebHelpers.ValidateRequestAsync(muscleGroupRequestValidator, muscleGroup,
-            "Incorrect muscle group request", context.CancellationToken);
+        var normalizedRequest = await ProceedMuscleRequestAsync(context);
 
-        var found = await musclesService.UpdateAsync(new MuscleGroup
+        await musclesService.UpdateAsync(new MuscleGroup
         {
             Id = id,
-            Title = muscleGroup.Title,
-            Description = muscleGroup.Description,
+            Title = normalizedRequest.Title,
+            Description = normalizedRequest.Description,
             ImagePath = null
         }, context.CancellationToken);
-
-        if (!found) ExceptionsHelpers.ThrowNotFound();
-
     }
 
     public async Task ArchiveMuscleGroupAsync(HttpContext context)
@@ -79,12 +68,13 @@ public class MusclesEndpoints(MusclesService musclesService,
     private async Task SetArchiveAsync(HttpContext context, bool isArchived)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);
-        var found = await musclesService.SetArchivedAsync(id, isArchived, context.CancellationToken);
-        if (!found) ExceptionsHelpers.ThrowNotFound();
+        await musclesService.SetArchivedAsync(id, isArchived, context.CancellationToken);
     }
-
-    private static async Task<MuscleGroupRequest> ReadMuscleGroupAsync(HttpContext context)
+    
+    private async Task<MuscleGroupRequest> ProceedMuscleRequestAsync(HttpContext context)
     {
-        return await context.Request.ReadJsonAsync<MuscleGroupRequest>(context.CancellationToken);
+        return await WebHelpers.ProceedRequestAsync<MuscleGroupRequest, MuscleGroupRequestValidator>(context,
+            muscleGroupRequestValidator, request => 
+                new MuscleGroupRequest(request.Title.Trim(), request.Description.Trim()), context.CancellationToken);
     }
 }

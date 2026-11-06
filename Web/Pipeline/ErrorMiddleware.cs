@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Application;
 using Web.Exceptions;
 using Web.Http;
 using Web.Routing;
@@ -15,6 +16,7 @@ public static class ErrorMiddleware
         {"server_error", Path.Combine(FilePaths.ErrorPages, "server_error.html")},
         {"forbidden", Path.Combine(FilePaths.ErrorPages, "forbidden.html")},
     };
+    
     private const string DefaultExceptionText = "Something went wrong";
     
     public static void UseErrorMiddleware(this Middleware middleware)

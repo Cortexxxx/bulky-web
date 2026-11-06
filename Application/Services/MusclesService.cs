@@ -10,9 +10,10 @@ public class MusclesService(IMuscleGroupsRepository muscleGroupsRepository)
         return await muscleGroupsRepository.GetAllAsync(includeArchived, ct);
     }
 
-    public async Task<MuscleGroup?> GetByIdAsync(bool includeArchived, Guid id, CancellationToken ct)
+    public async Task<MuscleGroup> GetByIdAsync(bool includeArchived, Guid id, CancellationToken ct)
     {
-        return await muscleGroupsRepository.GetByIdAsync(includeArchived, id, ct);
+        return await muscleGroupsRepository.GetByIdAsync(includeArchived, id, ct) 
+               ?? throw new NotFoundException("unknown_muscle_group");
     }
 
     public async Task<Guid> CreateAsync(MuscleGroup muscleGroup, CancellationToken ct)
@@ -20,13 +21,19 @@ public class MusclesService(IMuscleGroupsRepository muscleGroupsRepository)
         return await muscleGroupsRepository.CreateAsync(muscleGroup, ct);
     }
 
-    public async Task<bool> UpdateAsync(MuscleGroup muscleGroup, CancellationToken ct)
+    public async Task UpdateAsync(MuscleGroup muscleGroup, CancellationToken ct)
     {
-        return await muscleGroupsRepository.UpdateAsync(muscleGroup, ct);
+        if (!await muscleGroupsRepository.UpdateAsync(muscleGroup, ct))
+        {
+            throw new NotFoundException("unknown_muscle_group");
+        }
     }
     
-    public async Task<bool> SetArchivedAsync(Guid id, bool isArchived, CancellationToken ct)
+    public async Task SetArchivedAsync(Guid id, bool isArchived, CancellationToken ct)
     {
-        return await muscleGroupsRepository.SetArchivedAsync(id, isArchived, ct);
+        if (!await muscleGroupsRepository.SetArchivedAsync(id, isArchived, ct))
+        {
+            throw new NotFoundException("unknown_muscle_group");
+        }
     }
 }

@@ -64,7 +64,7 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
         }
         catch (PostgresException e) when(e.SqlState == PostgresErrorCodes.UniqueViolation)
         {
-            throw new MuscleGroupExistsException("Muscle group is already exists", e);
+            throw new ConflictException("muscle_group_exists", "Muscle group is already exists", e);
         }
         
         return (Guid)(guidObj ?? throw new InvalidOperationException("Not received UUID"));

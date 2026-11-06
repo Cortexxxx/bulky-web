@@ -106,7 +106,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         }
         catch (PostgresException e) when(e.SqlState == PostgresErrorCodes.UniqueViolation)
         {
-            throw new ExerciseExistsException("Exercise is already exists!", e);
+            throw new ConflictException("exercise_exists","Exercise is already exists!", e);
         }
 
         await CreateExerciseMuscles(connection, transaction, exercise, ct);
@@ -201,9 +201,8 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         }
         catch (PostgresException e) when(e.SqlState == PostgresErrorCodes.ForeignKeyViolation)
         {
-            throw new UnknownMuscleGroupException("Unknown muscle group!", e);
+            throw new UnknownMuscleGroupException(e);
         }
-
     }
     
     private static Exercise CreateExercise(NpgsqlDataReader reader, 
