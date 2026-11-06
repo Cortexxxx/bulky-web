@@ -19,7 +19,6 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         var (_, token) = await authService.CreateUserSessionAsync(userId, ct);
 
         context.Response.StatusCode = HttpStatusCode.Created;
-        context.Response.SetContentLength(0);
         SetTokenCookie(context, token);
     }
     
@@ -36,7 +35,6 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         var user = await authService.LoginUserAsync(email, password, ct);
         var (_, token) = await authService.CreateUserSessionAsync(user.Id, ct);
         
-        context.Response.SetContentLength(0);
         SetTokenCookie(context, token);
     }
 
@@ -69,7 +67,6 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
     {
         SetTokenCookie(context, "");
         context.Response.StatusCode = HttpStatusCode.NoContent;
-        context.Response.SetContentLength(0);
     }
     
     private static void SetTokenCookie(HttpContext context, string token)

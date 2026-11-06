@@ -1,54 +1,50 @@
 using Domain.Models.Auth;
 using Domain.Models.Workouts;
-using Web.DTOs;
 using Web.DTOs.Auth;
 using Web.DTOs.Exercise;
 using Web.DTOs.MuscleGroup;
+using Web.DTOs.Workout;
 
 namespace Web;
 
 public static class MappingExtensions
 {
-    public static MuscleGroupResponse ToResponse(this MuscleGroup muscleGroup)
+    public static MuscleGroupResponse ToResponse(this MuscleGroup muscleGroup) => new()
     {
-        return new MuscleGroupResponse
-        {
-            Id = muscleGroup.Id,
-            Title = muscleGroup.Title,
-            Description = muscleGroup.Description,
-            ImagePath = muscleGroup.ImagePath,
-            IsArchived = muscleGroup.IsArchived
-        };
-    }
+        Id = muscleGroup.Id,
+        Title = muscleGroup.Title,
+        Description = muscleGroup.Description,
+        ImagePath = muscleGroup.ImagePath,
+        IsArchived = muscleGroup.IsArchived
+    };
 
-    public static ExerciseMuscleGroup ToDomain(this ExerciseMuscleDto exerciseMuscleDto)
+    public static ExerciseMuscleGroup ToDomain(this ExerciseMuscleDto exerciseMuscleDto) => new()
     {
-        return new ExerciseMuscleGroup
-        {
-            MuscleGroupId = exerciseMuscleDto.MuscleGroupId,
-            Role = exerciseMuscleDto.Role
-        };
-    }
-    
-    public static ExerciseMuscleDto ToResponse(this ExerciseMuscleGroup exerciseMuscleGroup)
+        MuscleGroupId = exerciseMuscleDto.MuscleGroupId,
+        Role = exerciseMuscleDto.Role
+    };
+
+    public static ExerciseMuscleDto ToResponse(this ExerciseMuscleGroup exerciseMuscleGroup) => 
+        new(exerciseMuscleGroup.MuscleGroupId, exerciseMuscleGroup.Role);
+
+    public static ExerciseResponse ToResponse(this Exercise exercise) => new() 
+    { 
+        Id = exercise.Id,
+        Title = exercise.Title,
+        Description = exercise.Description,
+        ImagePath = exercise.ImagePath,
+        IsArchived = exercise.IsArchived,
+        MuscleGroups = exercise.MuscleGroups.Select(m => m.ToResponse()).ToList()
+    };
+
+    public static SessionResponse ToResponse(this Session session) => 
+        new(session.Id, session.CreatedAt, session.ExpiresAt);
+
+    public static WorkoutResponse ToResponse(this Workout workout) => new() 
     {
-        return new ExerciseMuscleDto(exerciseMuscleGroup.MuscleGroupId, exerciseMuscleGroup.Role);
-    }
-    
-    public static ExerciseResponse ToResponse(this Exercise exercise)
-    {
-        return new ExerciseResponse
-        {
-            Id = exercise.Id,
-            Title = exercise.Title,
-            Description = exercise.Description,
-            ImagePath = exercise.ImagePath,
-            IsArchived = exercise.IsArchived,
-            MuscleGroups = exercise.MuscleGroups.Select(m => m.ToResponse()).ToList()
-        };
-    }
-    public static SessionResponse ToResponse(this Session session)
-    {
-        return new SessionResponse(session.Id, session.CreatedAt, session.ExpiresAt);
-    }
+        Id = workout.Id,
+        Title = workout.Title,
+        StartedAt = workout.StartedAt,
+        EndedAt = workout.EndedAt
+    };
 }

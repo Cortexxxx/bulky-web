@@ -1,5 +1,6 @@
 using FluentValidation;
 using Web.DTOs;
+using Web.DTOs.Workout;
 
 namespace Web.Validators;
 

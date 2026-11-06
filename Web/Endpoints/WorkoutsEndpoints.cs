@@ -1,7 +1,6 @@
 using System.Net;
 using Application.Services;
-using Web.DTOs;
-using Web.Exceptions;
+using Web.DTOs.Workout;
 using Web.Http;
 using Web.Validators;
 
@@ -23,21 +22,33 @@ public class WorkoutsEndpoints(WorkoutsService workoutsService, WorkoutRequestVa
 
     public async Task DeleteAsync(HttpContext context)
     {
-        
+        var id = WebHelpers.GetIdOrThrowNotFound(context);
+        await workoutsService.DeleteAsync(context.Request.RequiredUserClaims.Id, id, context.CancellationToken);
+        context.Response.StatusCode = HttpStatusCode.NoContent;
     }
 
     public async Task GetCurrentAsync(HttpContext context)
     {
-
+        var workout = await workoutsService.GetCurrentAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
+        
+        if (workout == null)
+        {
+            context.Response.StatusCode = HttpStatusCode.NoContent;
+        }
+        else
+        {
+            context.Response.WriteJson(workout.Value.ToResponse());
+        }
     }
 
     public async Task GetAllAsync(HttpContext context)
     {
-
+        var workouts = await workoutsService.GetAllAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
+        context.Response.WriteJson(workouts);
     }
 
     public async Task EndCurrentAsync(HttpContext context)
     {
-
+        await workoutsService.EndCurrentAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
     }
 }
