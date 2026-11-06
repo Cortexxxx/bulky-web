@@ -25,9 +25,7 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
     
     public async Task GetMeAsync(HttpContext context)
     {
-        var user = context.Request.UserClaims;
-        if (user == null) ExceptionsHelpers.ThrowUnauthorized();
-        context.Response.WriteJson(user);
+        context.Response.WriteJson(context.Request.RequiredUserClaims);
     }
 
     public async Task LoginUserAsync(HttpContext context)
@@ -56,17 +54,13 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
 
     public async Task FullLogoutAsync(HttpContext context)
     {
-        if (context.Request.UserClaims == null) ExceptionsHelpers.ThrowUnauthorized();
-        
-        await authService.FullLogoutAsync(context.Request.UserClaims.Id, context.CancellationToken);
+        await authService.FullLogoutAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
         FillLogoutResponse(context);
     }
 
     public async Task GetSessionsAsync(HttpContext context)
     {
-        if (context.Request.UserClaims == null) ExceptionsHelpers.ThrowUnauthorized();
-
-        var sessions = await authService.GetUserSessionsAsync(context.Request.UserClaims.Id, context.CancellationToken);
+        var sessions = await authService.GetUserSessionsAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
         
         context.Response.WriteJson(sessions.Select(s => s.ToResponse()).ToList());
     }

@@ -14,10 +14,8 @@ public class WorkoutsEndpoints(WorkoutsService workoutsService, WorkoutRequestVa
         var ct = context.CancellationToken;
         var normalizedRequest = await WebHelpers.ProceedRequestAsync<WorkoutRequest, WorkoutRequestValidator>(context,
             validator, request => new WorkoutRequest { Title = request.Title.Trim() }, ct);
-
-        if (context.Request.UserClaims == null) ExceptionsHelpers.ThrowUnauthorized();
         
-        var id = await workoutsService.CreateAsync(context.Request.UserClaims.Id, normalizedRequest.Title, ct);
+        var id = await workoutsService.CreateAsync(context.Request.RequiredUserClaims.Id, normalizedRequest.Title, ct);
 
         context.Response.StatusCode = HttpStatusCode.Created;
         context.Response.WriteJson(id);

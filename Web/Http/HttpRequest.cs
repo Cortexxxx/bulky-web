@@ -29,6 +29,20 @@ public class HttpRequest
     public IReadOnlyDictionary<string, string>? RouteParameters { get; set; }
     public Route? Route { get; set; }
     public UserClaims? UserClaims;
+
+    public UserClaims RequiredUserClaims
+    {
+        get
+        {
+            if (UserClaims != null)
+            {
+                return UserClaims;
+            }
+
+            ExceptionsHelpers.ThrowUnauthorized();
+            return null;
+        }
+    }
     private byte[]? _bodyBytes;
     
     public async Task<T> ReadJsonAsync<T>(CancellationToken ct)
