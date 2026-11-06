@@ -23,6 +23,7 @@ public static class ErrorMiddleware
         {
             middleware.AddElement(async (context, next) =>
             {
+
                 var response = context.Response;
                 try
                 {

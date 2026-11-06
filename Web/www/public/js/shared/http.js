@@ -24,6 +24,10 @@ export function putData(path, body = "") {
     return request("PUT", path, body);
 }
 
+export function deleteData(path, body = "") {
+    return request("DELETE", path);
+}
+
 async function handleResponse(response) {
     const responseBody = await getResponseBody(response);
 

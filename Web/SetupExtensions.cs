@@ -14,14 +14,14 @@ public static class SetupExtensions
     private static readonly AuthRequirements AuthorizedOnly = new(AuthMode.Required);
     private static readonly AuthRequirements AdminOnly = new(AuthMode.Required, Role.Admin);
     const RouteKind Api = RouteKind.Api;
-    const RouteKind Page = RouteKind.Api;
+    const RouteKind Page = RouteKind.Page;
 
     public static void Setup(this Middleware middleware, Router router, AuthService authService)
     {
         middleware.UseErrorMiddleware();
-        middleware.UseApiErrors();
         middleware.UseStaticFiles();
         middleware.UseRouting(router);
+        middleware.UseApiErrors();
         middleware.UseAuthentication(authService);
         middleware.UseAuthorization();
         middleware.UseEndpoints();
