@@ -821,3 +821,32 @@ body {
     max-width: 520px;
     height: auto;
 }
+/* ---------- Toasts ---------- */
+.toast-container {
+    z-index: 1100;
+}
+
+.app-toast {
+    --bs-toast-bg: #ffffff;
+    --bs-toast-color: var(--bulky-ink);
+    --bs-toast-border-radius: 0.9rem;
+    --bs-toast-box-shadow: 0 0.75rem 2rem rgba(20, 24, 31, 0.14);
+    border-left: 4px solid var(--app-toast-accent, var(--bulky-muted)) !important;
+}
+
+.app-toast-body {
+    padding: 1rem 0.75rem 1rem 1.1rem;
+    font-weight: 500;
+}
+
+.app-toast-error {
+    --app-toast-accent: #d6334a;
+}
+
+.app-toast-success {
+    --app-toast-accent: var(--bulky-accent);
+}
+
+.app-toast-info {
+    --app-toast-accent: var(--bulky-muted);
+}

@@ -1,3 +1,6 @@
+import {showErrorToasts} from "./toast.js";
+import {handleErrors} from "./http.js";
+
 export function showErrors(box, messages) {
     box.replaceChildren();
     const list = document.createElement("ul")
@@ -16,4 +19,13 @@ export function showErrors(box, messages) {
 export function clearErrors(box) {
     box.replaceChildren();
     box.classList.add('d-none');
-}   
+}
+
+export async function withErrorToasts(action) {
+    try {
+        return await action();
+    } catch (e) {
+        showErrorToasts(handleErrors(e));
+        return undefined;
+    }
+}

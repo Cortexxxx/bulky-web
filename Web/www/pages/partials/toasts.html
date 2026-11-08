@@ -1,0 +1,15 @@
+<!-- Контейнер уведомлений и шаблон одного toast. Используется из /js/shared/toast.js.
+     Скрипт Bootstrap подключается здесь, поэтому на странице с {{toasts}} отдельно его добавлять не нужно. -->
+<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<template id="toast-template">
+    <div class="toast app-toast border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex align-items-start">
+            <div class="toast-body app-toast-body"></div>
+            <button type="button" class="btn-close me-3 mt-3 ms-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

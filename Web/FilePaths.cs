@@ -13,5 +13,6 @@ public static class FilePaths
     public static readonly string HeaderPartial = Path.Combine(Partials, "header.html");
     public static readonly string GuestsHeaderPartial = Path.Combine(Partials, "guests_header.html");
     public static readonly string FooterPartial = Path.Combine(Partials, "footer.html");
-    public static readonly string Public = Path.Combine(Root, "public");
+    public static readonly string ToastsPartial = Path.Combine(Partials, "toasts.html");
+    public static readonly string Public =Path.Combine(Root, "public");
 }

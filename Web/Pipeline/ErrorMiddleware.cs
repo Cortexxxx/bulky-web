@@ -1,7 +1,5 @@
 using System.Net;
 using System.Text;
-using Application;
-using Web.Exceptions;
 using Web.Http;
 using Web.Routing;
 using WebException = Web.Exceptions.WebException;
