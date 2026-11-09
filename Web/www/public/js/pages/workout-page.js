@@ -2,6 +2,7 @@ import {
     createSet,
     createWorkout,
     createWorkoutExercise,
+    deleteSet,
     deleteWorkout, deleteWorkoutExercise,
     endCurrentWorkout,
     getCurrentWorkout
@@ -150,6 +151,14 @@ function renderWorkoutExercises() {
             reps.value = set.repeats;
             reps.setAttribute('aria-label', `Reps, set ${setNumber}`);
 
+            const deleteSetButton = setRow.querySelector('.delete-set-btn');
+            deleteSetButton.setAttribute('aria-label', `Delete set ${setNumber}`);
+            deleteSetButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await withErrorToasts(() => deleteSet(set.id));
+                await refreshCurrent();
+            });
+
             rowsList.append(setRow);
         }
 
@@ -187,7 +196,7 @@ async function setupExercisePicker() {
             
             exerciseNode.addEventListener('click', async (e) => {
                 e.preventDefault();
-                await createWorkoutExercise(exercise.id);
+                await withErrorToasts(() => createWorkoutExercise(exercise.id));
                 await refreshCurrent();
                 addExerciseDialog.close();
             });

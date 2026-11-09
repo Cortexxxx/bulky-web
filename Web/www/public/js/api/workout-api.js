@@ -31,5 +31,9 @@ export async function deleteWorkoutExercise(id) {
 }
 
 export async function createSet(workoutExerciseId) {
-    return await postData("/api/workouts/current/set", JSON.stringify(workoutExerciseId));
+    return await postData("/api/workouts/current/sets", JSON.stringify(workoutExerciseId));
+}
+
+export async function deleteSet(id) {
+    await deleteData(`/api/workouts/current/sets/${id}`);
 }
