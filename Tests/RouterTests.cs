@@ -12,10 +12,10 @@ public class RouterTests
     private static Router CreateTestRouter()
     {
         var router = new Router();
-        router.Map(HttpMethod.Get,"api/programs/{id}", _ => Task.CompletedTask, RouteKind.Api);
-        router.Map(HttpMethod.Post, "api/programs", _ => Task.CompletedTask, RouteKind.Api);
-        router.Map(HttpMethod.Get, "api/programs", _ => Task.CompletedTask, RouteKind.Api);
-        router.Map(HttpMethod.Get, "api/programs/info", _ => Task.CompletedTask, RouteKind.Api);
+        router.MapGet("api/programs/{id}", _ => Task.CompletedTask);
+        router.MapPost("api/programs", _ => Task.CompletedTask);
+        router.MapGet("api/programs", _ => Task.CompletedTask);
+        router.MapGet("api/programs/info", _ => Task.CompletedTask);
         router.Initialize();
         return router;
     }
@@ -94,13 +94,13 @@ public class RouterTests
     {
         // Arrange
         var router = new Router();
-        router.Map(HttpMethod.Get, "api/programs", _ => Task.CompletedTask, RouteKind.Api);
+        router.MapGet("api/programs", _ => Task.CompletedTask);
         
         // Act
         
         // Assert
         Assert.Throws<InvalidOperationException>(() => 
-                router.Map(HttpMethod.Get, "api/programs", _ => Task.CompletedTask, RouteKind.Api));
+                router.MapGet("api/programs", _ => Task.CompletedTask));
     }
     
     [Fact]
@@ -108,12 +108,12 @@ public class RouterTests
     {
         // Arrange
         var router = new Router();
-        router.Map(HttpMethod.Get, "api/programs", _ => Task.CompletedTask, RouteKind.Api);
+        router.MapGet("api/programs", _ => Task.CompletedTask);
         router.Initialize();
         // Act
         
         // Assert
         Assert.Throws<InvalidOperationException>(() => 
-            router.Map(HttpMethod.Get, "api/workouts", _ => Task.CompletedTask, RouteKind.Api));
+            router.MapGet("api/workouts", _ => Task.CompletedTask));
     }
 }

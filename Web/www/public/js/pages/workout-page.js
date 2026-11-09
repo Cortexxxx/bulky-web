@@ -1,18 +1,37 @@
-import {createWorkout, deleteWorkout, endCurrentWorkout, getCurrentWorkout} from "../api/workout-api.js";
+import {
+    createWorkout,
+    createWorkoutExercise,
+    deleteWorkout,
+    endCurrentWorkout,
+    getCurrentWorkout
+} from "../api/workout-api.js";
 import {withErrorToasts} from "../shared/ui.js";
+import {getAllExercises} from "../api/exercise-api.js";
+import {getAllMuscles} from "../api/muscle-api.js";
 
 const createWorkoutDialog = document.getElementById('create-workout-dialog');
 const confirmDialog = document.getElementById('confirm-dialog');
 const workoutPanel = document.getElementById('workout-panel');
 const createWorkoutForm = document.getElementById('create-workout-form');
+
 const startWorkoutButton = document.getElementById('workout-start');
 const finishWorkoutButton = document.getElementById('finish-workout-btn');
 const deleteWorkoutButton = document.getElementById('delete-workout-btn');
 const workoutTitle = workoutPanel.querySelector('#workout-title');
+
+const addExerciseButton = document.getElementById('add-exercise-btn');
+const addExerciseDialog = document.getElementById('add-exercise-dialog');
+const exercisePickerList = document.getElementById("exercise-picker");
+const pickerGroupTemplate = document.getElementById("picker-group-template");
+const pickerItemTemplate = document.getElementById("picker-item-template");
+const rowTemplate = document.getElementById("row-template");
+const exerciseTemplate = document.getElementById('exercise-template');
+
 let currentWorkout;
 
 await setupWorkout();
 await setupCreateDialog();
+await setupExercisePicker();
 
 async function setupWorkout() {
 
@@ -31,6 +50,14 @@ async function setupWorkout() {
         createWorkoutDialog.returnValue = "";
         createWorkoutDialog.showModal();
     });
+
+    addExerciseButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        addExerciseDialog.returnValue = "";
+        addExerciseDialog.showModal();
+    });
+    
     renderCurrentWorkout();
 }
 async function setupCreateDialog() {
@@ -81,5 +108,81 @@ function renderCurrentWorkout() {
         startWorkoutButton.classList.add('d-none');
         workoutPanel.classList.remove('d-none');
         workoutTitle.textContent = currentWorkout.title;
+        renderWorkoutExercises();
+    }
+}
+
+function renderWorkoutExercises() {
+    const exerciseList = document.getElementById('exercise-list');
+    exerciseList.replaceChildren();
+
+    for (const [exerciseIndex, exercise] of currentWorkout.exercises.entries()) {
+        const exerciseCard = exerciseTemplate.content.firstElementChild.cloneNode(true);
+        exerciseCard.dataset.id = exercise.id;
+        exerciseCard.querySelector('.exercise-number').textContent = exerciseIndex + 1;
+        exerciseCard.querySelector('.exercise-name').textContent = exercise.exerciseTitle;
+
+        const rowsList = exerciseCard.querySelector('.exercise-sets');
+
+        for (const [setIndex, set] of exercise.sets.entries()) {
+            const setRow = rowTemplate.content.firstElementChild.cloneNode(true);
+            const setNumber = setIndex + 1;
+            const weight = setRow.querySelector('.set-weight');
+            const reps = setRow.querySelector('.set-reps');
+
+            setRow.dataset.id = set.id;
+            setRow.querySelector('.set-number').textContent = setNumber;
+            weight.value = set.weight;
+            weight.setAttribute('aria-label', `Weight, set ${setNumber}`);
+            reps.value = set.repeats;
+            reps.setAttribute('aria-label', `Reps, set ${setNumber}`);
+
+            rowsList.append(setRow);
+        }
+
+        exerciseList.append(exerciseCard);
+    }
+}
+
+async function setupExercisePicker() {
+    const exercises = await getAllExercises();
+    const muscleGroups = await getAllMuscles();
+    
+    const grouped = new Map();
+    
+    for (const exercise of exercises) {
+        const groupId = exercise.muscleGroups.find(g => g.role === "primary")?.muscleGroupId ?? "other";
+        
+        if (!grouped.has(groupId)) {
+            grouped.set(groupId, []);
+        }
+        grouped.get(groupId).push(exercise);
+    }
+
+    for (const group of muscleGroups.toSorted((a, b) => a.title.localeCompare(b.title))) {
+        const groupExercises = grouped.get(group.id);
+        if (groupExercises === undefined) continue;
+        const groupNode = pickerGroupTemplate.content.firstElementChild.cloneNode(true);
+        groupNode.dataset.id = group.id;
+        groupNode.querySelector('h3').textContent = group.title;
+
+        for (const exercise of groupExercises) {
+            const exerciseNode = pickerItemTemplate.content.firstElementChild.cloneNode(true);
+
+            exerciseNode.dataset.id = exercise.id;
+            exerciseNode.textContent = exercise.title;
+            
+            exerciseNode.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await createWorkoutExercise(exercise.id);
+                currentWorkout = await getCurrentWorkout();
+                renderCurrentWorkout();
+                addExerciseDialog.close();
+            });
+            
+            groupNode.append(exerciseNode);
+        }
+
+        exercisePickerList.append(groupNode);
     }
 }

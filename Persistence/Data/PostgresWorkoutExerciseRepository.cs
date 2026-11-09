@@ -18,7 +18,7 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
             WHERE w.user_id = @user_id AND w.ended_at IS NULL
             group by w.id
             RETURNING id;
-        """);
+        """, connection);
 
         command.Parameters.AddWithValue("user_id", userId);
         command.Parameters.AddWithValue("exercise_id", exerciseId);
@@ -36,17 +36,7 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
 
         return id ?? throw new NotFoundException("not_active_workout");
     }
-
-    public Task<WorkoutExercise> GetWorkoutExerciseByIdAsync(Guid userId, Guid id, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<WorkoutExercise>> GetAllWorkoutExercisesAsync(Guid userId, CancellationToken ct)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public Task<bool> DeleteWorkoutExerciseAsync(Guid userId, Guid id)
     {
         throw new NotImplementedException();

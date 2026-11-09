@@ -13,8 +13,6 @@ public static class SetupExtensions
     private static readonly AuthRequirements Public = new(AuthMode.Public);
     private static readonly AuthRequirements AuthorizedOnly = new(AuthMode.Required);
     private static readonly AuthRequirements AdminOnly = new(AuthMode.Required, Role.Admin);
-    const RouteKind Api = RouteKind.Api;
-    const RouteKind Page = RouteKind.Page;
 
     public static void Setup(this Middleware middleware, Router router, AuthService authService)
     {
@@ -30,104 +28,89 @@ public static class SetupExtensions
 
     public static void MapPages(this Router router)
     {
-        router.Map(HttpMethod.Get, "", context =>
-            PagesEndpoints.GetPage(context, "home.html"), Page, Public);
-        router.Map(HttpMethod.Get, "home", context =>
-            PagesEndpoints.GetPage(context, "home.html"), Page, Public);
-        router.Map(HttpMethod.Get, "login", context =>
-            PagesEndpoints.GetPage(context, "login.html"), Page, GuestsOnly);
+        router.MapHtmlPage("", "home.html", Public);
+        router.MapHtmlPage("home", "home.html", Public);
+        router.MapHtmlPage("login", "login.html", GuestsOnly);
 
-        router.Map(HttpMethod.Get, "dashboard/account", context =>
-            PagesEndpoints.GetPage(context, "dashboard/account.html"), Page, AuthorizedOnly);
-        router.Map(HttpMethod.Get, "dashboard/workout", context =>
-            PagesEndpoints.GetPage(context, "dashboard/workout.html"), Page, AuthorizedOnly);
-        router.Map(HttpMethod.Get, "dashboard/history", context =>
-            PagesEndpoints.GetPage(context, "dashboard/history.html"), Page, AuthorizedOnly);
-        router.Map(HttpMethod.Get, "dashboard/analytics", context =>
-            PagesEndpoints.GetPage(context, "dashboard/analytics.html"), Page, AuthorizedOnly);
+        router.MapHtmlPage("dashboard/account", "dashboard/account.html", AuthorizedOnly);
+        router.MapHtmlPage("dashboard/workout", "dashboard/workout.html", AuthorizedOnly);
+        router.MapHtmlPage("dashboard/history", "dashboard/history.html", AuthorizedOnly);
+        router.MapHtmlPage("dashboard/analytics", "dashboard/analytics.html", AuthorizedOnly);
 
-        router.Map(HttpMethod.Get, "admin", context =>
-            PagesEndpoints.GetPage(context, "admin.html"), Page, AdminOnly);
+        router.MapHtmlPage("admin", "admin.html", AdminOnly);
     }
-
+    
     public static void MapAuthApi(this Router router, AuthService authService,
         RegisterRequestValidator registerRequestValidator)
     {
         var authEndpoints = new AuthEndpoints(registerRequestValidator, authService);
-        router.Map(HttpMethod.Post, "api/auth/register", authEndpoints.RegisterUserAsync, Api, GuestsOnly);
-        router.Map(HttpMethod.Post, "api/auth/login", authEndpoints.LoginUserAsync, Api, GuestsOnly);
-        router.Map(HttpMethod.Get, "api/auth/me", authEndpoints.GetMeAsync, Api, AuthorizedOnly);
-        router.Map(HttpMethod.Post, "api/auth/logout", authEndpoints.LogoutAsync, Api, AuthorizedOnly);
-        router.Map(HttpMethod.Post, "api/auth/logoutall", authEndpoints.FullLogoutAsync, Api, AuthorizedOnly);
-        router.Map(HttpMethod.Get, "api/auth/sessions", authEndpoints.GetSessionsAsync, Api, AuthorizedOnly);
+        router.MapPost("api/auth/register", authEndpoints.RegisterUserAsync, GuestsOnly);
+        router.MapPost("api/auth/login", authEndpoints.LoginUserAsync, GuestsOnly);
+        router.MapGet("api/auth/me", authEndpoints.GetMeAsync, AuthorizedOnly);
+        router.MapPost("api/auth/logout", authEndpoints.LogoutAsync, AuthorizedOnly);
+        router.MapPost("api/auth/logoutall", authEndpoints.FullLogoutAsync, AuthorizedOnly);
+        router.MapGet("api/auth/sessions", authEndpoints.GetSessionsAsync, AuthorizedOnly);
     }
 
     public static void MapMuscleGroupsApi(this Router router, MusclesService musclesService,
         MuscleGroupRequestValidator muscleGroupRequestValidator)
     {
         var musclesEndpoints = new MusclesEndpoints(musclesService, muscleGroupRequestValidator);
-        
-        router.Map(HttpMethod.Get, "api/muscle_groups",
-            context => musclesEndpoints.GetAllMuscleGroupsAsync(false, context), Api, 
-            AuthorizedOnly);
-        router.Map(HttpMethod.Get, "api/muscle_groups/{id}",
-            context => musclesEndpoints.GetMuscleGroupByIdAsync(false, context), Api, 
-            AuthorizedOnly);
-        
-        router.Map(HttpMethod.Get, "api/admin/muscle_groups",
-            context => musclesEndpoints.GetAllMuscleGroupsAsync(true, context), Api, 
-            AdminOnly);
-        router.Map(HttpMethod.Get, "api/admin/muscle_groups/{id}",
-            context => musclesEndpoints.GetMuscleGroupByIdAsync(true, context), Api, 
-            AdminOnly);
-        
-        router.Map(HttpMethod.Post, "api/muscle_groups",
-            musclesEndpoints.CreateMuscleGroupAsync, Api, AdminOnly);
-        router.Map(HttpMethod.Put, "api/muscle_groups/{id}",
-            musclesEndpoints.UpdateMuscleGroupAsync, Api, AdminOnly);
-        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/archive",
-            musclesEndpoints.ArchiveMuscleGroupAsync, Api, AdminOnly);
-        router.Map(HttpMethod.Post, "api/muscle_groups/{id}/unarchive",
-            musclesEndpoints.UnarchiveMuscleGroupAsync, Api, AdminOnly);
+
+        router.MapGet("api/muscle_groups", context => 
+            musclesEndpoints.GetAllMuscleGroupsAsync(false, context), AuthorizedOnly);
+        router.MapGet("api/muscle_groups/{id}", context => 
+            musclesEndpoints.GetMuscleGroupByIdAsync(false, context), AuthorizedOnly);
+        router.MapGet("api/admin/muscle_groups", context => 
+            musclesEndpoints.GetAllMuscleGroupsAsync(true, context), AdminOnly);
+        router.MapGet("api/admin/muscle_groups/{id}", context => 
+            musclesEndpoints.GetMuscleGroupByIdAsync(true, context), AdminOnly);
+
+        router.MapPost("api/muscle_groups", musclesEndpoints.CreateMuscleGroupAsync, AdminOnly);
+        router.MapPut("api/muscle_groups/{id}", musclesEndpoints.UpdateMuscleGroupAsync, AdminOnly);
+        router.MapPost("api/muscle_groups/{id}/archive", musclesEndpoints.ArchiveMuscleGroupAsync, AdminOnly);
+        router.MapPost("api/muscle_groups/{id}/unarchive", musclesEndpoints.UnarchiveMuscleGroupAsync, AdminOnly);
     }
-    
+
     public static void MapExercisesApi(this Router router, ExercisesService exercisesService,
         ExerciseRequestValidator exerciseRequestValidator)
     {
         var exercisesEndpoints = new ExercisesEndpoints(exercisesService, exerciseRequestValidator);
 
-        router.Map(HttpMethod.Get, "api/exercises", context => 
-            exercisesEndpoints.GetAllExercisesAsync(false, context), Api, AuthorizedOnly);
-        router.Map(HttpMethod.Get, "api/exercises/{id}", context => 
-            exercisesEndpoints.GetExerciseByIdAsync(false, context), Api, AuthorizedOnly);
-
-        router.Map(HttpMethod.Get, "api/admin/exercises", context => 
-            exercisesEndpoints.GetAllExercisesAsync(true, context), Api, AdminOnly);
-        router.Map(HttpMethod.Get, "api/admin/exercises/{id}", context => 
-            exercisesEndpoints.GetExerciseByIdAsync(true, context), Api, AdminOnly);
-        router.Map(HttpMethod.Post, "api/exercises",
-            exercisesEndpoints.CreateExerciseAsync, Api, AdminOnly);
-        router.Map(HttpMethod.Put, "api/exercises/{id}",
-            exercisesEndpoints.UpdateExerciseAsync, Api, AdminOnly);
-        router.Map(HttpMethod.Post, "api/exercises/{id}/archive",
-            exercisesEndpoints.ArchiveExerciseAsync, Api, AdminOnly);
-        router.Map(HttpMethod.Post, "api/exercises/{id}/unarchive",
-            exercisesEndpoints.UnarchiveExerciseAsync, Api, AdminOnly);
+        router.MapGet("api/exercises", context =>
+            exercisesEndpoints.GetAllExercisesAsync(false, context), AuthorizedOnly);
+        router.MapGet("api/exercises/{id}", context =>
+            exercisesEndpoints.GetExerciseByIdAsync(false, context), AuthorizedOnly);
+        router.MapGet("api/admin/exercises", context =>
+            exercisesEndpoints.GetAllExercisesAsync(true, context), AdminOnly);
+        router.MapGet("api/admin/exercises/{id}", context =>
+            exercisesEndpoints.GetExerciseByIdAsync(true, context), AdminOnly);
+        router.MapPost("api/exercises", exercisesEndpoints.CreateExerciseAsync, AdminOnly);
+        router.MapPut("api/exercises/{id}", exercisesEndpoints.UpdateExerciseAsync, AdminOnly);
+        router.MapPost("api/exercises/{id}/archive", exercisesEndpoints.ArchiveExerciseAsync, AdminOnly);
+        router.MapPost("api/exercises/{id}/unarchive", exercisesEndpoints.UnarchiveExerciseAsync, AdminOnly);
     }
 
     public static void MapWorkoutsApi(this Router router, WorkoutsService workoutsService,
         WorkoutRequestValidator workoutRequestValidator)
     {
         var workoutEndpoints = new WorkoutsEndpoints(workoutsService, workoutRequestValidator);
-        router.Map(HttpMethod.Get, "api/workouts", workoutEndpoints.GetAllAsync, 
-            Api, AuthorizedOnly);
-        router.Map(HttpMethod.Get, "api/workouts/current", workoutEndpoints.GetCurrentAsync, 
-            Api, AuthorizedOnly);
-        router.Map(HttpMethod.Post, "api/workouts/", workoutEndpoints.CreateAsync, 
-            Api, AuthorizedOnly);
-        router.Map(HttpMethod.Delete, "api/workouts/{id}", workoutEndpoints.DeleteAsync, 
-            Api, AuthorizedOnly);
-        router.Map(HttpMethod.Post, "api/workouts/current/end", workoutEndpoints.EndCurrentAsync, 
-            Api, AuthorizedOnly);
+        router.MapGet("api/workouts", workoutEndpoints.GetAllAsync, AuthorizedOnly);
+        router.MapGet("api/workouts/current", workoutEndpoints.GetCurrentAsync, AuthorizedOnly);
+        router.MapPost("api/workouts/", workoutEndpoints.CreateAsync, AuthorizedOnly);
+        router.MapDelete("api/workouts/{id}", workoutEndpoints.DeleteAsync, AuthorizedOnly);
+        router.MapPost("api/workouts/current/end", workoutEndpoints.EndCurrentAsync, AuthorizedOnly);
+    }
+
+    public static void MapWorkoutExercisesApi(this Router router, WorkoutExerciseService workoutExerciseService)
+    {
+        var workoutExerciseEndpoints = new WorkoutExercisesEndpoints(workoutExerciseService);
+        router.MapPost("api/workouts/current/exercise", workoutExerciseEndpoints.CreateAsync, AuthorizedOnly);
+    }
+    
+    private static void MapHtmlPage(this Router router, string route, string pageFilePath,
+        AuthRequirements authRequirements)
+    {
+        router.MapPage(route, context => PagesEndpoints.GetPage(context, pageFilePath), authRequirements);
     }
 }

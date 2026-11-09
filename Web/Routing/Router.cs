@@ -16,10 +16,31 @@ public class Router
         _isInitialized = true;
     }
 
-    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, RouteKind routeKind) 
-        => Map(method, template, endpointHandler, routeKind, DefaultAuthRequirements);
-    
-    public void Map(HttpMethod method, string template, EndpointHandler endpointHandler, RouteKind routeKind, AuthRequirements authRequirements)
+    /// <summary>
+    /// Registers an HTML page. Pages are always served by GET.
+    /// </summary>
+    public void MapPage(string template, EndpointHandler endpointHandler, AuthRequirements? authRequirements = null)
+        => Map(HttpMethod.Get, template, endpointHandler, RouteKind.Page,
+            authRequirements ?? DefaultAuthRequirements);
+
+    // MapGet, MapPost, MapPut and MapDelete register API routes (errors are rendered as JSON)
+    public void MapGet(string template, EndpointHandler endpointHandler, AuthRequirements? authRequirements = null)
+        => MapApi(HttpMethod.Get, template, endpointHandler, authRequirements);
+
+    public void MapPost(string template, EndpointHandler endpointHandler, AuthRequirements? authRequirements = null)
+        => MapApi(HttpMethod.Post, template, endpointHandler, authRequirements);
+
+    public void MapPut(string template, EndpointHandler endpointHandler, AuthRequirements? authRequirements = null)
+        => MapApi(HttpMethod.Put, template, endpointHandler, authRequirements);
+
+    public void MapDelete(string template, EndpointHandler endpointHandler, AuthRequirements? authRequirements = null)
+        => MapApi(HttpMethod.Delete, template, endpointHandler, authRequirements);
+
+    private void MapApi(HttpMethod method, string template, EndpointHandler endpointHandler,
+        AuthRequirements? authRequirements)
+        => Map(method, template, endpointHandler, RouteKind.Api, authRequirements ?? DefaultAuthRequirements);
+
+    private void Map(HttpMethod method, string template, EndpointHandler endpointHandler, RouteKind routeKind, AuthRequirements authRequirements)
     {
         ThrowIfInitialized();
         

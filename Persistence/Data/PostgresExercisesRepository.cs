@@ -37,7 +37,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
             {
                 if (group != null)
                 {
-                    exercise.MuscleGroups.Add(group.Value);
+                    exercise.MuscleGroups.Add(group);
                 }
             }
             else
@@ -82,7 +82,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
                 continue;
             }
             
-            exercise.MuscleGroups.Add(group.Value);
+            exercise.MuscleGroups.Add(group);
         }
 
         return exercise;
@@ -216,7 +216,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
             ImagePath = reader.IsDBNull(columns.ImagePath)
                 ? null : reader.GetString(columns.ImagePath),
             IsArchived = reader.GetBoolean(columns.IsArchived),
-            MuscleGroups = group == null ? [] : [group.Value]
+            MuscleGroups = group == null ? [] : [group]
         };
     }
     

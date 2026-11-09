@@ -28,6 +28,7 @@ var authService = new AuthService(new PostgresUserRepository(dataSource),
 var musclesService = new MusclesService(new PostgresMuscleGroupsRepository(dataSource));
 var exercisesService = new ExercisesService(new PostgresExercisesRepository(dataSource));
 var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(dataSource));
+var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(dataSource));
 
 // Routing
 
@@ -37,6 +38,7 @@ router.MapAuthApi(authService, new RegisterRequestValidator());
 router.MapMuscleGroupsApi(musclesService, new MuscleGroupRequestValidator());
 router.MapExercisesApi(exercisesService, new ExerciseRequestValidator());
 router.MapWorkoutsApi(workoutsService, new WorkoutRequestValidator());
+router.MapWorkoutExercisesApi(workoutExercisesService);
 router.Initialize();
 
 // Middleware

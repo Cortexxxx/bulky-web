@@ -21,3 +21,7 @@ export async function createWorkout(title) {
         title: title
     }));
 }
+
+export async function createWorkoutExercise(exerciseId) {
+    return await postData(`/api/workouts/current/exercise`, JSON.stringify(exerciseId));
+}
