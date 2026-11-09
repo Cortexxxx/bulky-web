@@ -6,4 +6,5 @@ public class WorkoutResponse
     public string Title { get; init; }
     public DateTime StartedAt { get; init; }
     public DateTime? EndedAt { get; init; }
+    public List<WorkoutExerciseResponse> Exercises { get; init; } = [];
 }

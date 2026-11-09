@@ -37,7 +37,7 @@ public class WorkoutsEndpoints(WorkoutsService workoutsService, WorkoutRequestVa
         }
         else
         {
-            context.Response.WriteJson(workout.Value.ToResponse());
+            context.Response.WriteJson(workout.ToResponse());
         }
     }
 

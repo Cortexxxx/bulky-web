@@ -40,11 +40,27 @@ public static class MappingExtensions
     public static SessionResponse ToResponse(this Session session) => 
         new(session.Id, session.CreatedAt, session.ExpiresAt);
 
-    public static WorkoutResponse ToResponse(this Workout workout) => new() 
+    public static WorkoutSetResponse ToResponse(this WorkoutSet set) => new()
+    {
+        Id = set.Id,
+        Repeats = set.Repeats,
+        Weight = set.Weight
+    };
+
+    public static WorkoutExerciseResponse ToResponse(this WorkoutExercise workoutExercise) => new()
+    {
+        Id = workoutExercise.Id,
+        ExerciseId = workoutExercise.ExerciseId,
+        ExerciseTitle = workoutExercise.ExerciseTitle,
+        Sets = workoutExercise.Sets.Select(s => s.ToResponse()).ToList()
+    };
+
+    public static WorkoutResponse ToResponse(this Workout workout) => new()
     {
         Id = workout.Id,
         Title = workout.Title,
         StartedAt = workout.StartedAt,
-        EndedAt = workout.EndedAt
+        EndedAt = workout.EndedAt,
+        Exercises = workout.WorkoutExercises.Select(e => e.ToResponse()).ToList()
     };
 }
