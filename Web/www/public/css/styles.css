@@ -414,6 +414,16 @@ body {
     font-weight: 700;
 }
 
+.delete-exercise-btn {
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-left: auto;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #fff;
+}
+
 .sets {
     display: flex;
     flex-direction: column;

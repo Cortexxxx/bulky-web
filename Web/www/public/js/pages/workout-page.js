@@ -1,7 +1,8 @@
 import {
+    createSet,
     createWorkout,
     createWorkoutExercise,
-    deleteWorkout,
+    deleteWorkout, deleteWorkoutExercise,
     endCurrentWorkout,
     getCurrentWorkout
 } from "../api/workout-api.js";
@@ -121,6 +122,18 @@ function renderWorkoutExercises() {
         exerciseCard.dataset.id = exercise.id;
         exerciseCard.querySelector('.exercise-number').textContent = exerciseIndex + 1;
         exerciseCard.querySelector('.exercise-name').textContent = exercise.exerciseTitle;
+        
+        exerciseCard.querySelector('.add-set-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await withErrorToasts(() => createSet(exercise.id));
+            await refreshCurrent();
+        });
+        
+        exerciseCard.querySelector('.delete-exercise-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            await withErrorToasts(() => deleteWorkoutExercise(exercise.id));
+            await refreshCurrent();
+        });
 
         const rowsList = exerciseCard.querySelector('.exercise-sets');
 
@@ -175,8 +188,7 @@ async function setupExercisePicker() {
             exerciseNode.addEventListener('click', async (e) => {
                 e.preventDefault();
                 await createWorkoutExercise(exercise.id);
-                currentWorkout = await getCurrentWorkout();
-                renderCurrentWorkout();
+                await refreshCurrent();
                 addExerciseDialog.close();
             });
             
@@ -185,4 +197,9 @@ async function setupExercisePicker() {
 
         exercisePickerList.append(groupNode);
     }
+}
+
+async function refreshCurrent() {
+    currentWorkout = await getCurrentWorkout();
+    renderCurrentWorkout();
 }

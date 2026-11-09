@@ -58,8 +58,8 @@ CREATE TABLE public.sets (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     workout_exercise_id uuid NOT NULL REFERENCES public.workout_exercises ON DELETE CASCADE ,
     set_number smallint NOT NULL check ( set_number > 0 ),
-    repeats smallint NOT NULL CHECK ( repeats > 0 ),
-    weight numeric(5, 2) NOT NULL CHECK ( weight > 0 ),
+    repeats smallint NOT NULL DEFAULT 0 CHECK ( repeats >= 0 ),
+    weight numeric(5, 2) NOT NULL DEFAULT 0 CHECK ( weight >= 0 ),
     UNIQUE (workout_exercise_id, set_number)
 );
 

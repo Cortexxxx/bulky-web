@@ -105,7 +105,9 @@ public static class SetupExtensions
     public static void MapWorkoutExercisesApi(this Router router, WorkoutExerciseService workoutExerciseService)
     {
         var workoutExerciseEndpoints = new WorkoutExercisesEndpoints(workoutExerciseService);
-        router.MapPost("api/workouts/current/exercise", workoutExerciseEndpoints.CreateAsync, AuthorizedOnly);
+        router.MapPost("api/workouts/current/exercise", workoutExerciseEndpoints.CreateExerciseAsync, AuthorizedOnly);
+        router.MapDelete("api/workouts/current/exercise/{id}", workoutExerciseEndpoints.DeleteExerciseAsync, AuthorizedOnly);
+        router.MapPost("api/workouts/current/sets", workoutExerciseEndpoints.CreateSetAsync, AuthorizedOnly);
     }
     
     private static void MapHtmlPage(this Router router, string route, string pageFilePath,
