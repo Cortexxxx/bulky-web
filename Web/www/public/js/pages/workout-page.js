@@ -30,6 +30,9 @@ const rowTemplate = document.getElementById("row-template");
 const exerciseTemplate = document.getElementById('exercise-template');
 
 let currentWorkout;
+// id подходов, которые были отрисованы в прошлый раз: новые среди них анимируем (null = первая отрисовка)
+let renderedSetIds = null;
+let renderedExerciseIds = null;
 
 await setupWorkout();
 await setupCreateDialog();
@@ -117,10 +120,21 @@ function renderCurrentWorkout() {
 function renderWorkoutExercises() {
     const exerciseList = document.getElementById('exercise-list');
     exerciseList.replaceChildren();
+    const currentSetIds = new Set();
+    const currentExerciseIds = new Set();
 
     for (const [exerciseIndex, exercise] of currentWorkout.exercises.entries()) {
         const exerciseCard = exerciseTemplate.content.firstElementChild.cloneNode(true);
         exerciseCard.dataset.id = exercise.id;
+
+        currentExerciseIds.add(exercise.id);
+        if (renderedExerciseIds !== null && !renderedExerciseIds.has(exercise.id)) {
+            exerciseCard.classList.add('exercise-card-new');
+            exerciseCard.addEventListener('animationend', (e) => {
+                if (e.target === exerciseCard) exerciseCard.classList.remove('exercise-card-new');
+            }, {once: true});
+        }
+
         exerciseCard.querySelector('.exercise-number').textContent = exerciseIndex + 1;
         exerciseCard.querySelector('.exercise-name').textContent = exercise.exerciseTitle;
         
@@ -132,7 +146,12 @@ function renderWorkoutExercises() {
         
         exerciseCard.querySelector('.delete-exercise-btn').addEventListener('click', async (e) => {
             e.preventDefault();
-            await withErrorToasts(() => deleteWorkoutExercise(exercise.id));
+            e.currentTarget.disabled = true;
+            const deleted = await withErrorToasts(async () => {
+                await deleteWorkoutExercise(exercise.id);
+                return true;
+            });
+            if (deleted) await playRemoval(exerciseCard);
             await refreshCurrent();
         });
 
@@ -155,15 +174,43 @@ function renderWorkoutExercises() {
             deleteSetButton.setAttribute('aria-label', `Delete set ${setNumber}`);
             deleteSetButton.addEventListener('click', async (e) => {
                 e.preventDefault();
-                await withErrorToasts(() => deleteSet(set.id));
+                e.currentTarget.disabled = true;
+                const deleted = await withErrorToasts(async () => {
+                    await deleteSet(set.id);
+                    return true;
+                });
+                if (deleted) await playRemoval(setRow);
                 await refreshCurrent();
             });
+
+            currentSetIds.add(set.id);
+            if (renderedSetIds !== null && !renderedSetIds.has(set.id)) {
+                setRow.classList.add('set-row-new');
+                setRow.addEventListener('animationend', () => setRow.classList.remove('set-row-new'), {once: true});
+            }
 
             rowsList.append(setRow);
         }
 
         exerciseList.append(exerciseCard);
     }
+
+    renderedSetIds = currentSetIds;
+    renderedExerciseIds = currentExerciseIds;
+}
+
+// Проигрывает анимацию удаления (класс .removing) и ждёт её конца.
+// Высоту передаём через --h: анимировать height можно только от конкретного значения, а не от auto.
+function playRemoval(element) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve();
+
+    return new Promise((resolve) => {
+        element.addEventListener('animationend', (e) => {
+            if (e.target === element) resolve();
+        });
+        element.style.setProperty('--h', `${element.offsetHeight}px`);
+        element.classList.add('removing');
+    });
 }
 
 async function setupExercisePicker() {

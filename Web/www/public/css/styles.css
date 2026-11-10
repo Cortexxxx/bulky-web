@@ -488,6 +488,103 @@ body {
     margin: 0;
 }
 
+/* Новый подход: строка плавно раскрывается по высоте, подъезжает сверху и гасит зелёную подсветку.
+   overflow: hidden нужен только на время анимации: класс снимается в JS по animationend. */
+.set-row-new {
+    overflow: hidden;
+    animation: set-row-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes set-row-in {
+    from {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        opacity: 0;
+        transform: translateY(-0.6rem);
+        background-color: var(--bulky-accent-soft);
+    }
+    to {
+        max-height: 4.5rem;
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+        opacity: 1;
+        transform: none;
+        background-color: transparent;
+    }
+}
+
+/* Новая карточка упражнения: раскрывается и подъезжает сверху.
+   margin-top от -1rem до 0 гасит скачок на gap списка в начале анимации. */
+.exercise-card-new {
+    animation: exercise-card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes exercise-card-in {
+    from {
+        max-height: 0;
+        margin-top: -1rem;
+        opacity: 0;
+        transform: translateY(-0.6rem);
+    }
+    to {
+        max-height: 14rem;
+        margin-top: 0;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Удаление: класс .removing ставит JS (playRemoval), высота берётся из --h.
+   forwards держит конечное состояние до перерисовки, чтобы элемент не мигнул обратно. */
+.set-row.removing {
+    overflow: hidden;
+    animation: set-row-out 0.3s ease-in forwards;
+}
+
+@keyframes set-row-out {
+    from {
+        height: var(--h);
+        opacity: 1;
+    }
+    to {
+        height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        border-bottom-width: 0;
+        opacity: 0;
+        transform: translateX(1rem);
+    }
+}
+
+/* margin-bottom: -1rem убирает gap списка, иначе после перерисовки остальные карточки подпрыгнут на 1rem */
+.exercise-card.removing {
+    animation: exercise-card-out 0.35s ease-in forwards;
+}
+
+@keyframes exercise-card-out {
+    from {
+        height: var(--h);
+        opacity: 1;
+    }
+    to {
+        height: 0;
+        margin-bottom: -1rem;
+        border-width: 0;
+        opacity: 0;
+        transform: translateX(1rem);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .set-row-new,
+    .exercise-card-new,
+    .set-row.removing,
+    .exercise-card.removing {
+        animation: none;
+    }
+}
+
 /* Удалить подход: маленький круглый минус */
 .delete-set-btn {
     width: 2rem;
