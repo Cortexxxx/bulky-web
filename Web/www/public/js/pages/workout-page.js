@@ -5,7 +5,7 @@ import {
     deleteSet,
     deleteWorkout, deleteWorkoutExercise,
     endCurrentWorkout,
-    getCurrentWorkout
+    getCurrentWorkout, updateSet
 } from "../api/workout-api.js";
 import {withErrorToasts} from "../shared/ui.js";
 import {getAllExercises} from "../api/exercise-api.js";
@@ -29,8 +29,8 @@ const pickerItemTemplate = document.getElementById("picker-item-template");
 const rowTemplate = document.getElementById("row-template");
 const exerciseTemplate = document.getElementById('exercise-template');
 
+
 let currentWorkout;
-// id подходов, которые были отрисованы в прошлый раз: новые среди них анимируем (null = первая отрисовка)
 let renderedSetIds = null;
 let renderedExerciseIds = null;
 
@@ -183,7 +183,22 @@ function renderWorkoutExercises() {
                 await refreshCurrent();
             });
 
+            const repeatsField = setRow.querySelector('.set-reps');
+            const weightField = setRow.querySelector('.set-weight');
+
+            repeatsField.value = set.repeats;
+            weightField.value = set.weight;
+            
+            repeatsField.addEventListener('change', async () => {
+                await withErrorToasts(() => updateSet(set.id, repeatsField.value, weightField.value));
+            });
+            
+            weightField.addEventListener('change', async () => {
+                await withErrorToasts(() => updateSet(set.id, repeatsField.value, weightField.value));
+            });
+            
             currentSetIds.add(set.id);
+            
             if (renderedSetIds !== null && !renderedSetIds.has(set.id)) {
                 setRow.classList.add('set-row-new');
                 setRow.addEventListener('animationend', () => setRow.classList.remove('set-row-new'), {once: true});
@@ -199,8 +214,6 @@ function renderWorkoutExercises() {
     renderedExerciseIds = currentExerciseIds;
 }
 
-// Проигрывает анимацию удаления (класс .removing) и ждёт её конца.
-// Высоту передаём через --h: анимировать height можно только от конкретного значения, а не от auto.
 function playRemoval(element) {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve();
 

@@ -12,8 +12,8 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
     public async Task RegisterUserAsync(HttpContext context)
     {
         var ct = context.CancellationToken;
-        var normalizedRequest = await WebHelpers.ProceedRequestAsync<RegisterRequest, RegisterRequestValidator>(context,
-            registerRequestValidator, request => request with { Email = request.Email.ToLowerInvariant().Trim() }, ct);
+        var normalizedRequest = await WebHelpers.ProceedRequestAsync(context, registerRequestValidator, 
+            request => request with { Email = request.Email.ToLowerInvariant().Trim() }, ct);
 
         var userId = await authService.RegisterUserAsync(normalizedRequest.Email, normalizedRequest.Password, ct);
         var (_, token) = await authService.CreateUserSessionAsync(userId, ct);
@@ -58,7 +58,8 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
 
     public async Task GetSessionsAsync(HttpContext context)
     {
-        var sessions = await authService.GetUserSessionsAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
+        var sessions = await authService.GetUserSessionsAsync(context.Request.RequiredUserClaims.Id, 
+            context.CancellationToken);
         
         context.Response.WriteJson(sessions.Select(s => s.ToResponse()).ToList());
     }

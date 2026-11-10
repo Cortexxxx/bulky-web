@@ -1,11 +1,13 @@
 using System.Net;
 using Application.Services;
+using Web.DTOs.Workout;
 using Web.Http;
 using Web.Routing;
+using Web.Validators;
 
 namespace Web.Endpoints;
 
-public class WorkoutExercisesEndpoints(WorkoutExerciseService service)
+public class WorkoutExercisesEndpoints(WorkoutExerciseService service, WorkoutSetRequestValidator workoutSetRequestValidator)
 {
     public async Task CreateExerciseAsync(HttpContext context)
     {
@@ -38,5 +40,13 @@ public class WorkoutExercisesEndpoints(WorkoutExerciseService service)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);
         await service.DeleteSetAsync(context.Request.RequiredUserClaims.Id, id, context.CancellationToken);
+    }
+
+    public async Task UpdateSetAsync(HttpContext context)
+    {
+        var ct = context.CancellationToken;
+        var id = WebHelpers.GetIdOrThrowNotFound(context);
+        var request = await WebHelpers.ProceedRequestAsync(context, workoutSetRequestValidator, ct);
+        await service.UpdateSetAsync(context.Request.RequiredUserClaims.Id, id, request.Repeats, request.Weight, ct);
     }
 }

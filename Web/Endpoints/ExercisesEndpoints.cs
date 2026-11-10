@@ -57,8 +57,7 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
     
     private async Task<ExerciseRequest> ProceedExerciseRequestAsync(HttpContext context, CancellationToken ct)
     {
-        return await WebHelpers.ProceedRequestAsync<ExerciseRequest, ExerciseRequestValidator>(context,
-            exerciseRequestValidator, request => request with { Title = request.Title.Trim(), 
-                Description = request.Description.Trim()}, ct);
+        return await WebHelpers.ProceedRequestAsync(context, exerciseRequestValidator, 
+            request => request with { Title = request.Title.Trim(), Description = request.Description.Trim()}, ct);
     }
 }

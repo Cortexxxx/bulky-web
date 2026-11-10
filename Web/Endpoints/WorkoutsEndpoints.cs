@@ -11,7 +11,7 @@ public class WorkoutsEndpoints(WorkoutsService workoutsService, WorkoutRequestVa
     public async Task CreateAsync(HttpContext context)
     {
         var ct = context.CancellationToken;
-        var normalizedRequest = await WebHelpers.ProceedRequestAsync<WorkoutRequest, WorkoutRequestValidator>(context,
+        var normalizedRequest = await WebHelpers.ProceedRequestAsync(context,
             validator, request => new WorkoutRequest { Title = request.Title.Trim() }, ct);
         
         var id = await workoutsService.CreateAsync(context.Request.RequiredUserClaims.Id, normalizedRequest.Title, ct);

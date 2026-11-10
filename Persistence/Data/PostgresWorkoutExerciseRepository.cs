@@ -73,9 +73,25 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
         return (Guid)(await command.ExecuteScalarAsync(ct) ?? throw new InvalidOperationException("Not received UUID"));
     }
 
-    public Task<Guid> UpdateSetAsync(Guid userId, Guid id, int repeats, decimal weight, CancellationToken ct)
+    public async Task<bool> UpdateSetAsync(Guid userId, Guid id, int repeats, decimal weight, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand(
+            """
+            UPDATE public.sets s 
+            SET weight = @weight,
+                repeats = @repeats
+            FROM public.workouts w
+            JOIN public.workout_exercises we ON w.id = we.workout_id
+            WHERE w.user_id = @user_id AND w.ended_at IS NULL AND s.id = @id AND s.workout_exercise_id = we.id
+            """, connection);
+        
+        command.Parameters.AddWithValue("user_id", userId);
+        command.Parameters.AddWithValue("id", id);
+        command.Parameters.AddWithValue("repeats", repeats);
+        command.Parameters.AddWithValue("weight", weight);
+
+        return await command.ExecuteNonQueryAsync(ct) != 0;
     }
 
     public async Task<bool> DeleteSetAsync(Guid userId, Guid id, CancellationToken ct)
@@ -88,6 +104,7 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
                    JOIN public.workout_exercises we ON we.workout_id = w.id
             WHERE s.workout_exercise_id = we.id AND w.user_id = @user_id AND s.id = @id AND w.ended_at IS NULL
             """, connection);
+        
         command.Parameters.AddWithValue("user_id", userId);
         command.Parameters.AddWithValue("id", id);
 

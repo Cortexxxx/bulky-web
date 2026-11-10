@@ -15,7 +15,7 @@ public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRe
 
         if (!found)
         {
-            throw new NotFoundException("unknown_workout_exercise");
+            throw new NotFoundException("workout_exercise_not_found");
         }
     }
 
@@ -31,5 +31,13 @@ public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRe
             throw new NotFoundException("set_not_found");
         }
     }
+
+    public async Task UpdateSetAsync(Guid userId, Guid setId, int repeats, decimal weight, CancellationToken ct)
+    {
+        if (!await workoutExerciseRepository.UpdateSetAsync(userId, setId, repeats, weight, ct))
+        {
+            throw new NotFoundException("set_not_found");
+        }
+    } 
     
 }

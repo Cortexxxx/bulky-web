@@ -38,6 +38,15 @@ export const errorMessages = {
 
     // Workouts
     no_current_workout: "You don't have an active workout.",
+    not_active_workout: "You don't have an active workout.",
+    workout_exercise_not_found: "Exercise not found in this workout.",
+
+    // Sets
+    set_not_found: "Set not found.",
+    invalid_repeats: "Reps can't be negative.",
+    too_many_repeats: "Too many reps (1000 max).",
+    invalid_weight: "Weight can't be negative.",
+    too_heavy_weight: "Weight is too large (999 kg max).",
 
     // Request errors
     bad_request: "Invalid request.",

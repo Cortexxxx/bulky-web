@@ -1,4 +1,4 @@
-import {deleteData, getData, postData} from "../shared/http.js";
+import {deleteData, getData, postData, putData} from "../shared/http.js";
 
 export async function getCurrentWorkout() {
     return await getData("/api/workouts/current");
@@ -36,4 +36,11 @@ export async function createSet(workoutExerciseId) {
 
 export async function deleteSet(id) {
     await deleteData(`/api/workouts/current/sets/${id}`);
+}
+
+export async function updateSet(id, repeats, weight) {
+    await putData(`/api/workouts/current/sets/${id}`, JSON.stringify({
+        repeats: repeats,
+        weight: weight
+    }));
 }

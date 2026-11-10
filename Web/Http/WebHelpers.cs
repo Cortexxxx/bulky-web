@@ -45,10 +45,13 @@ public static class WebHelpers
 
         return request.Route.RouteKind;
     }
+    
+    public static Task<TRequest> ProceedRequestAsync<TRequest>(HttpContext context,
+        IValidator<TRequest> validator, CancellationToken ct)
+        => ProceedRequestAsync(context, validator, request => request, ct);
 
-    public static async Task<TRequest> ProceedRequestAsync<TRequest, TValidator>(HttpContext context, 
-        TValidator validator, Func<TRequest, TRequest> normalizeFunc, CancellationToken ct) 
-        where TValidator : AbstractValidator<TRequest>
+    public static async Task<TRequest> ProceedRequestAsync<TRequest>(HttpContext context,
+        IValidator<TRequest> validator, Func<TRequest, TRequest> normalizeFunc, CancellationToken ct)
     {
         var exerciseRequest = await context.Request.ReadJsonAsync<TRequest>(ct);
         var normalizedRequest = normalizeFunc(exerciseRequest);

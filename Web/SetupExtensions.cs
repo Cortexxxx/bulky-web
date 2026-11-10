@@ -10,7 +10,7 @@ namespace Web;
 public static class SetupExtensions
 {
     private static readonly AuthRequirements GuestsOnly = new(AuthMode.GuestsOnly);
-    private static readonly AuthRequirements Public = new(AuthMode.Public);
+    private static readonly AuthRequirements Public = new();
     private static readonly AuthRequirements AuthorizedOnly = new(AuthMode.Required);
     private static readonly AuthRequirements AdminOnly = new(AuthMode.Required, Role.Admin);
 
@@ -102,13 +102,15 @@ public static class SetupExtensions
         router.MapPost("api/workouts/current/end", workoutEndpoints.EndCurrentAsync, AuthorizedOnly);
     }
 
-    public static void MapWorkoutExercisesApi(this Router router, WorkoutExerciseService workoutExerciseService)
+    public static void MapWorkoutExercisesApi(this Router router, WorkoutExerciseService workoutExerciseService,
+        WorkoutSetRequestValidator workoutSetRequestValidator)
     {
-        var workoutExerciseEndpoints = new WorkoutExercisesEndpoints(workoutExerciseService);
+        var workoutExerciseEndpoints = new WorkoutExercisesEndpoints(workoutExerciseService, workoutSetRequestValidator);
         router.MapPost("api/workouts/current/exercise", workoutExerciseEndpoints.CreateExerciseAsync, AuthorizedOnly);
         router.MapDelete("api/workouts/current/exercise/{id}", workoutExerciseEndpoints.DeleteExerciseAsync, AuthorizedOnly);
         router.MapPost("api/workouts/current/sets", workoutExerciseEndpoints.CreateSetAsync, AuthorizedOnly);
         router.MapDelete("api/workouts/current/sets/{id}", workoutExerciseEndpoints.DeleteSetAsync, AuthorizedOnly);
+        router.MapPut("api/workouts/current/sets/{id}", workoutExerciseEndpoints.UpdateSetAsync, AuthorizedOnly);
     }
     
     private static void MapHtmlPage(this Router router, string route, string pageFilePath,

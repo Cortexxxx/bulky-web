@@ -73,8 +73,7 @@ public class MusclesEndpoints(MusclesService musclesService,
     
     private async Task<MuscleGroupRequest> ProceedMuscleRequestAsync(HttpContext context)
     {
-        return await WebHelpers.ProceedRequestAsync<MuscleGroupRequest, MuscleGroupRequestValidator>(context,
-            muscleGroupRequestValidator, request => 
+        return await WebHelpers.ProceedRequestAsync(context, muscleGroupRequestValidator, request => 
                 new MuscleGroupRequest(request.Title.Trim(), request.Description.Trim()), context.CancellationToken);
     }
 }

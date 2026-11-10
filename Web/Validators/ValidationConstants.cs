@@ -7,4 +7,7 @@ public static class ValidationConstants
     
     public const int MinMuscleTitleLength = 3;
     public const int MaxMuscleTitleLength = 256;
+
+    public const int MaxSetRepeats = 1000;
+    public const int MaxSetWeight = 999;
 }

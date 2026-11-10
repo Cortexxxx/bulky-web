@@ -38,7 +38,7 @@ router.MapAuthApi(authService, new RegisterRequestValidator());
 router.MapMuscleGroupsApi(musclesService, new MuscleGroupRequestValidator());
 router.MapExercisesApi(exercisesService, new ExerciseRequestValidator());
 router.MapWorkoutsApi(workoutsService, new WorkoutRequestValidator());
-router.MapWorkoutExercisesApi(workoutExercisesService);
+router.MapWorkoutExercisesApi(workoutExercisesService, new WorkoutSetRequestValidator());
 router.Initialize();
 
 // Middleware
