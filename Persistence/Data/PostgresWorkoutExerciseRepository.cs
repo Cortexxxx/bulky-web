@@ -78,8 +78,19 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
         throw new NotImplementedException();
     }
 
-    public Task<Guid> DeleteSetAsync(Guid userId, Guid id, CancellationToken ct)
+    public async Task<bool> DeleteSetAsync(Guid userId, Guid id, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand(
+            """
+            DELETE FROM public.sets s
+                USING public.workouts w
+                   JOIN public.workout_exercises we ON we.workout_id = w.id
+            WHERE s.workout_exercise_id = we.id AND w.user_id = @user_id AND s.id = @id AND w.ended_at IS NULL
+            """, connection);
+        command.Parameters.AddWithValue("user_id", userId);
+        command.Parameters.AddWithValue("id", id);
+
+        return await command.ExecuteNonQueryAsync(ct) != 0;
     }
 }

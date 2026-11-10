@@ -1,6 +1,7 @@
 using System.Net;
 using Application.Services;
 using Web.Http;
+using Web.Routing;
 
 namespace Web.Endpoints;
 
@@ -31,5 +32,11 @@ public class WorkoutExercisesEndpoints(WorkoutExerciseService service)
         
         context.Response.WriteJson(id);
         context.Response.StatusCode = HttpStatusCode.Created;
+    }
+
+    public async Task DeleteSetAsync(HttpContext context)
+    {
+        var id = WebHelpers.GetIdOrThrowNotFound(context);
+        await service.DeleteSetAsync(context.Request.RequiredUserClaims.Id, id, context.CancellationToken);
     }
 }

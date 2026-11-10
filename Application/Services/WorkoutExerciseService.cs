@@ -23,5 +23,13 @@ public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRe
     {
         return await workoutExerciseRepository.CreateSetAsync(userId, workoutExerciseId, ct);
     }
+
+    public async Task DeleteSetAsync(Guid userId, Guid workoutExerciseId, CancellationToken ct)
+    {
+        if (!await workoutExerciseRepository.DeleteSetAsync(userId, workoutExerciseId, ct))
+        {
+            throw new NotFoundException("set_not_found");
+        }
+    }
     
 }

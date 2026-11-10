@@ -108,6 +108,7 @@ public static class SetupExtensions
         router.MapPost("api/workouts/current/exercise", workoutExerciseEndpoints.CreateExerciseAsync, AuthorizedOnly);
         router.MapDelete("api/workouts/current/exercise/{id}", workoutExerciseEndpoints.DeleteExerciseAsync, AuthorizedOnly);
         router.MapPost("api/workouts/current/sets", workoutExerciseEndpoints.CreateSetAsync, AuthorizedOnly);
+        router.MapDelete("api/workouts/current/sets/{id}", workoutExerciseEndpoints.DeleteSetAsync, AuthorizedOnly);
     }
     
     private static void MapHtmlPage(this Router router, string route, string pageFilePath,

@@ -7,5 +7,5 @@ public interface IWorkoutExerciseRepository
 
     Task<Guid> CreateSetAsync(Guid userId, Guid workoutExerciseId, CancellationToken ct);
     Task<Guid> UpdateSetAsync(Guid userId, Guid id, int repeats, decimal weight, CancellationToken ct);
-    Task<Guid> DeleteSetAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<bool> DeleteSetAsync(Guid userId, Guid id, CancellationToken ct);
 }
