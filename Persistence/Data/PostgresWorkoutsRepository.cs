@@ -64,7 +64,8 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
         await using var command = new NpgsqlCommand("""
                                                     SELECT id, title, started_at, ended_at
                                                     FROM public.workouts
-                                                    WHERE user_id = @user_id;
+                                                    WHERE user_id = @user_id
+                                                    ORDER BY started_at DESC;
                                                     """, connection);
 
         AddUserId(userId, command);

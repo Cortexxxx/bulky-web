@@ -751,6 +751,13 @@ body {
     white-space: nowrap;
 }
 
+/* Пусто: надпись по центру вместо списка */
+.history-empty {
+    margin: 4rem 0;
+    color: var(--bulky-muted);
+    text-align: center;
+}
+
 /* Модалка просмотра тренировки: шире обычной, карточки лежат на сером фоне страницы */
 .app-dialog-lg {
     width: min(42rem, calc(100% - 2rem));
