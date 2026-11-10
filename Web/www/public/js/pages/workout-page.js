@@ -21,6 +21,8 @@ const finishWorkoutButton = document.getElementById('finish-workout-btn');
 const deleteWorkoutButton = document.getElementById('delete-workout-btn');
 const workoutTitle = workoutPanel.querySelector('#workout-title');
 
+const workoutTimer = document.getElementById('workout-timer');
+let timerId = null;
 const addExerciseButton = document.getElementById('add-exercise-btn');
 const addExerciseDialog = document.getElementById('add-exercise-dialog');
 const exercisePickerList = document.getElementById("exercise-picker");
@@ -30,17 +32,18 @@ const rowTemplate = document.getElementById("row-template");
 const exerciseTemplate = document.getElementById('exercise-template');
 
 
-let currentWorkout;
+let currentWorkout = null;
 let renderedSetIds = null;
 let renderedExerciseIds = null;
-
+updateTimer();
 await setupWorkout();
 await setupCreateDialog();
 await setupExercisePicker();
 
 async function setupWorkout() {
-
+    
     currentWorkout = await getCurrentWorkout();
+    timerId = setInterval(updateTimer, 1000);
     finishWorkoutButton.addEventListener('click',
         async (e) => setConfirmDialog(e, finishWorkoutButton, async (e) => await setFinishEvent(e)));
     deleteWorkoutButton.addEventListener('click',
@@ -65,6 +68,19 @@ async function setupWorkout() {
     
     renderCurrentWorkout();
 }
+
+function updateTimer() {
+    if (currentWorkout === null) return;
+    const elapsed = Date.now() - new Date(currentWorkout.startedAt);
+    const seconds = Math.floor(elapsed / 1000) % 60;
+    const minutes = Math.floor(elapsed / 1000 / 60) % 60;
+    const hours = Math.floor(elapsed / 1000 / 60 / 60) % 24;
+    workoutTimer.textContent = `${hours > 0 ? `
+        ${String(hours).padStart(2, '0')}:` : ""}
+        ${String(minutes).padStart(2, '0')}:
+        ${String(seconds).padStart(2, '0')}`;
+}
+
 async function setupCreateDialog() {
     createWorkoutDialog.addEventListener('close', async (e) => {
         e.preventDefault();
@@ -106,13 +122,20 @@ async function setDeleteEvent(e) {
 
 
 function renderCurrentWorkout() {
+    updateTimer();
+    if (timerId !== null) {
+        clearInterval(timerId);
+    }
+    
     if (currentWorkout === null) {
         startWorkoutButton.classList.remove('d-none');
         workoutPanel.classList.add('d-none');
     } else {
+        timerId = setInterval(updateTimer, 1000);
         startWorkoutButton.classList.add('d-none');
         workoutPanel.classList.remove('d-none');
         workoutTitle.textContent = currentWorkout.title;
+        
         renderWorkoutExercises();
     }
 }

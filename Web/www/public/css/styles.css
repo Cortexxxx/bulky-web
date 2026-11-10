@@ -183,7 +183,6 @@ body {
     border-radius: 1.5rem;
     background-color: #fff;
     color: var(--bulky-ink);
-    box-shadow: 0 2rem 4rem -1rem rgba(20, 24, 31, 0.3);
     overflow: hidden;
 }
 
@@ -309,7 +308,6 @@ body {
     background-color: #fff;
     border: 1px solid #e3e6eb;
     border-radius: 1.5rem;
-    box-shadow: 0 1px 3px rgba(20, 24, 31, 0.05);
 }
 
 .workout-header {
@@ -642,6 +640,162 @@ body {
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
 }
 
+/* ---------- История тренировок ---------- */
+
+/* Узкая колонка по центру: широкие карточки с редкими данными выглядели бы разреженно */
+.history-page {
+    max-width: 48rem;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 1.75rem;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--bulky-muted);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.history-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.25rem;
+    color: var(--bulky-ink);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.history-card:hover {
+    border-color: #cfd5dc;
+}
+
+.history-card:focus-visible {
+    outline: 0;
+    border-color: var(--bulky-accent);
+    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.25);
+}
+
+/* Стрелка-«крыша»: смотрит вправо, при наведении чуть сдвигается и зеленеет */
+.history-card-chevron {
+    flex: none;
+    color: var(--bulky-muted);
+    transition: transform 0.15s, color 0.15s;
+}
+
+.history-card:hover .history-card-chevron,
+.history-card:focus-visible .history-card-chevron {
+    color: var(--bulky-accent);
+    transform: translateX(3px);
+}
+
+.history-card-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.history-card-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.history-card-title {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-card-date {
+    color: var(--bulky-muted);
+    font-size: 0.875rem;
+}
+
+.history-card-duration {
+    flex: none;
+    color: var(--bulky-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Модалка просмотра тренировки: шире обычной, карточки лежат на сером фоне страницы */
+.app-dialog-lg {
+    width: min(42rem, calc(100% - 2rem));
+    max-height: min(88vh, 46rem);
+}
+
+.history-dialog .app-dialog-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e3e6eb;
+}
+
+.history-dialog-meta {
+    margin: 0.2rem 0 0;
+    color: var(--bulky-muted);
+    font-size: 0.875rem;
+}
+
+.history-dialog-body {
+    gap: 1rem;
+    overflow-y: auto;
+    background-color: #f4f5f7;
+}
+
+/* Карточки имеют overflow: hidden, и без этого flex их бы сжимал вместо прокрутки */
+.history-dialog-body > * {
+    flex: none;
+}
+
+/* Карточка только для чтения: та же строка подхода, но без кнопки и полей ввода */
+.exercise-card-readonly .set-row {
+    grid-template-columns: 2rem 1fr 5.5rem 5rem;
+}
+
+.exercise-card-readonly .set-row:last-child {
+    border-bottom: 0;
+}
+
+.set-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.375rem;
+    font-weight: 600;
+}
+
 /* ---------- Футер ---------- */
 
 .site-footer {
@@ -759,7 +913,6 @@ body {
 
 .feature-card:hover {
     border-color: rgba(14, 124, 102, 0.45);
-    box-shadow: 0 1rem 2rem -1rem rgba(14, 124, 102, 0.25);
     transform: translateY(-2px);
 }
 
@@ -891,7 +1044,6 @@ body {
     max-width: 440px;
     border: 1px solid #e3e6eb;
     border-radius: 1.25rem;
-    box-shadow: 0 1.25rem 3rem rgba(20, 24, 31, 0.08);
 }
 
 .auth-tabs {
@@ -909,7 +1061,6 @@ body {
 .auth-tabs .nav-link.active {
     background-color: #fff;
     color: var(--bulky-ink);
-    box-shadow: 0 1px 3px rgba(20, 24, 31, 0.15);
 }
 
 /* ---------- Главная ---------- */
@@ -975,7 +1126,7 @@ body {
     --bs-toast-bg: #ffffff;
     --bs-toast-color: var(--bulky-ink);
     --bs-toast-border-radius: 0.9rem;
-    --bs-toast-box-shadow: 0 0.75rem 2rem rgba(20, 24, 31, 0.14);
+    --bs-toast-box-shadow: 0 2px 8px rgba(20, 24, 31, 0.08);
     border-left: 4px solid var(--app-toast-accent, var(--bulky-muted)) !important;
 }
 
