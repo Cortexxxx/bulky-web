@@ -24,42 +24,42 @@
         <section class="analytics-card" aria-labelledby="overview-title">
             <div class="analytics-card-header">
                 <h2 id="overview-title" class="analytics-card-title">Overview</h2>
-                <span class="analytics-card-note">Compared with the previous period</span>
             </div>
 
             <div class="analytics-stats analytics-stats-grid">
+                <!-- Значения подставляет analytics-page.js, пока он не отработал, везде прочерк -->
                 <div class="stat">
                     <div class="stat-label">Workouts, 7 days</div>
                     <div class="stat-row">
-                        <span class="stat-value">4</span>
-                        <span class="stat-delta">+1</span>
+                        <span id="workouts-week-value" class="stat-value">–</span>
+                        <span id="workouts-week-delta" class="stat-delta stat-delta-down">–</span>
                     </div>
                 </div>
                 <div class="stat">
                     <div class="stat-label">Sets, 7 days</div>
                     <div class="stat-row">
-                        <span class="stat-value">58</span>
-                        <span class="stat-delta">+8</span>
+                        <span id="sets-week-value" class="stat-value">–</span>
+                        <span id="sets-week-delta" class="stat-delta stat-delta-down">–</span>
                     </div>
                 </div>
                 <div class="stat">
                     <div class="stat-label">Workouts, 4 weeks</div>
                     <div class="stat-row">
-                        <span class="stat-value">14</span>
-                        <span class="stat-delta">+2</span>
+                        <span id="workouts-month-value" class="stat-value">–</span>
+                        <span id="workouts-month-delta" class="stat-delta stat-delta-down">–</span>
                     </div>
                 </div>
                 <div class="stat">
                     <div class="stat-label">Sets, 4 weeks</div>
                     <div class="stat-row">
-                        <span class="stat-value">241</span>
-                        <span class="stat-delta stat-delta-down">-19</span>
+                        <span id="sets-month-value" class="stat-value">–</span>
+                        <span id="sets-month-delta" class="stat-delta stat-delta-down">–</span>
                     </div>
                 </div>
                 <div class="stat">
                     <div class="stat-label">Average duration</div>
                     <div class="stat-row">
-                        <span class="stat-value">1 h 04</span>
+                        <span id="average-duration-value" class="stat-value">–</span>
                         <span class="stat-unit">min</span>
                     </div>
                 </div>
@@ -67,10 +67,11 @@
 
             <!-- Два графика рядом: на узком экране друг под другом. Каждый столбец это 7 дней, последний = последние 7 дней -->
             <div class="analytics-charts">
+                <p class="analytics-charts-caption">Last 12 weeks</p>
+
                 <div class="analytics-chart">
                     <div class="analytics-chart-header">
                         <span class="analytics-chart-title">Total volume by week, kg</span>
-                        <span class="analytics-chart-note">Last 12 weeks</span>
                     </div>
                     <div class="chart-box">
                         <canvas id="overview-volume-chart" role="img"
@@ -81,7 +82,6 @@
                 <div class="analytics-chart">
                     <div class="analytics-chart-header">
                         <span class="analytics-chart-title">Sets by week</span>
-                        <span class="analytics-chart-note">Last 12 weeks</span>
                     </div>
                     <div class="chart-box">
                         <canvas id="overview-sets-chart" role="img"
@@ -298,5 +298,7 @@
         options: chartOptions('kg', {suggestedMin: 80, suggestedMax: 110})
     });
 </script>
+
+<script type="module" src="/js/pages/analytics-page.js"></script>
 </body>
 </html>

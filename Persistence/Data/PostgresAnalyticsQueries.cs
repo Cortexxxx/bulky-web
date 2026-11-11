@@ -15,22 +15,22 @@ public class PostgresAnalyticsQueries(NpgsqlDataSource dataSource) : IAnalyticsQ
                 SELECT floor(extract(epoch from now() - w.started_at) / extract(epoch from interval '1 week'))::int AS week_number,
                        count(w) AS workouts_count, sum(w.ended_at - w.started_at) AS total_time
                 FROM public.workouts w
-                WHERE w.user_id = @user_id AND w.ended_at IS NOT NULL AND now() - started_at < interval '12 week'
+                WHERE w.user_id = @user_id AND w.ended_at IS NOT NULL AND now() - w.started_at < interval '12 week'
                 GROUP BY week_number
-            )
-            WITH weekly_sets AS (
+            ),
+            weekly_sets AS (
                 SELECT floor(extract(epoch from now() - w.started_at) / extract(epoch from interval '1 week'))::int AS week_number,
                        sum(s.repeats * s.weight) AS total_volume, count(*) AS total_sets
                 FROM public.workouts w
-                JOIN public.workout_exercises we ON w.id = we.workout_id
-                JOIN public.sets s ON we.id = s.workout_exercise_id
+                         JOIN public.workout_exercises we ON w.id = we.workout_id
+                         JOIN public.sets s ON we.id = s.workout_exercise_id
                 WHERE w.user_id = @user_id AND w.ended_at IS NOT NULL AND now() - started_at < interval '12 week' AND s.repeats != 0 AND s.weight != 0
                 GROUP BY week_number
             )
-            SELECT n AS week_number, COALESCE(w.workouts_count, 0), COALESCE(w.total_time, 0), COALESCE(s.total_volume, 0), COALESCE(s.total_sets, 0)
+            SELECT n AS week_number, COALESCE(w.workouts_count, 0) AS workouts_count, COALESCE(w.total_time, interval '0') AS total_time, COALESCE(s.total_volume, 0) AS total_volume, COALESCE(s.total_sets, 0) AS total_sets
             FROM generate_series(0,11) AS n
                      LEFT JOIN weekly_workouts w ON w.week_number = n
-                     LEFT JOIN weekly_sets s ON w.week_number = n
+                     LEFT JOIN weekly_sets s ON s.week_number = n
             
             ORDER BY n
             """, connection);
