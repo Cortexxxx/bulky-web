@@ -1,5 +1,7 @@
+using Application.Models;
 using Domain.Models.Auth;
 using Domain.Models.Workouts;
+using Web.DTOs.Analytics;
 using Web.DTOs.Auth;
 using Web.DTOs.Exercise;
 using Web.DTOs.MuscleGroup;
@@ -62,5 +64,20 @@ public static class MappingExtensions
         StartedAt = workout.StartedAt,
         EndedAt = workout.EndedAt,
         Exercises = workout.WorkoutExercises.Select(e => e.ToResponse()).ToList()
+    };
+
+    public static OverviewResponse ToResponse(this WorkoutsOverview overview) => new()
+    {
+        LastWeekWorkouts = overview.LastWeekWorkouts,
+        LastWeekWorkoutsIncrease = overview.LastWeekWorkoutsIncrease,
+        LastWeekSets = overview.LastWeekSets,
+        LastWeekSetsIncrease = overview.LastWeekSetsIncrease,
+        LastMonthWorkouts = overview.LastMonthWorkouts,
+        LastMonthWorkoutsIncrease = overview.LastMonthWorkoutsIncrease,
+        LastMonthSets = overview.LastMonthSets,
+        LastMonthSetsIncrease = overview.LastMonthSetsIncrease,
+        AverageDurationMinutes = overview.AverageDuration,
+        WeeksVolumes = overview.WeeksVolumes.ToList(),
+        WeeksSets = overview.WeeksSets.ToList()
     };
 }

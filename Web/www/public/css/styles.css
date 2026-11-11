@@ -843,6 +843,178 @@ body {
     font-weight: 600;
 }
 
+/* ---------- Аналитика ---------- */
+
+.analytics-page {
+    max-width: 72rem;
+    margin: 0 auto;
+}
+
+.analytics-card {
+    min-width: 0;
+    padding: 1.5rem;
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: 1.25rem;
+}
+
+/* Два нижних блока рядом, на узком экране друг под другом */
+.analytics-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.analytics-row > .analytics-card {
+    flex: 1 1 30rem;
+}
+
+.analytics-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.analytics-card-title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.analytics-card-note {
+    color: var(--bulky-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.analytics-select {
+    width: auto;
+    max-width: 100%;
+    border-color: #d5d9e0;
+    border-radius: 0.75rem;
+    font-weight: 600;
+}
+
+.analytics-select:focus {
+    border-color: var(--bulky-accent);
+    box-shadow: 0 0 0 0.2rem rgba(14, 124, 102, 0.2);
+}
+
+.analytics-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 3rem;
+    margin-top: 1.25rem;
+}
+
+.stat-label {
+    color: var(--bulky-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.stat-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.stat-unit {
+    color: var(--bulky-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Прирост относительно предыдущего периода */
+.stat-delta {
+    margin-left: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.analytics-chart {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #eef0f3;
+}
+
+/* Сводка из пяти показателей: равные колонки, на узком экране переносятся */
+.analytics-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+/* Несколько графиков в одном блоке: одна общая линия сверху, графики рядом */
+.analytics-charts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #eef0f3;
+}
+
+.analytics-charts > .analytics-chart {
+    flex: 1 1 24rem;
+    min-width: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+/* Прирост ниже нуля: спокойный серый вместо зелёного */
+.stat-delta-down {
+    background-color: #eef0f3;
+    color: var(--bulky-muted);
+}
+
+.analytics-chart-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.analytics-chart-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.analytics-chart-note {
+    color: var(--bulky-muted);
+    font-size: 0.8125rem;
+}
+
+/* Chart.js занимает весь контейнер, поэтому высоту задаём ему */
+.chart-box {
+    position: relative;
+    height: 16rem;
+}
+
+.chart-box-lg {
+    height: 18rem;
+}
+
 /* ---------- Футер ---------- */
 
 .site-footer {

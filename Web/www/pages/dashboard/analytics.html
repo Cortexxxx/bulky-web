@@ -13,9 +13,290 @@
 <body class="d-flex flex-column min-vh-100">
 {{header}}
 <main class="container flex-grow-1 py-5">
-    <h1 class="h3 mb-4">Analytics</h1>
+    <div class="analytics-page">
+
+        <header class="page-header">
+            <h1 class="page-title">Analytics</h1>
+            <p class="page-subtitle">Your training progress at a glance</p>
+        </header>
+
+        <!-- Блок 1: общая сводка -->
+        <section class="analytics-card" aria-labelledby="overview-title">
+            <div class="analytics-card-header">
+                <h2 id="overview-title" class="analytics-card-title">Overview</h2>
+                <span class="analytics-card-note">Compared with the previous period</span>
+            </div>
+
+            <div class="analytics-stats analytics-stats-grid">
+                <div class="stat">
+                    <div class="stat-label">Workouts, 7 days</div>
+                    <div class="stat-row">
+                        <span class="stat-value">4</span>
+                        <span class="stat-delta">+1</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Sets, 7 days</div>
+                    <div class="stat-row">
+                        <span class="stat-value">58</span>
+                        <span class="stat-delta">+8</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Workouts, 4 weeks</div>
+                    <div class="stat-row">
+                        <span class="stat-value">14</span>
+                        <span class="stat-delta">+2</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Sets, 4 weeks</div>
+                    <div class="stat-row">
+                        <span class="stat-value">241</span>
+                        <span class="stat-delta stat-delta-down">-19</span>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Average duration</div>
+                    <div class="stat-row">
+                        <span class="stat-value">1 h 04</span>
+                        <span class="stat-unit">min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Два графика рядом: на узком экране друг под другом. Каждый столбец это 7 дней, последний = последние 7 дней -->
+            <div class="analytics-charts">
+                <div class="analytics-chart">
+                    <div class="analytics-chart-header">
+                        <span class="analytics-chart-title">Total volume by week, kg</span>
+                        <span class="analytics-chart-note">Last 12 weeks</span>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="overview-volume-chart" role="img"
+                                aria-label="Bar chart of total training volume for each of the last 12 weeks"></canvas>
+                    </div>
+                </div>
+
+                <div class="analytics-chart">
+                    <div class="analytics-chart-header">
+                        <span class="analytics-chart-title">Sets by week</span>
+                        <span class="analytics-chart-note">Last 12 weeks</span>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="overview-sets-chart" role="img"
+                                aria-label="Bar chart of the number of sets for each of the last 12 weeks"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="analytics-row">
+
+            <!-- Блок 2: группы мышц -->
+            <section class="analytics-card" aria-labelledby="muscle-title">
+                <div class="analytics-card-header">
+                    <h2 id="muscle-title" class="analytics-card-title">Muscle groups</h2>
+                    <div>
+                        <label for="muscle-select" class="visually-hidden">Muscle group</label>
+                        <select id="muscle-select" class="form-select analytics-select">
+                            <option selected>Chest</option>
+                            <option>Back</option>
+                            <option>Shoulders</option>
+                            <option>Biceps</option>
+                            <option>Triceps</option>
+                            <option>Quadriceps</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="analytics-stats">
+                    <div class="stat">
+                        <div class="stat-label">Last 7 days</div>
+                        <div class="stat-row">
+                            <span class="stat-value">3 900</span>
+                            <span class="stat-unit">kg</span>
+                            <span class="stat-delta">+7%</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Last 30 days</div>
+                        <div class="stat-row">
+                            <span class="stat-value">15 300</span>
+                            <span class="stat-unit">kg</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Average per week</div>
+                        <div class="stat-row">
+                            <span class="stat-value">3 000</span>
+                            <span class="stat-unit">kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-chart">
+                    <div class="analytics-chart-header">
+                        <span class="analytics-chart-title">Volume by week, kg</span>
+                        <span class="analytics-chart-note">Primary muscle counts fully, secondary by half</span>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="muscle-chart" role="img"
+                                aria-label="Bar chart of weekly volume for the selected muscle group"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Блок 3: упражнения -->
+            <section class="analytics-card" aria-labelledby="exercise-title">
+                <div class="analytics-card-header">
+                    <h2 id="exercise-title" class="analytics-card-title">Exercises</h2>
+                    <div>
+                        <label for="exercise-select" class="visually-hidden">Exercise</label>
+                        <select id="exercise-select" class="form-select analytics-select">
+                            <option selected>Barbell bench press</option>
+                            <option>Incline dumbbell press</option>
+                            <option>Overhead press</option>
+                            <option>Barbell row</option>
+                            <option>Back squat</option>
+                            <option>Romanian deadlift</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="analytics-stats">
+                    <div class="stat">
+                        <div class="stat-label">Estimated 1RM</div>
+                        <div class="stat-row">
+                            <span class="stat-value">101</span>
+                            <span class="stat-unit">kg</span>
+                            <span class="stat-delta">+3 kg</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Sets, last 7 days</div>
+                        <div class="stat-row">
+                            <span class="stat-value">12</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Sets, last 30 days</div>
+                        <div class="stat-row">
+                            <span class="stat-value">46</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-chart">
+                    <div class="analytics-chart-header">
+                        <span class="analytics-chart-title">Estimated 1RM by week, kg</span>
+                        <span class="analytics-chart-note">Weeks without sets are skipped</span>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="exercise-chart" role="img"
+                                aria-label="Line chart of the estimated one-rep max for the selected exercise by week"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
 </main>
 
 {{toasts}}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<!-- Временно: рисует графики на тестовых данных, чтобы показать вёрстку без страницы-скрипта и бэка.
+     Когда появится analytics-page.js, этот блок нужно удалить. -->
+<script>
+    // Каждый столбец это 7 дней, подпись = дата начала периода; последний столбец = последние 7 дней
+    const weeks = Array.from({length: 12}, (_, i) => {
+        const start = new Date(Date.now() - (12 - i) * 7 * 24 * 60 * 60 * 1000);
+        return start.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+    });
+    const lastIndex = weeks.length - 1;
+
+    const accent = '#0e7c66';
+
+    // Общий вид графиков
+    Chart.defaults.font.family = 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+    Chart.defaults.color = '#5b6472';
+    Chart.defaults.plugins.legend.display = false;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#14181f';
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.displayColors = false;
+
+    function chartOptions(unit, yScale) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {grid: {display: false}, ticks: {maxRotation: 0}},
+                y: {
+                    grid: {color: '#eef0f3'},
+                    border: {display: false},
+                    ticks: {callback: value => value >= 1000 ? `${value / 1000}k` : value},
+                    ...yScale
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: items => `7 days from ${items[0].label}`,
+                        label: item => `${item.parsed.y.toLocaleString('ru-RU')} ${unit}`
+                    }
+                }
+            }
+        };
+    }
+
+    // Столбцы по неделям (данные от старых к новым); unit попадает в подсказку
+    function createBarChart(canvasId, data, unit) {
+        new Chart(document.getElementById(canvasId), {
+            type: 'bar',
+            data: {
+                labels: weeks,
+                datasets: [{
+                    data,
+                    backgroundColor: accent,
+                    borderRadius: 5,
+                    maxBarThickness: 44
+                }]
+            },
+            options: chartOptions(unit, {beginAtZero: true})
+        });
+    }
+
+    createBarChart('overview-volume-chart',
+        [9800, 11200, 10500, 12900, 13400, 12100, 14600, 15200, 14100, 16800, 17500, 18200], 'kg');
+
+    createBarChart('overview-sets-chart',
+        [38, 44, 41, 50, 52, 47, 56, 59, 54, 63, 66, 70], 'sets');
+
+    createBarChart('muscle-chart',
+        [2100, 2600, 2300, 2900, 3100, 2700, 3300, 3500, 3200, 3900, 4200, 4400], 'kg');
+
+    // Линия 1RM: null = неделя без подходов, линия в этом месте прерывается (spanGaps: false)
+    new Chart(document.getElementById('exercise-chart'), {
+        type: 'line',
+        data: {
+            labels: weeks,
+            datasets: [{
+                data: [88, 90, null, 92, 93, 93, null, 95, 97, 98, 100, 101],
+                borderColor: accent,
+                borderWidth: 2.5,
+                tension: 0,
+                spanGaps: false,
+                pointRadius: 4,
+                pointBorderWidth: 2.5,
+                pointBorderColor: accent,
+                pointBackgroundColor: ctx => ctx.dataIndex === lastIndex ? accent : '#ffffff'
+            }]
+        },
+        options: chartOptions('kg', {suggestedMin: 80, suggestedMax: 110})
+    });
+</script>
 </body>
 </html>
