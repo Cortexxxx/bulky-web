@@ -58,6 +58,30 @@ public class PostgresWorkoutsRepository(NpgsqlDataSource dataSource) : IWorkouts
         return await ReadWorkoutWithExercisesAsync(reader, ct);
     }
 
+    public async Task<Workout?> GetByIdAsync(Guid userId, Guid id, CancellationToken ct)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand("""
+                                                    SELECT w.id AS workout_id, w.title AS workout_title, w.started_at,
+                                                           w.ended_at AS ended_at,
+                                                           we.id AS workout_exercise_id, e.title AS exercise_title,
+                                                           e.id AS exercise_id, s.id AS set_id, s.repeats, s.weight
+                                                    FROM public.workouts w
+                                                    LEFT JOIN public.workout_exercises we ON we.workout_id = w.id
+                                                    LEFT JOIN public.exercises e ON we.exercise_id = e.id
+                                                    LEFT JOIN public.sets s ON s.workout_exercise_id = we.id
+                                                    WHERE w.user_id = @user_id AND w.id = @id
+                                                    ORDER BY we.exercise_number, s.set_number
+                                                    """, connection);
+
+        AddUserId(userId, command);
+        command.Parameters.AddWithValue("id", id);
+
+        await using var reader = await command.ExecuteReaderAsync(ct);
+
+        return await ReadWorkoutWithExercisesAsync(reader, ct);
+    }
+
     public async Task<IEnumerable<Workout>> GetAllAsync(Guid userId, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);

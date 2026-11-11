@@ -25,6 +25,14 @@
 
         <p id="history-empty" class="history-empty d-none">You haven't completed any workouts yet</p>
 
+        <!-- Шаблон секции месяца: заголовок и список карточек этого месяца -->
+        <template id="history-month-template">
+            <section class="history-month">
+                <h2 class="history-month-title"></h2>
+                <div class="history-month-cards"></div>
+            </section>
+        </template>
+
         <!-- Шаблон карточки: клонируется из history-page.js. Внутри только классы, id нельзя.
              Карточка это button, чтобы её можно было открыть с клавиатуры. -->
         <template id="history-card-template">
@@ -43,6 +51,32 @@
             </button>
         </template>
 
+        <!-- Шаблоны модалки: карточка упражнения и строка подхода только для чтения.
+             Строки подходов добавляются внутрь .sets после строки заголовков. -->
+        <template id="history-exercise-template">
+            <article class="exercise-card exercise-card-readonly">
+                <header class="exercise-header">
+                    <span class="exercise-number"></span>
+                    <h3 class="exercise-name"></h3>
+                </header>
+                <div class="sets">
+                    <div class="set-row set-row-head" aria-hidden="true">
+                        <span>Set</span>
+                        <span>Weight, kg</span>
+                        <span>Reps</span>
+                    </div>
+                </div>
+            </article>
+        </template>
+
+        <template id="history-set-template">
+            <div class="set-row">
+                <span class="set-number"></span>
+                <span class="set-value set-weight"></span>
+                <span class="set-value set-reps"></span>
+            </div>
+        </template>
+
     </div>
 </main>
 
@@ -50,8 +84,8 @@
 <dialog id="history-dialog" class="app-dialog app-dialog-lg history-dialog" aria-labelledby="history-dialog-title">
     <header class="app-dialog-header">
         <div class="history-dialog-heading">
-            <h2 id="history-dialog-title" class="app-dialog-title">Push day</h2>
-            <p class="history-dialog-meta">Nov 9, 2026, 6:40 PM · 1 h 12 min</p>
+            <h2 id="history-dialog-title" class="app-dialog-title"></h2>
+            <p id="history-dialog-meta" class="history-dialog-meta"></p>
         </div>
         <form method="dialog">
             <button type="submit" class="header-btn header-btn-neutral dialog-close" aria-label="Close" title="Close">
@@ -63,62 +97,12 @@
         </form>
     </header>
 
-    <div class="app-dialog-body history-dialog-body">
+    <!-- Карточки упражнений добавляет history-page.js -->
+    <div id="history-dialog-body" class="app-dialog-body history-dialog-body"></div>
 
-        <article class="exercise-card exercise-card-readonly">
-            <header class="exercise-header">
-                <span class="exercise-number">1</span>
-                <h3 class="exercise-name">Barbell bench press</h3>
-            </header>
-            <div class="sets">
-                <div class="set-row set-row-head" aria-hidden="true">
-                    <span>Set</span>
-                    <span>Weight, kg</span>
-                    <span>Reps</span>
-                </div>
-                <div class="set-row">
-                    <span class="set-number">1</span>
-                    <span class="set-value">60</span>
-                    <span class="set-value">10</span>
-                </div>
-                <div class="set-row">
-                    <span class="set-number">2</span>
-                    <span class="set-value">70</span>
-                    <span class="set-value">8</span>
-                </div>
-                <div class="set-row">
-                    <span class="set-number">3</span>
-                    <span class="set-value">75</span>
-                    <span class="set-value">6</span>
-                </div>
-            </div>
-        </article>
-
-        <article class="exercise-card exercise-card-readonly">
-            <header class="exercise-header">
-                <span class="exercise-number">2</span>
-                <h3 class="exercise-name">Overhead press</h3>
-            </header>
-            <div class="sets">
-                <div class="set-row set-row-head" aria-hidden="true">
-                    <span>Set</span>
-                    <span>Weight, kg</span>
-                    <span>Reps</span>
-                </div>
-                <div class="set-row">
-                    <span class="set-number">1</span>
-                    <span class="set-value">40</span>
-                    <span class="set-value">10</span>
-                </div>
-                <div class="set-row">
-                    <span class="set-number">2</span>
-                    <span class="set-value">42.5</span>
-                    <span class="set-value">8</span>
-                </div>
-            </div>
-        </article>
-
-    </div>
+    <footer class="history-dialog-footer">
+        <button type="button" id="history-delete-btn" class="header-btn header-btn-ghost header-btn-sm">Delete</button>
+    </footer>
 </dialog>
 
 {{toasts}}

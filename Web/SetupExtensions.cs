@@ -99,6 +99,7 @@ public static class SetupExtensions
         router.MapGet("api/workouts/current", workoutEndpoints.GetCurrentAsync, AuthorizedOnly);
         router.MapPost("api/workouts/", workoutEndpoints.CreateAsync, AuthorizedOnly);
         router.MapDelete("api/workouts/{id}", workoutEndpoints.DeleteAsync, AuthorizedOnly);
+        router.MapGet("api/workouts/{id}", workoutEndpoints.GetByIdAsync, AuthorizedOnly);
         router.MapPost("api/workouts/current/end", workoutEndpoints.EndCurrentAsync, AuthorizedOnly);
     }
 

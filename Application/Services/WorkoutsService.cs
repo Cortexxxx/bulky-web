@@ -20,6 +20,18 @@ public class WorkoutsService(IWorkoutsRepository workoutsRepository)
         return await workoutsRepository.GetCurrentAsync(userId, ct);
     }
 
+    public async Task<Workout> GetByIdAsync(Guid userId, Guid id, CancellationToken ct)
+    {
+        var workout = await workoutsRepository.GetByIdAsync(userId, id, ct);
+        
+        if (workout == null)
+        {
+            throw new NotFoundException("workout_not_found");
+        }
+
+        return workout;
+    }
+    
     public async Task<IEnumerable<Workout>> GetAllAsync(Guid userId, CancellationToken ct)
     {
         return await workoutsRepository.GetAllAsync(userId, ct);

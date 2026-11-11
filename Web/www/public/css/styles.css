@@ -667,6 +667,22 @@ body {
 .history-list {
     display: flex;
     flex-direction: column;
+    gap: 2rem;
+}
+
+.history-month-title {
+    margin: 0 0 0.75rem;
+    padding: 0 0.25rem;
+    color: var(--bulky-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.history-month-cards {
+    display: flex;
+    flex-direction: column;
     gap: 0.75rem;
 }
 
@@ -784,6 +800,30 @@ body {
 /* Карточки имеют overflow: hidden, и без этого flex их бы сжимал вместо прокрутки */
 .history-dialog-body > * {
     flex: none;
+}
+
+/* Подвал модалки с кнопкой удаления: не сжимается, прокручивается только тело */
+.history-dialog-footer {
+    display: flex;
+    flex: none;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
+    background-color: #fff;
+    border-top: 1px solid #e3e6eb;
+}
+
+/* Пустые состояния модалки: нет упражнений / нет подходов */
+.history-dialog-empty {
+    margin: 2.5rem 0;
+    color: var(--bulky-muted);
+    text-align: center;
+}
+
+.sets-empty {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    color: var(--bulky-muted);
+    text-align: center;
 }
 
 /* Карточка только для чтения: та же строка подхода, но без кнопки и полей ввода */

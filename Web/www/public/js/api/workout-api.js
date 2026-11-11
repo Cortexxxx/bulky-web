@@ -8,6 +8,10 @@ export async function getAllWorkouts() {
     return await getData("/api/workouts");
 }
 
+export async function getWorkoutById(id) {
+    return await getData(`/api/workouts/${id}`);
+}
+
 export async function endCurrentWorkout() {
     await postData("/api/workouts/current/end");
 }
@@ -15,7 +19,7 @@ export async function endCurrentWorkout() {
 export async function deleteWorkout(id) {
     await deleteData(`/api/workouts/${id}`);
 }
-
+    
 export async function createWorkout(title) {
     return await postData(`/api/workouts`, JSON.stringify({
         title: title

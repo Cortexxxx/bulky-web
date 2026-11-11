@@ -41,6 +41,14 @@ public class WorkoutsEndpoints(WorkoutsService workoutsService, WorkoutRequestVa
         }
     }
 
+    public async Task GetByIdAsync(HttpContext context)
+    {
+        var id = WebHelpers.GetIdOrThrowNotFound(context);
+        var workout = await workoutsService.GetByIdAsync(context.Request.RequiredUserClaims.Id, id, context.CancellationToken);
+
+        context.Response.WriteJson(workout.ToResponse());
+    }
+
     public async Task GetAllAsync(HttpContext context)
     {
         var workouts = await workoutsService.GetAllAsync(context.Request.RequiredUserClaims.Id, context.CancellationToken);
