@@ -1,11 +1,24 @@
 /* Bulky: общие стили поверх Bootstrap 5.3 */
 
+/* Шрифты с Google Fonts (как Bootstrap с CDN, свои файлы раздавать не нужно).
+   Inter основной текст (раньше он был только указан в font-family, но нигде не подключался), IBM Plex Mono для цифр. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
 :root {
     --bulky-accent: #0e7c66;
     --bulky-accent-dark: #095a4a;
     --bulky-accent-soft: #e3f1ed;
     --bulky-ink: #14181f;
     --bulky-muted: #5b6472;
+
+    /* Сетка страниц: одна ширина колонки, один шаг между блоками, одни отступы и скругление у карточек */
+    --page-width: 72rem;
+    --space-gap: 1.5rem;
+    --card-padding: 1.5rem;
+    --card-radius: 1.25rem;
+
+    /* Цифры (вес, повторы, таймер, показатели) моноширинным шрифтом: ровные колонки и «приборный» вид */
+    --font-numbers: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
     /* Перекрашиваем «primary» Bootstrap в наш акцент */
     --bs-primary: var(--bulky-accent);
@@ -21,6 +34,20 @@
 body {
     background-color: #f4f5f7;
     color: var(--bulky-ink);
+}
+
+/* Всё, что показывает число: шрифт для цифр и одинаковая ширина цифр */
+.stat-value,
+.stat-delta,
+.set-input,
+.set-value,
+.set-number,
+.exercise-number,
+.workout-timer,
+.history-card-number,
+.history-card-duration {
+    font-family: var(--font-numbers);
+    font-variant-numeric: tabular-nums;
 }
 
 /* Кнопка primary в нашем цвете */
@@ -43,9 +70,64 @@ body {
 
 /* ---------- Хедер (одинаковый на всех страницах) ---------- */
 
+/* Полоса прокрутки не должна сдвигать страницу: на коротких страницах (вход) и длинных (главная)
+   ширина содержимого и положение шапки совпадают */
+html {
+    scrollbar-gutter: stable;
+}
+
 .site-header {
     background-color: #fff;
     border-bottom: 1px solid #e3e6eb;
+}
+
+/* Одна шапка на всех страницах: логотип слева, навигация по центру, действия справа.
+   Высота и отступы фиксированы, поэтому при переходах между страницами шапка не «плывёт».
+   Колонки заданы явно: на гостевой шапке без навигации действия всё равно остаются справа. */
+.site-nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    min-height: 4.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.site-nav-start {
+    grid-column: 1;
+    justify-self: start;
+}
+
+.site-nav-center {
+    grid-column: 2;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.site-nav-end {
+    grid-column: 3;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 0.75rem;
+}
+
+/* Узкий экран: логотип и действия в первой строке, навигация второй строкой на всю ширину */
+@media (max-width: 47.99rem) {
+    .site-nav {
+        grid-template-columns: 1fr auto;
+    }
+
+    .site-nav-end {
+        grid-column: 2;
+    }
+
+    .site-nav-center {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
 }
 
 .site-logo {
@@ -75,7 +157,7 @@ body {
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .header-btn {
@@ -269,10 +351,8 @@ body {
     margin: 0 0 0.35rem;
     padding: 0 0.75rem;
     color: var(--bulky-muted);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 0.8125rem;
+    font-weight: 600;
 }
 
 .picker-item {
@@ -298,16 +378,13 @@ body {
 
 /* ---------- Панель тренировки ---------- */
 
+/* Вся тренировка одна белая карточка из полос на всю ширину: шапка, упражнения, добавление.
+   Секции разделены тонкими линиями, без вложенных рамок и скруглений. */
 .workout-panel {
-    align-self: stretch;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    min-height: 100%;
-    padding: 1.75rem;
+    overflow: hidden;
     background-color: #fff;
     border: 1px solid #e3e6eb;
-    border-radius: 1.5rem;
+    border-radius: var(--card-radius);
 }
 
 .workout-header {
@@ -315,41 +392,25 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid #eef0f3;
-}
-
-.workout-heading {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.4rem;
-}
-
-/* Метка «текущая тренировка»: строгий текст без фона и рамки */
-.workout-badge {
-    color: var(--bulky-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    gap: 0.75rem 1rem;
+    padding: 0.875rem var(--card-padding);
+    border-bottom: 1px solid #e3e6eb;
 }
 
 .workout-title {
     margin: 0;
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .workout-header-actions {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
-/* Компактный вариант кнопки */
+/* Компактный вариант кнопки (используется в модалке истории) */
 .header-btn-sm {
     height: 2.75rem;
     padding: 0 1.35rem;
@@ -357,62 +418,66 @@ body {
     font-size: 1rem;
 }
 
-.workout-timer {
-    display: inline-flex;
-    align-items: center;
-    height: 2.75rem;
-    padding: 0 1.1rem;
-    border: 1px solid #e3e6eb;
+/* Ещё меньше, чем header-btn-sm: для шапки тренировки (Delete, Finish). Кольцо и цвета остаются от header-btn */
+.header-btn-compact {
+    height: 2.25rem;
+    padding: 0 1rem;
     border-radius: 999px;
-    background-color: #f8f9fb;
-    color: var(--bulky-accent-dark);
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+/* Таймер: просто цифры, отделённые от кнопок тонкой линией */
+.workout-timer {
+    margin-left: 0.5rem;
+    padding-left: 1rem;
+    border-left: 1px solid #dfe3e8;
+    color: var(--bulky-ink);
+    font-size: 1rem;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
+    line-height: 1.4;
 }
 
 .exercise-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
 }
 
-/* Карточка упражнения: белая «таблица» из полос на всю ширину (шапка, строки, подвал).
-   Внутренних отступов у самой карточки нет, их задают полосы, чтобы линии шли от края до края. */
+/* Секция упражнения внутри карточки тренировки: полосы на всю ширину (шапка, заголовки колонок, строки, подвал),
+   снизу линия-разделитель. Внутренних отступов нет, их задают полосы, чтобы линии шли от края до края. */
 .exercise-card {
     overflow: hidden;
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
-    border-radius: 1.25rem;
+    border-bottom: 1px solid #e3e6eb;
 }
 
+/* Шапка упражнения на слегка сером фоне: именно она отделяет секции друг от друга и держит иерархию */
 .exercise-header {
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #e3e6eb;
+    padding: 1rem var(--card-padding);
+    background-color: #f8f9fb;
 }
 
+/* Номер упражнения: цифра цвета сайта, отделённая от названия тонкой линией, без кружка */
 .exercise-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     flex: none;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background-color: var(--bulky-accent-soft);
+    min-width: 1.5rem;
+    padding-right: 0.9rem;
+    border-right: 1px solid #dfe3e8;
     color: var(--bulky-accent-dark);
     font-size: 0.95rem;
-    font-weight: 700;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    text-align: right;
 }
 
 .exercise-name {
     margin: 0;
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 600;
 }
 
 .delete-exercise-btn {
@@ -436,8 +501,8 @@ body {
     grid-template-columns: 2rem 1fr 5.5rem 5rem 2rem;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.6rem 1.25rem;
-    border-bottom: 1px solid #e3e6eb;
+    padding: 0.6rem var(--card-padding);
+    border-bottom: 1px solid #f0f2f5;
 }
 
 .set-row > :nth-child(2) {
@@ -452,10 +517,11 @@ body {
     grid-column: 5;
 }
 
+/* Подписи колонок: просто мелкий текст на белом, без фона и линии, чтобы не спорить с шапкой упражнения */
 .set-row-head {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    background-color: #f8f9fb;
+    padding-top: 0.75rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 0;
     color: var(--bulky-muted);
     font-size: 0.75rem;
     font-weight: 600;
@@ -476,7 +542,7 @@ body {
 .set-input {
     text-align: center;
     font-weight: 600;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     -moz-appearance: textfield;
 }
 
@@ -512,8 +578,7 @@ body {
     }
 }
 
-/* Новая карточка упражнения: раскрывается и подъезжает сверху.
-   margin-top от -1rem до 0 гасит скачок на gap списка в начале анимации. */
+/* Новое упражнение: секция раскрывается и подъезжает сверху */
 .exercise-card-new {
     animation: exercise-card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -521,13 +586,11 @@ body {
 @keyframes exercise-card-in {
     from {
         max-height: 0;
-        margin-top: -1rem;
         opacity: 0;
         transform: translateY(-0.6rem);
     }
     to {
         max-height: 14rem;
-        margin-top: 0;
         opacity: 1;
         transform: none;
     }
@@ -555,7 +618,6 @@ body {
     }
 }
 
-/* margin-bottom: -1rem убирает gap списка, иначе после перерисовки остальные карточки подпрыгнут на 1rem */
 .exercise-card.removing {
     animation: exercise-card-out 0.35s ease-in forwards;
 }
@@ -567,7 +629,6 @@ body {
     }
     to {
         height: 0;
-        margin-bottom: -1rem;
         border-width: 0;
         opacity: 0;
         transform: translateX(1rem);
@@ -592,19 +653,19 @@ body {
     background-color: #fff;
 }
 
-/* Добавить подход: плоская кнопка на всю ширину, подвал таблицы */
+/* Добавить подход: тихая строка под таблицей, текст слева под номерами подходов */
 .add-set-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.5rem;
     width: 100%;
-    height: 2.75rem;
-    padding: 0;
+    height: 2.5rem;
+    padding: 0 var(--card-padding);
     border: 0;
     background-color: transparent;
     color: var(--bulky-muted);
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     font-weight: 600;
     transition: background-color 0.15s, color 0.15s;
 }
@@ -618,16 +679,27 @@ body {
 
 /* Добавить упражнение: широкая пунктирная полоса */
 .add-exercise-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     width: 100%;
-    height: 4rem;
+    height: 3.5rem;
     padding: 0;
-    border-style: dashed;
-    border-radius: 1rem;
-    color: var(--bulky-muted);
+    border: 0;
+    background-color: #f8f9fb;
+    color: var(--bulky-accent-dark);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
 }
 
-.add-exercise-btn:hover {
-    color: var(--bulky-accent);
+.add-exercise-btn:hover,
+.add-exercise-btn:focus-visible {
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    outline: 0;
 }
 
 /* Logout: алая линия, приглушённый текст в покое */
@@ -642,48 +714,184 @@ body {
 
 /* ---------- История тренировок ---------- */
 
-/* Узкая колонка по центру: широкие карточки с редкими данными выглядели бы разреженно */
 .history-page {
-    max-width: 48rem;
+    max-width: var(--page-width);
     margin: 0 auto;
 }
 
-.page-header {
-    margin-bottom: 1.75rem;
+/* Название страницы огромными буквами на фоне.
+   Надпись лежит под контентом, а белые карточки частично её закрывают: получается глубина без теней.
+   Размер задан переменной, чтобы отступ контента подстраивался под высоту букв. */
+.page-with-watermark {
+    --watermark-size: clamp(2.75rem, 11vw, 10rem);
+    position: relative;
 }
 
-.page-title {
-    margin: 0;
-    font-size: 1.75rem;
+.page-watermark {
+    position: absolute;
+    top: 1rem;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    overflow: hidden;
+    padding-left: 0.1em;
+    color: #e7eaee;
+    font-size: var(--watermark-size);
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
 }
 
-.page-subtitle {
-    margin: 0.25rem 0 0;
+/* Контент выше надписи; отступ сверху оставляет часть букв на виду */
+.page-with-watermark .watermark-content {
+    position: relative;
+    z-index: 1;
+    margin-top: calc(var(--watermark-size) * 0.45);
+}
+
+/* Колонка контента одной ширины на всех страницах; узкий вариант для страниц-форм (аккаунт) */
+.page-column {
+    max-width: var(--page-width);
+    margin: 0 auto;
+}
+
+.page-column-narrow {
+    max-width: 40rem;
+    margin: 0 auto;
+}
+
+/* Средняя колонка для страниц с формой ввода (тренировка): строки не растягиваются на всю ширину */
+.page-column-medium {
+    max-width: 52rem;
+    margin: 0 auto;
+}
+
+/* Белая карточка: общая основа для блоков страниц */
+.panel {
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: var(--card-radius);
+}
+
+/* ---------- Аккаунт: одна карточка из полос на всю ширину (профиль, данные, действия) ---------- */
+
+.account-head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: var(--card-padding);
+    border-bottom: 1px solid #e3e6eb;
+}
+
+.account-avatar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.account-identity {
+    min-width: 0;
+}
+
+.account-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.account-role {
+    display: inline-block;
+    margin-top: 0.25rem;
+    padding: 0.125rem 0.6rem;
+    border-radius: 999px;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* Пока скрипт не подставил роль, пустую плашку не показываем */
+.account-role:empty {
+    display: none;
+}
+
+.account-details {
+    margin: 0;
+}
+
+.account-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem var(--card-padding);
+    border-bottom: 1px solid #eef0f3;
+}
+
+.account-row dt {
     color: var(--bulky-muted);
+    font-weight: 500;
+}
+
+.account-row dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+}
+
+/* Нижняя полоса с кнопками на слегка сером фоне, как строка заголовков в таблице подходов */
+.account-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.25rem var(--card-padding);
+    background-color: #f8f9fb;
 }
 
 .history-list {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: var(--space-gap);
+}
+
+/* Месяц это одна белая карточка: полоса с названием месяца сверху, под ней плоские строки тренировок.
+   Строки без своих рамок и скруглений, их разделяют тонкие линии, как в карточке упражнения. */
+.history-month {
+    overflow: hidden;
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: var(--card-radius);
 }
 
 .history-month-title {
-    margin: 0 0 0.75rem;
-    padding: 0 0.25rem;
-    color: var(--bulky-muted);
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    margin: 0;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e3e6eb;
+    color: var(--bulky-ink);
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .history-month-cards {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
 }
 
 .history-card {
@@ -692,23 +900,28 @@ body {
     gap: 1rem;
     width: 100%;
     padding: 1rem 1.25rem;
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
-    border-radius: 1.25rem;
+    background-color: transparent;
+    border: 0;
+    border-bottom: 1px solid #eef0f3;
     color: var(--bulky-ink);
     text-align: left;
     cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: background-color 0.15s;
+}
+
+.history-month-cards > .history-card:last-child {
+    border-bottom: 0;
 }
 
 .history-card:hover {
-    border-color: #cfd5dc;
+    background-color: #f8f9fb;
 }
 
+/* Фокус внутри строки: кольцо не должно обрезаться краем карточки */
 .history-card:focus-visible {
     outline: 0;
-    border-color: var(--bulky-accent);
-    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.25);
+    background-color: #f8f9fb;
+    box-shadow: inset 0 0 0 2px rgba(14, 124, 102, 0.4);
 }
 
 /* Стрелка-«крыша»: смотрит вправо, при наведении чуть сдвигается и зеленеет */
@@ -826,6 +1039,13 @@ body {
     text-align: center;
 }
 
+/* В модалке истории упражнения остаются отдельными белыми карточками на сером фоне */
+.exercise-card-readonly {
+    background-color: #fff;
+    border: 1px solid #e3e6eb;
+    border-radius: var(--card-radius);
+}
+
 /* Карточка только для чтения: та же строка подхода, но без кнопки и полей ввода */
 .exercise-card-readonly .set-row {
     grid-template-columns: 2rem 1fr 5.5rem 5rem;
@@ -846,24 +1066,24 @@ body {
 /* ---------- Аналитика ---------- */
 
 .analytics-page {
-    max-width: 72rem;
+    max-width: var(--page-width);
     margin: 0 auto;
 }
 
 .analytics-card {
     min-width: 0;
-    padding: 1.5rem;
+    padding: var(--card-padding);
     background-color: #fff;
     border: 1px solid #e3e6eb;
-    border-radius: 1.25rem;
+    border-radius: var(--card-radius);
 }
 
 /* Два нижних блока рядом, на узком экране друг под другом */
 .analytics-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
+    gap: var(--space-gap);
+    margin-top: var(--space-gap);
 }
 
 .analytics-row > .analytics-card {
@@ -895,7 +1115,7 @@ body {
     width: auto;
     max-width: 100%;
     border-color: #d5d9e0;
-    border-radius: 0.75rem;
+    border-radius: 0.5rem;
     font-weight: 600;
 }
 
@@ -913,10 +1133,8 @@ body {
 
 .stat-label {
     color: var(--bulky-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .stat-row {
@@ -928,7 +1146,7 @@ body {
 
 .stat-value {
     font-size: 1.75rem;
-    font-weight: 800;
+    font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.2;
 }
@@ -972,15 +1190,13 @@ body {
     border-top: 1px solid #eef0f3;
 }
 
-/* Общая подпись над обоими графиками: на всю ширину ряда, в стиле подписей показателей */
+/* Общая подпись над обоими графиками: на всю ширину ряда */
 .analytics-charts-caption {
     flex: 1 1 100%;
     margin: 0;
     color: var(--bulky-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .analytics-charts > .analytics-chart {
@@ -1070,6 +1286,9 @@ body {
 
 .site-footer-link {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     padding-bottom: 2px;
     color: var(--bulky-muted);
     font-weight: 500;
@@ -1101,10 +1320,18 @@ body {
 .site-footer-bottom {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 0.35rem 0.75rem;
+    gap: 0.75rem 1.5rem;
     color: var(--bulky-muted);
     font-size: 0.85rem;
+}
+
+.site-footer-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
 }
 
 .site-footer-dot {
@@ -1112,104 +1339,6 @@ body {
     height: 3px;
     border-radius: 50%;
     background-color: #c2c8d1;
-}
-
-/* ---------- Блоки главной страницы ---------- */
-
-.section-eyebrow {
-    display: inline-block;
-    margin-bottom: 0.75rem;
-    color: var(--bulky-accent);
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
-.section-title {
-    font-size: clamp(1.6rem, 3.5vw, 2.25rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-}
-
-.feature-card {
-    padding: 1.75rem;
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
-    border-radius: 1.25rem;
-    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
-}
-
-.feature-card:hover {
-    border-color: rgba(14, 124, 102, 0.45);
-    transform: translateY(-2px);
-}
-
-.feature-index {
-    display: block;
-    margin-bottom: 1.25rem;
-    color: var(--bulky-accent);
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-}
-
-.step {
-    text-align: center;
-    padding: 0 0.5rem;
-}
-
-.step-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    margin-bottom: 1.1rem;
-    border: 1.5px solid #d5d9e0;
-    border-radius: 50%;
-    background-color: #fff;
-    color: var(--bulky-accent);
-    font-size: 1.15rem;
-    font-weight: 700;
-}
-
-.cta-card {
-    padding: 3.5rem 1.5rem;
-    border: 1px solid #e3e6eb;
-    border-radius: 1.5rem;
-    background:
-            radial-gradient(40rem 18rem at 85% -20%, rgba(14, 124, 102, 0.10), transparent 60%),
-            radial-gradient(30rem 16rem at 0% 120%, rgba(14, 124, 102, 0.07), transparent 60%),
-            #fff;
-}
-
-/* Строки графика по группам мышц */
-.muscle-label,
-.muscle-value {
-    font-family: Inter, system-ui, sans-serif;
-    font-size: 13px;
-    transition: fill 0.3s ease;
-}
-
-.muscle-label {
-    fill: var(--bulky-muted);
-}
-
-.muscle-value {
-    fill: var(--bulky-muted);
-    text-anchor: end;
-    font-weight: 600;
-}
-
-.muscle-row:hover .chart-bar {
-    fill: var(--bulky-accent);
-}
-
-.muscle-row:hover .muscle-label,
-.muscle-row:hover .muscle-value {
-    fill: var(--bulky-ink);
 }
 
 /* ---------- Кнопки навигации дашборда ---------- */
@@ -1249,31 +1378,333 @@ body {
 
 /* ---------- Админка ---------- */
 
-/* Архивный элемент списка */
-.archived {
-    background-color: #f8f9fa;
+.admin-sections {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-gap) * 2);
 }
 
-.archived .list-group-item-action {
+.admin-section-title {
+    margin: 0 0 0.75rem;
+    padding: 0 0.25rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* Три карточки в ряд (список, Create, Edit) одной высоты, чтобы не оставалось пустой области под короткой.
+   Средняя ширина: список сверху на всю ширину, формы парой под ним. Узкая: всё друг под другом.
+   Карточки форм лежат внутри .admin-forms, display: contents делает их прямыми ячейками сетки. */
+.admin-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-gap);
+}
+
+.admin-forms {
+    display: contents;
+}
+
+.admin-grid > .panel,
+.admin-forms > .panel {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 48rem) {
+    .admin-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-grid > .panel:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (min-width: 72rem) {
+    .admin-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .admin-grid > .panel:first-child {
+        grid-column: auto;
+    }
+}
+
+/* Полоса-заголовок карточки: List / Create / Edit */
+.admin-band {
+    padding: 1rem var(--card-padding);
+    border-bottom: 1px solid #e3e6eb;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Список: плоские строки с линиями; выбранная строка подсвечена, архивная приглушена и зачёркнута */
+/* Длинный список (упражнения) прокручивается внутри карточки и не растягивает ряд */
+.admin-list {
+    max-height: 40rem;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+}
+
+.admin-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-right: var(--card-padding);
+    border-bottom: 1px solid #eef0f3;
+    transition: background-color 0.15s;
+}
+
+.admin-row:last-child {
+    border-bottom: 0;
+}
+
+.admin-row:hover {
+    background-color: #f8f9fb;
+}
+
+.admin-row.active {
+    background-color: var(--bulky-accent-soft);
+}
+
+.admin-row-select {
+    flex: 1;
+    min-width: 0;
+    padding: 0.85rem var(--card-padding);
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: var(--bulky-ink);
+    font-weight: 600;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.admin-row-select:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px rgba(14, 124, 102, 0.4);
+}
+
+.admin-row.active .admin-row-select {
+    color: var(--bulky-accent-dark);
+}
+
+.admin-row.archived .admin-row-select {
     color: var(--bulky-muted);
+    font-weight: 500;
     text-decoration: line-through;
-    opacity: 0.65;
+}
+
+/* Небольшая круглая кнопка в строке: Archive подсвечивается красным, Unarchive зелёным */
+.admin-row-action {
+    flex: none;
+    height: 2rem;
+    padding: 0 0.9rem;
+    border: 1px solid #d5d9e0;
+    border-radius: 999px;
+    background-color: #fff;
+    color: var(--bulky-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.admin-row-action:hover {
+    border-color: var(--bulky-accent);
+    color: var(--bulky-accent);
+}
+
+.admin-row-action[data-action="archive"]:hover {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.admin-row-action:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.3);
+}
+
+/* Формы */
+.admin-form {
+    padding: var(--card-padding);
+}
+
+.admin-form fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    transition: opacity 0.15s;
+}
+
+/* Пока ничего не выбрано, форма редактирования приглушена */
+.admin-form fieldset:disabled {
+    opacity: 0.55;
+}
+
+.admin-form .form-label {
+    color: var(--bulky-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.admin-form .form-control {
+    border-color: #d5d9e0;
+    border-radius: 0.5rem;
+}
+
+/* Ошибки формы: спокойная красная плашка (admin-page.js показывает её, убирая d-none) */
+.admin-error {
+    margin: var(--card-padding) var(--card-padding) 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid #f0c9ce;
+    border-radius: 0.75rem;
+    background-color: #fdf3f4;
+    color: #8a1f2d;
+    font-size: 0.9rem;
+}
+
+.admin-error ul {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+/* Выбор групп мышц для упражнения: рамка со списком и переключатель роли в каждой строке */
+.admin-muscles {
+    max-height: 14rem;
+    overflow: auto;
+    border: 1px solid #e3e6eb;
+    border-radius: 0.5rem;
+}
+
+.admin-muscle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.admin-muscle-row:last-child {
+    border-bottom: 0;
+}
+
+.admin-muscle-name {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Переключатель из трёх положений (None / Primary / Secondary) на скрытых радиокнопках.
+   Label обязан идти сразу после своего input: на этом держится admin-page.js. */
+.segmented {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    overflow: hidden;
+    border: 1px solid #d5d9e0;
+    border-radius: 999px;
+}
+
+.segmented input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.segmented label {
+    margin: 0;
+    padding: 0.2rem 0.65rem;
+    color: var(--bulky-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.segmented label:not(:first-of-type) {
+    border-left: 1px solid #d5d9e0;
+}
+
+.segmented input[value="none"]:checked + label {
+    background-color: #eef0f3;
+    color: var(--bulky-ink);
+}
+
+.segmented input[value="primary"]:checked + label {
+    background-color: var(--bulky-accent);
+    color: #fff;
+}
+
+.segmented input[value="secondary"]:checked + label {
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+}
+
+.segmented input:focus-visible + label {
+    box-shadow: inset 0 0 0 2px rgba(14, 124, 102, 0.5);
 }
 
 /* ---------- Страница входа ---------- */
 
+/* position + overflow: надпись на фоне не должна залезать на шапку, если окно невысокое.
+   align-items: flex-start: карточка привязана к верху, а не центрируется, иначе при переключении вкладок
+   (в регистрации на одно поле больше) она вместе с надписью прыгает вверх-вниз. */
 .auth-main {
+    position: relative;
+    align-items: flex-start;
+    overflow: hidden;
     background:
             radial-gradient(60rem 30rem at 85% -10%, rgba(14, 124, 102, 0.10), transparent 60%),
             radial-gradient(40rem 24rem at 0% 110%, rgba(14, 124, 102, 0.07), transparent 60%),
             #f4f5f7;
 }
 
+/* Сцена шире карточки, чтобы название по бокам поместилось. margin-top оставляет над карточкой место
+   под всю надпись (она выступает вверх на 0.55 своей высоты), поэтому надпись видна целиком. */
+.auth-stage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: var(--page-width);
+    margin-top: calc(var(--watermark-size) * 0.55);
+}
+
+.auth-stage .page-watermark {
+    top: calc(var(--watermark-size) * -0.55);
+}
+
+/* Надпись зависит от активной вкладки: по умолчанию «Log in», на вкладке регистрации «Sign up» */
+.page-watermark-register {
+    display: none;
+}
+
+.auth-main:has(#tab-register.active) .page-watermark-login {
+    display: none;
+}
+
+.auth-main:has(#tab-register.active) .page-watermark-register {
+    display: block;
+}
+
 .auth-card {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 440px;
     border: 1px solid #e3e6eb;
-    border-radius: 1.25rem;
+    border-radius: var(--card-radius);
 }
 
 .auth-tabs {
@@ -1295,7 +1726,31 @@ body {
 
 /* ---------- Главная ---------- */
 
+/* Главный блок: текст слева, иллюстрация справа; на узком экране друг под другом */
+.home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: center;
+    padding: 1.5rem 0 4rem;
+}
+
+@media (min-width: 62rem) {
+    .home-hero {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4rem;
+        padding: 3rem 0 6rem;
+    }
+}
+
+.home-eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--bulky-muted);
+    font-weight: 600;
+}
+
 .hero-title {
+    margin: 0 0 1rem;
     font-size: clamp(3.5rem, 9vw, 6rem);
     font-weight: 800;
     letter-spacing: -0.04em;
@@ -1306,47 +1761,232 @@ body {
     color: var(--bulky-accent);
 }
 
-.hero-badge {
-    display: inline-block;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    background-color: var(--bulky-accent-soft);
+.hero-lead {
+    max-width: 30rem;
+    margin: 0 0 2rem;
+    color: var(--bulky-muted);
+    font-size: 1.15rem;
+}
+
+.home-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+}
+
+/* Вторая ссылка тихая: подчёркнутый текст, не конкурирует с кнопкой */
+.home-link {
+    color: var(--bulky-muted);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: #c2c8d1;
+    text-underline-offset: 0.3em;
+    transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+.home-link:hover {
     color: var(--bulky-accent-dark);
-    font-size: 0.85rem;
+    text-decoration-color: var(--bulky-accent);
+}
+
+/* Иллюстрация-график: SVG-карточка в стиле карточек приложения */
+.home-art {
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    justify-self: center;
+}
+
+.home-art-label {
+    fill: var(--bulky-muted);
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.home-art-number {
+    fill: var(--bulky-ink);
+    font-family: var(--font-numbers);
+    font-size: 32px;
     font-weight: 600;
 }
 
-/* Столбцы графика-иллюстрации: блёклые, на hover плавно насыщаются */
-.chart-hit {
+.home-art-chip {
+    fill: var(--bulky-accent-dark);
+    font-family: var(--font-numbers);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.home-art-axis {
+    fill: var(--bulky-muted);
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 12px;
+}
+
+/* Столбики: блёклые, при наведении насыщаются и показывают значение */
+.home-chart-hit {
     fill: transparent;
 }
 
-.chart-bar {
+.home-chart-bar {
     fill: #bfe0d6;
     transition: fill 0.3s ease;
 }
 
-.chart-label {
-    fill: var(--bulky-muted);
-    font-family: Inter, system-ui, sans-serif;
-    font-size: 13px;
+.home-chart-value {
+    fill: var(--bulky-ink);
+    font-family: var(--font-numbers);
+    font-size: 12px;
+    font-weight: 600;
     text-anchor: middle;
-    transition: fill 0.3s ease;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
-.chart-day:hover .chart-bar {
+.home-chart-day:hover .home-chart-bar {
     fill: var(--bulky-accent);
 }
 
-.chart-day:hover .chart-label {
-    fill: var(--bulky-ink);
+.home-chart-day:hover .home-chart-value {
+    opacity: 1;
 }
 
-.hero-art {
+/* Блок «что внутри»: переключатель на радиокнопках (без JS), под ним текст и экран приложения.
+   Переключение панелей через :has(); если браузер его не знает, остаётся первая вкладка. */
+.home-tour-tabs {
+    position: relative;
+    display: inline-flex;
+    gap: 0.25rem;
+    margin-bottom: 2rem;
+    padding: 0.3rem;
+    border-radius: 0.85rem;
+    background-color: #eef0f3;
+}
+
+.home-tour-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.home-tour-tab {
+    margin: 0;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.65rem;
+    color: var(--bulky-muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.home-tour-input:checked + .home-tour-tab {
+    background-color: #fff;
+    color: var(--bulky-ink);
+}
+
+.home-tour-input:focus-visible + .home-tour-tab {
+    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.3);
+}
+
+/* Высота общая для всех вкладок, чтобы страница не прыгала при переключении */
+.home-tour-body {
+    display: flex;
+    align-items: center;
+}
+
+@media (min-width: 62rem) {
+    .home-tour-body {
+        min-height: 34rem;
+    }
+}
+
+.home-tour-pane {
+    display: none;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    align-items: center;
     width: 100%;
-    max-width: 520px;
+}
+
+.home-tour-pane-workout {
+    display: grid;
+}
+
+.home-tour:has(#tour-history:checked) .home-tour-pane-workout,
+.home-tour:has(#tour-analytics:checked) .home-tour-pane-workout {
+    display: none;
+}
+
+.home-tour:has(#tour-history:checked) .home-tour-pane-history,
+.home-tour:has(#tour-analytics:checked) .home-tour-pane-analytics {
+    display: grid;
+}
+
+@media (min-width: 62rem) {
+    .home-tour-pane {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+        gap: 4rem;
+    }
+}
+
+.home-tour-title {
+    margin: 0 0 0.75rem;
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.home-tour-lead {
+    margin: 0 0 1.5rem;
+    color: var(--bulky-muted);
+    font-size: 1.05rem;
+}
+
+/* Пункты строками с тонкими линиями, как данные в аккаунте */
+.home-points {
+    margin: 0;
+    border-top: 1px solid #e3e6eb;
+}
+
+.home-point {
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #e3e6eb;
+}
+
+.home-point dt {
+    font-weight: 600;
+}
+
+.home-point dd {
+    margin: 0.15rem 0 0;
+    color: var(--bulky-muted);
+}
+
+/* Экраны приложения из настоящих компонентов. home-demo без нажатий (inert),
+   home-demo-live оставляет наведение: строки подсвечиваются, столбики графика темнеют */
+.home-demo {
+    min-width: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+.home-demo-live {
+    pointer-events: auto;
+}
+
+.home-demo .workout-panel {
+    overflow: hidden;
+}
+
+.home-chart {
+    display: block;
+    width: 100%;
     height: auto;
 }
+
 /* ---------- Toasts ---------- */
 .toast-container {
     z-index: 1100;

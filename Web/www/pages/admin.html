@@ -12,9 +12,10 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 
+<!-- Шапка как у приложения: логотип, навигация по центру, выход справа -->
 <header class="site-header">
-    <nav class="container row align-items-center py-3 mx-auto">
-        <div class="col site-logo">
+    <nav class="container site-nav">
+        <a class="site-logo site-nav-start" href="/home" aria-label="Bulky, home">
             <svg viewBox="0 0 150 40" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <g transform="rotate(-18 20 20)" fill="#0e7c66">
                     <rect x="2" y="12" width="5" height="16" rx="1.5"/>
@@ -28,26 +29,47 @@
                     <tspan fill="#0e7c66">B</tspan>ulky
                 </text>
             </svg>
+        </a>
+
+        <div class="site-nav-center">
+            <a class="dashboard-nav-btn" href="/admin" aria-current="page">Admin panel</a>
+            <a class="dashboard-nav-btn" href="/dashboard/workout">Back to app</a>
         </div>
 
-        <div class="col-auto fw-semibold fs-5">Admin panel</div>
-
-        <div class="col text-end">
-            <button type="button" id="logout-btn" class="btn btn-outline-dark btn-sm px-3">Log out</button>
+        <div class="site-nav-end">
+            <button type="button" id="logout-btn" class="header-btn header-btn-ghost">Log out</button>
         </div>
     </nav>
 </header>
 
-<main class="container flex-grow-1 py-5 d-flex flex-column gap-5">
-        <section id="muscle-group-section">
-            <h2 class="h4 mb-3">Muscle groups</h2>
-            <div class="row g-4">
-                <div class="col-lg-4 d-flex flex-column gap-4">
-                <section class="card shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h3 class="h6 text-secondary text-uppercase mb-3">Create</h3>
-                        <div class="alert alert-danger d-none" id="muscle-create-error" role="alert"></div>
-                        <form id="muscle-create-form">
+<main class="container flex-grow-1 py-5 page-with-watermark">
+    <!-- Декор: огромное название на фоне. Настоящий заголовок для скринридеров скрыт визуально -->
+    <div class="page-watermark" aria-hidden="true">Admin</div>
+    <h1 class="visually-hidden">Admin panel</h1>
+
+    <div class="watermark-content page-column admin-sections">
+
+        <!-- Группы мышц -->
+        <section id="muscle-group-section" aria-labelledby="muscle-section-title">
+            <h2 id="muscle-section-title" class="admin-section-title">Muscle groups</h2>
+
+            <div class="admin-grid">
+                <section class="panel">
+                    <div class="admin-band">List</div>
+                    <template id="muscle-element-template">
+                        <li class="admin-row">
+                            <button type="button" data-action="select" class="admin-row-select"></button>
+                            <button type="button" data-action="archive" class="admin-row-action"></button>
+                        </li>
+                    </template>
+                    <ul class="admin-list" id="muscle-list"></ul>
+                </section>
+
+                <div class="admin-forms">
+                    <section class="panel">
+                        <div class="admin-band">Create</div>
+                        <div class="admin-error d-none" id="muscle-create-error" role="alert"></div>
+                        <form id="muscle-create-form" class="admin-form">
                             <fieldset>
                                 <div class="mb-3">
                                     <label class="form-label" for="muscle-create-title">Title</label>
@@ -61,17 +83,15 @@
                                     <label class="form-label" for="muscle-create-image">Image</label>
                                     <input class="form-control" id="muscle-create-image" name="image" type="file" accept="image/*">
                                 </div>
-                                <button class="btn btn-primary w-100" id="muscle-create-btn">Create</button>
+                                <button class="header-btn header-btn-primary w-100" id="muscle-create-btn">Create</button>
                             </fieldset>
                         </form>
-                    </div>
-                </section>
+                    </section>
 
-                <section class="card shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h3 class="h6 text-secondary text-uppercase mb-3">Edit</h3>
-                        <div class="alert alert-danger d-none" id="muscle-edit-error" role="alert"></div>
-                        <form id="muscle-edit-form">
+                    <section class="panel">
+                        <div class="admin-band">Edit</div>
+                        <div class="admin-error d-none" id="muscle-edit-error" role="alert"></div>
+                        <form id="muscle-edit-form" class="admin-form">
                             <fieldset disabled>
                                 <div class="mb-3">
                                     <label class="form-label" for="muscle-edit-title">Title</label>
@@ -85,53 +105,51 @@
                                     <label class="form-label" for="muscle-edit-image">Image</label>
                                     <input class="form-control" id="muscle-edit-image" name="image" type="file" accept="image/*">
                                 </div>
-                                <button class="btn btn-primary w-100" id="muscle-edit-btn">Save</button>
+                                <button class="header-btn header-btn-primary w-100" id="muscle-edit-btn">Save</button>
                             </fieldset>
                         </form>
-                    </div>
-                </section>
-                </div>
-
-                <div class="col-lg-8">
-                    <section class="card shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <h3 class="h6 text-secondary text-uppercase mb-3">List</h3>
-                            <template id="muscle-element-template">
-                                <li class="list-group-item d-flex align-items-center gap-2 p-0">
-                                    <button type="button" data-action="select" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1"></button>
-                                    <button type="button" data-action="archive" class="btn btn-outline-secondary btn-sm me-2"></button>
-                                </li>
-                            </template>
-                            <ul class="list-group" id="muscle-list">
-                            </ul>
-                        </div>
                     </section>
                 </div>
             </div>
         </section>
 
-        <section id="exercise-section">
-            <h2 class="h4 mb-3">Exercises</h2>
+        <!-- Упражнения -->
+        <section id="exercise-section" aria-labelledby="exercise-section-title">
+            <h2 id="exercise-section-title" class="admin-section-title">Exercises</h2>
+
+            <!-- Строка выбора групп мышц для упражнения. admin-page.js читает: первый span (название),
+                 input и следующий за ним label (должен идти сразу после input), data-muscle-id -->
             <template id="exercise-muscles-list-template">
-                <div data-muscle-id class="list-group-item d-flex align-items-center justify-content-between gap-2 px-0">
-                    <span></span>
-                    <div class="btn-group btn-group-sm" role="group">
-                        <input class="btn-check" type="radio" name="muscle" value="none" checked>
-                        <label class="btn btn-outline-secondary">None</label>
-                        <input class="btn-check" type="radio" name="muscle" value="primary">
-                        <label class="btn btn-outline-primary">Primary</label>
-                        <input class="btn-check" type="radio" name="muscle" value="secondary">
-                        <label class="btn btn-outline-dark">Secondary</label>
+                <div data-muscle-id class="admin-muscle-row">
+                    <span class="admin-muscle-name"></span>
+                    <div class="segmented" role="group" aria-label="Role">
+                        <input type="radio" name="muscle" value="none" checked>
+                        <label>None</label>
+                        <input type="radio" name="muscle" value="primary">
+                        <label>Primary</label>
+                        <input type="radio" name="muscle" value="secondary">
+                        <label>Secondary</label>
                     </div>
                 </div>
             </template>
-            <div class="row g-4">
-                <div class="col-lg-4 d-flex flex-column gap-4">
-                <section class="card shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h3 class="h6 text-secondary text-uppercase mb-3">Create</h3>
-                        <div class="alert alert-danger d-none" id="exercise-create-error" role="alert"></div>
-                        <form id="exercise-create-form">
+
+            <div class="admin-grid">
+                <section class="panel">
+                    <div class="admin-band">List</div>
+                    <template id="exercise-element-template">
+                        <li class="admin-row">
+                            <button type="button" data-action="select" class="admin-row-select"></button>
+                            <button type="button" data-action="archive" class="admin-row-action"></button>
+                        </li>
+                    </template>
+                    <ul class="admin-list" id="exercise-list"></ul>
+                </section>
+
+                <div class="admin-forms">
+                    <section class="panel">
+                        <div class="admin-band">Create</div>
+                        <div class="admin-error d-none" id="exercise-create-error" role="alert"></div>
+                        <form id="exercise-create-form" class="admin-form">
                             <fieldset>
                                 <div class="mb-3">
                                     <label class="form-label" for="exercise-create-title">Title</label>
@@ -143,25 +161,21 @@
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-label">Muscle groups</div>
-                                    <div class="list-group list-group-flush border-top border-bottom overflow-auto"
-                                         id="exercise-create-muscles" style="max-height: 14rem">
-                                    </div>
+                                    <div class="admin-muscles" id="exercise-create-muscles"></div>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label" for="exercise-create-image">Image</label>
                                     <input class="form-control" id="exercise-create-image" name="image" type="file" accept="image/*">
                                 </div>
-                                <button class="btn btn-primary w-100" id="exercise-create-btn">Create</button>
+                                <button class="header-btn header-btn-primary w-100" id="exercise-create-btn">Create</button>
                             </fieldset>
                         </form>
-                    </div>
-                </section>
+                    </section>
 
-                <section class="card shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h3 class="h6 text-secondary text-uppercase mb-3">Edit</h3>
-                        <div class="alert alert-danger d-none" id="exercise-edit-error" role="alert"></div>
-                        <form id="exercise-edit-form">
+                    <section class="panel">
+                        <div class="admin-band">Edit</div>
+                        <div class="admin-error d-none" id="exercise-edit-error" role="alert"></div>
+                        <form id="exercise-edit-form" class="admin-form">
                             <fieldset disabled>
                                 <div class="mb-3">
                                     <label class="form-label" for="exercise-edit-title">Title</label>
@@ -173,38 +187,21 @@
                                 </div>
                                 <div class="mb-3">
                                     <div class="form-label">Muscle groups</div>
-                                    <div class="list-group list-group-flush border-top border-bottom overflow-auto"
-                                         id="exercise-edit-muscles" style="max-height: 14rem">
-                                    </div>
+                                    <div class="admin-muscles" id="exercise-edit-muscles"></div>
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label" for="exercise-edit-image">Image</label>
                                     <input class="form-control" id="exercise-edit-image" name="image" type="file" accept="image/*">
                                 </div>
-                                <button class="btn btn-primary w-100" id="exercise-edit-btn">Save</button>
+                                <button class="header-btn header-btn-primary w-100" id="exercise-edit-btn">Save</button>
                             </fieldset>
                         </form>
-                    </div>
-                </section>
-                </div>
-
-                <div class="col-lg-8">
-                    <section class="card shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <h3 class="h6 text-secondary text-uppercase mb-3">List</h3>
-                            <template id="exercise-element-template">
-                                <li class="list-group-item d-flex align-items-center gap-2 p-0">
-                                    <button type="button" data-action="select" class="list-group-item-action border-0 bg-transparent text-start px-3 py-2 flex-grow-1"></button>
-                                    <button type="button" data-action="archive" class="btn btn-outline-secondary btn-sm me-2"></button>
-                                </li>
-                            </template>
-                            <ul class="list-group" id="exercise-list">
-                            </ul>
-                        </div>
                     </section>
                 </div>
             </div>
         </section>
+
+    </div>
 </main>
 <script type="module" src="/js/pages/admin-page.js"></script>
 </body>

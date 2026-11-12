@@ -12,13 +12,12 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 {{header}}
-<main class="container flex-grow-1 py-5">
-    <div class="history-page">
+<main class="container flex-grow-1 py-5 page-with-watermark">
+    <!-- Декор: огромное название на фоне. Настоящий заголовок для скринридеров скрыт визуально -->
+    <div class="page-watermark" aria-hidden="true">History</div>
+    <h1 class="visually-hidden">History</h1>
 
-        <header class="page-header">
-            <h1 class="page-title">History</h1>
-            <p class="page-subtitle">Your completed workouts</p>
-        </header>
+    <div class="history-page watermark-content">
 
         <!-- Список карточек наполняет history-page.js -->
         <div id="history-list" class="history-list"></div>

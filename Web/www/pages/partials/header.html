@@ -1,6 +1,6 @@
 <header class="site-header">
-    <nav class="container row align-items-center gy-2 py-3 mx-auto">
-        <div class="col-6 col-md site-logo">
+    <nav class="container site-nav">
+        <a class="site-logo site-nav-start" href="/home" aria-label="Bulky, home">
             <svg viewBox="0 0 150 40" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
                 <g transform="rotate(-18 20 20)" fill="#0e7c66">
                     <rect x="2" y="12" width="5" height="16" rx="1.5"/>
@@ -14,15 +14,16 @@
                     <tspan fill="#0e7c66">B</tspan>ulky
                 </text>
             </svg>
-        </div>
+        </a>
 
-        <div class="col-12 col-md-auto order-3 order-md-2 d-flex justify-content-center gap-4">
+        <div class="site-nav-center">
             <a id="nav-workout-btn" class="dashboard-nav-btn" href="/dashboard/workout">Workout</a>
             <a id="nav-analytics-btn" class="dashboard-nav-btn" href="/dashboard/analytics">Analytics</a>
             <a id="nav-history-btn" class="dashboard-nav-btn" href="/dashboard/history">History</a>
+            <a id="nav-guide-btn" class="dashboard-nav-btn" href="/dashboard/guide">Guide</a>
         </div>
 
-        <div class="col-6 col-md order-2 order-md-3 text-end">
+        <div class="site-nav-end">
             <a id="nav-account-btn" class="dashboard-nav-btn" href="/dashboard/account">Account</a>
         </div>
     </nav>

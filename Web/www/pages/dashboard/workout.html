@@ -12,9 +12,15 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
 {{header}}
-<main class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+<main class="container flex-grow-1 d-flex flex-column py-5 page-with-watermark">
+    <!-- Декор: огромное название на фоне. Настоящий заголовок для скринридеров скрыт визуально -->
+    <div class="page-watermark" aria-hidden="true">Workout</div>
+    <h1 class="visually-hidden">Workout</h1>
 
-    <section id="workout-start" class="workout-start d-none">
+    <div class="watermark-content page-column-medium w-100 flex-grow-1 d-flex flex-column">
+
+    <!-- m-auto центрирует кнопку по свободному месту страницы, пока тренировки нет -->
+    <section id="workout-start" class="workout-start m-auto d-none">
         <button type="button" id="create-workout-btn" class="header-btn header-btn-primary workout-add-btn"
                 aria-label="Create workout" title="Create workout">
             <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor"
@@ -24,16 +30,14 @@
         </button>
     </section>
 
-    <!-- Панель тренировки: показывается вместо кнопки, когда тренировка создана -->
-    <section id="workout-panel" class="workout-panel w-100 d-none">
+    <!-- Панель тренировки: показывается вместо кнопки, когда тренировка создана.
+         Без собственной рамки: карточки упражнений лежат прямо на фоне страницы -->
+    <section id="workout-panel" class="workout-panel d-none">
 
         <header class="workout-header">
-            <div class="workout-heading">
-                <span class="workout-badge"></span>
-                <h1 id="workout-title" class="workout-title"></h1>
-            </div>
+            <h2 id="workout-title" class="workout-title"></h2>
             <div class="workout-header-actions">
-                <button type="button" id="delete-workout-btn" class="header-btn header-btn-ghost header-btn-sm"
+                <button type="button" id="delete-workout-btn" class="header-btn header-btn-ghost header-btn-compact"
                         data-confirm-action="delete"
                         data-confirm-title="Delete workout?"
                         data-confirm-text="The workout and all its sets will be permanently deleted."
@@ -41,7 +45,7 @@
                         data-confirm-tone="danger">
                     Delete
                 </button>
-                <button type="button" id="finish-workout-btn" class="header-btn header-btn-primary header-btn-sm"
+                <button type="button" id="finish-workout-btn" class="header-btn header-btn-primary header-btn-compact"
                         data-confirm-action="finish"
                         data-confirm-title="Finish workout?"
                         data-confirm-text="The workout will be saved to your history and the timer will stop."
@@ -62,7 +66,7 @@
             <article class="exercise-card">
                 <header class="exercise-header">
                     <span class="exercise-number"></span>
-                    <h2 class="exercise-name"></h2>
+                    <h3 class="exercise-name"></h3>
                     <button type="button" class="header-btn header-btn-ghost delete-exercise-btn"
                             aria-label="Delete exercise" title="Delete exercise">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
@@ -110,17 +114,18 @@
         </template>
 
 
-        <!-- Добавить упражнение: широкая пунктирная полоса, всегда после всех упражнений -->
-        <button type="button" id="add-exercise-btn" class="header-btn header-btn-primary add-exercise-btn"
-                aria-label="Add exercise" title="Add exercise">
-            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor"
-                 stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+        <!-- Добавить упражнение: строка внизу карточки, всегда после всех упражнений -->
+        <button type="button" id="add-exercise-btn" class="add-exercise-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" aria-hidden="true">
                 <path d="M12 5v14M5 12h14"/>
             </svg>
+            Add exercise
         </button>
 
     </section>
 
+    </div>
 </main>
 
 <dialog id="create-workout-dialog" class="app-dialog" aria-labelledby="create-workout-dialog-title">

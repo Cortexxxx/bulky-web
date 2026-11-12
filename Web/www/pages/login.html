@@ -14,7 +14,14 @@
 
 {{guests_header}}
 
-<main class="auth-main flex-grow-1 d-flex align-items-center justify-content-center px-3 py-5">
+<main class="auth-main flex-grow-1 d-flex justify-content-center px-3 py-5">
+    <h1 class="visually-hidden">Log in or sign up</h1>
+
+    <!-- Сцена: огромная надпись на фоне за карточкой. Какая именно (вход или регистрация), решает активная вкладка (CSS :has) -->
+    <div class="auth-stage page-with-watermark">
+        <div class="page-watermark page-watermark-login" aria-hidden="true">Log in</div>
+        <div class="page-watermark page-watermark-register" aria-hidden="true">Sign up</div>
+
     <div class="card auth-card">
         <div class="card-body p-4 p-sm-5">
 
@@ -37,9 +44,6 @@
                 <!-- ВХОД -->
                 <div class="tab-pane fade show active" id="pane-login" role="tabpanel"
                      aria-labelledby="tab-login" tabindex="0">
-                    <h1 class="h4 fw-bold mb-1">Welcome back</h1>
-                    <p class="text-secondary mb-4">Log in to continue your training diary.</p>
-
                     <div data-errors class="alert alert-danger d-none" id="login-error" role="alert"></div>
 
                     <form id="login-form">
@@ -60,9 +64,6 @@
                 <!-- РЕГИСТРАЦИЯ -->
                 <div class="tab-pane fade" id="pane-register" role="tabpanel"
                      aria-labelledby="tab-register" tabindex="0">
-                    <h1 class="h4 fw-bold mb-1">Create an account</h1>
-                    <p class="text-secondary mb-4">It takes less than a minute.</p>
-
                     <div class="alert alert-danger d-none" id="register-error" role="alert"></div>
 
                     <form id="register-form">
@@ -88,6 +89,7 @@
 
             </div>
         </div>
+    </div>
     </div>
 </main>
 

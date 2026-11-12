@@ -6,7 +6,6 @@ public static class PageRenderer
     private const string GuestsHeaderPlaceholder = "{{guests_header}}";
     private const string FooterPlaceholder = "{{footer}}";
     private const string ToastsPlaceholder = "{{toasts}}";
-
     /// <summary>
     /// Read page file, render all partial parts of page
     /// </summary>
@@ -25,8 +24,7 @@ public static class PageRenderer
         page = await RenderPartialAsync(page, HeaderPlaceholder, FilePaths.HeaderPartial);
         page = await RenderPartialAsync(page, GuestsHeaderPlaceholder, FilePaths.GuestsHeaderPartial);
         page = await RenderPartialAsync(page, FooterPlaceholder, FilePaths.FooterPartial);
-        page = await RenderPartialAsync(page, ToastsPlaceholder, FilePaths.ToastsPartial);
-        return page;
+        page = await RenderPartialAsync(page, ToastsPlaceholder, FilePaths.ToastsPartial);        return page;
     }
 
     private static async Task<string> RenderPartialAsync(string page, string placeholder, string partialPath)

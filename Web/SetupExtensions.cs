@@ -36,6 +36,7 @@ public static class SetupExtensions
         router.MapHtmlPage("dashboard/workout", "dashboard/workout.html", AuthorizedOnly);
         router.MapHtmlPage("dashboard/history", "dashboard/history.html", AuthorizedOnly);
         router.MapHtmlPage("dashboard/analytics", "dashboard/analytics.html", AuthorizedOnly);
+        router.MapHtmlPage("dashboard/guide", "dashboard/guide.html", AuthorizedOnly);
 
         router.MapHtmlPage("admin", "admin.html", AdminOnly);
     }
