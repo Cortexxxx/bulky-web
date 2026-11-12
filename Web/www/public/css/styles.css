@@ -1,38 +1,57 @@
 /* Bulky: общие стили поверх Bootstrap 5.3 */
 
-/* Шрифты с Google Fonts (как Bootstrap с CDN, свои файлы раздавать не нужно).
-   Inter основной текст (раньше он был только указан в font-family, но нигде не подключался), IBM Plex Mono для цифр. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap");
+/* Шрифты с Google Fonts (как Bootstrap с CDN, свои файлы раздавать не нужно):
+   Big Shoulders Display для крупных заголовков, IBM Plex Sans для текста, IBM Plex Mono для цифр. */
+@import url("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
 :root {
-    --bulky-accent: #0e7c66;
-    --bulky-accent-dark: #095a4a;
-    --bulky-accent-soft: #e3f1ed;
-    --bulky-ink: #14181f;
-    --bulky-muted: #5b6472;
+    /* Тема «блокнот»: тёплая бумага, чернильно-чёрный текст и синий акцент цвета чернил */
+    --bg: #e9e3d4;
+    --surface: #fcfaf5;
+    --surface-2: #f4f0e4;
+    --line: #d6cfbc;
+    --line-soft: #e7e1d1;
+    --line-strong: #c2b9a3;
+    --watermark: #dcd5c2;
 
-    /* Сетка страниц: одна ширина колонки, один шаг между блоками, одни отступы и скругление у карточек */
+    --bulky-ink: #1a1813;
+    --bulky-muted: #625d50;
+    --bulky-accent: #5b6b1e;
+    --bulky-accent-dark: #424f12;
+    --bulky-accent-soft: #e3e8cf;
+    --accent-pale: #b9c58a;
+    --accent-rgb: 91, 107, 30;
+
+    /* Сетка страниц: одна ширина колонки, один шаг между блоками, одни отступы у карточек.
+       Скругления маленькие: карточки почти прямоугольные, как листы бумаги. */
     --page-width: 72rem;
     --space-gap: 1.5rem;
     --card-padding: 1.5rem;
-    --card-radius: 1.25rem;
+    --card-radius: 0.375rem;
+    --control-radius: 0.25rem;
 
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    /* Узкий плакатный шрифт для названий страниц и крупных заголовков */
+    --font-display: "Big Shoulders Display", "IBM Plex Sans", system-ui, sans-serif;
     /* Цифры (вес, повторы, таймер, показатели) моноширинным шрифтом: ровные колонки и «приборный» вид */
     --font-numbers: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
-    /* Перекрашиваем «primary» Bootstrap в наш акцент */
+    /* Перекрашиваем Bootstrap в нашу тему */
     --bs-primary: var(--bulky-accent);
-    --bs-primary-rgb: 14, 124, 102;
+    --bs-primary-rgb: 91, 107, 30;
     --bs-link-color: var(--bulky-accent);
-    --bs-link-color-rgb: 14, 124, 102;
+    --bs-link-color-rgb: 91, 107, 30;
     --bs-link-hover-color: var(--bulky-accent-dark);
-    --bs-link-hover-color-rgb: 9, 90, 74;
+    --bs-link-hover-color-rgb: 66, 79, 18;
     --bs-body-color: var(--bulky-ink);
-    --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --bs-body-bg: var(--surface);
+    --bs-border-color: var(--line);
+    --bs-border-radius: var(--control-radius);
+    --bs-body-font-family: var(--font-body);
 }
 
 body {
-    background-color: #f4f5f7;
+    background-color: var(--bg);
     color: var(--bulky-ink);
 }
 
@@ -60,12 +79,12 @@ body {
     --bs-btn-active-border-color: var(--bulky-accent-dark);
     --bs-btn-disabled-bg: var(--bulky-accent);
     --bs-btn-disabled-border-color: var(--bulky-accent);
-    --bs-btn-focus-shadow-rgb: 14, 124, 102;
+    --bs-btn-focus-shadow-rgb: 91, 107, 30;
 }
 
 .form-control:focus {
     border-color: var(--bulky-accent);
-    box-shadow: 0 0 0 0.25rem rgba(14, 124, 102, 0.2);
+    box-shadow: 0 0 0 0.25rem rgba(var(--accent-rgb), 0.2);
 }
 
 /* ---------- Хедер (одинаковый на всех страницах) ---------- */
@@ -76,9 +95,10 @@ html {
     scrollbar-gutter: stable;
 }
 
+/* Шапка чуть светлее страницы, но не белая: тон между фоном и карточкой */
 .site-header {
-    background-color: #fff;
-    border-bottom: 1px solid #e3e6eb;
+    background-color: var(--surface-2);
+    border-bottom: 1px solid var(--line);
 }
 
 /* Одна шапка на всех страницах: логотип слева, навигация по центру, действия справа.
@@ -166,7 +186,7 @@ html {
     justify-content: center;
     padding: 0.65rem 1.5rem;
     border: 1px solid transparent;
-    border-radius: 0.75rem;
+    border-radius: var(--control-radius);
     font-size: 0.95rem;
     font-weight: 500;
     letter-spacing: 0.01em;
@@ -179,7 +199,7 @@ html {
 
 .header-btn:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Контурные кнопки: светло-серая обводка; на hover цветная линия «обегает» контур по кругу.
@@ -193,7 +213,7 @@ html {
 .header-btn {
     position: relative;
     background-color: transparent;
-    border-color: #d5d9e0;
+    border-color: var(--line-strong);
     color: var(--bulky-ink);
     --ring-color: var(--bulky-accent);
 }
@@ -226,7 +246,7 @@ html {
 .header-btn-lg {
     padding: 0.85rem 2.25rem;
     font-size: 1.05rem;
-    border-radius: 0.85rem;
+    border-radius: var(--control-radius);
     cursor: pointer;
 }
 
@@ -235,7 +255,7 @@ html {
     width: 9rem;
     height: 9rem;
     padding: 0;
-    border-radius: 1.75rem;
+    border-radius: var(--card-radius);
     color: var(--bulky-muted);
 }
 
@@ -261,9 +281,9 @@ html {
     width: min(30rem, calc(100% - 2rem));
     max-height: min(85vh, 40rem);
     padding: 0;
-    border: 1px solid #e3e6eb;
-    border-radius: 1.5rem;
-    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--card-radius);
+    background-color: var(--surface);
     color: var(--bulky-ink);
     overflow: hidden;
 }
@@ -275,7 +295,7 @@ html {
 }
 
 .app-dialog::backdrop {
-    background-color: rgba(20, 24, 31, 0.45);
+    background-color: rgba(26, 24, 19, 0.45);
     backdrop-filter: blur(3px);
 }
 
@@ -316,7 +336,7 @@ html {
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    border-radius: 50%;
+    border-radius: var(--control-radius);
     color: var(--bulky-muted);
 }
 
@@ -360,7 +380,7 @@ html {
     width: 100%;
     padding: 0.6rem 0.75rem;
     border: 0;
-    border-radius: 0.75rem;
+    border-radius: var(--control-radius);
     background: transparent;
     color: var(--bulky-ink);
     font-weight: 500;
@@ -382,8 +402,8 @@ html {
    Секции разделены тонкими линиями, без вложенных рамок и скруглений. */
 .workout-panel {
     overflow: hidden;
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
     border-radius: var(--card-radius);
 }
 
@@ -394,7 +414,7 @@ html {
     justify-content: space-between;
     gap: 0.75rem 1rem;
     padding: 0.875rem var(--card-padding);
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
 }
 
 .workout-title {
@@ -414,7 +434,7 @@ html {
 .header-btn-sm {
     height: 2.75rem;
     padding: 0 1.35rem;
-    border-radius: 999px;
+    border-radius: var(--control-radius);
     font-size: 1rem;
 }
 
@@ -422,7 +442,7 @@ html {
 .header-btn-compact {
     height: 2.25rem;
     padding: 0 1rem;
-    border-radius: 999px;
+    border-radius: var(--control-radius);
     font-size: 0.875rem;
 }
 
@@ -430,7 +450,7 @@ html {
 .workout-timer {
     margin-left: 0.5rem;
     padding-left: 1rem;
-    border-left: 1px solid #dfe3e8;
+    border-left: 1px solid var(--line-strong);
     color: var(--bulky-ink);
     font-size: 1rem;
     font-weight: 600;
@@ -448,7 +468,7 @@ html {
    снизу линия-разделитель. Внутренних отступов нет, их задают полосы, чтобы линии шли от края до края. */
 .exercise-card {
     overflow: hidden;
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
 }
 
 /* Шапка упражнения на слегка сером фоне: именно она отделяет секции друг от друга и держит иерархию */
@@ -457,7 +477,7 @@ html {
     align-items: center;
     gap: 0.85rem;
     padding: 1rem var(--card-padding);
-    background-color: #f8f9fb;
+    background-color: var(--surface-2);
 }
 
 /* Номер упражнения: цифра цвета сайта, отделённая от названия тонкой линией, без кружка */
@@ -465,7 +485,7 @@ html {
     flex: none;
     min-width: 1.5rem;
     padding-right: 0.9rem;
-    border-right: 1px solid #dfe3e8;
+    border-right: 1px solid var(--line-strong);
     color: var(--bulky-accent-dark);
     font-size: 0.95rem;
     font-weight: 600;
@@ -486,8 +506,8 @@ html {
     height: 2.25rem;
     margin-left: auto;
     padding: 0;
-    border-radius: 50%;
-    background-color: #fff;
+    border-radius: var(--control-radius);
+    background-color: var(--surface);
 }
 
 .sets {
@@ -502,7 +522,7 @@ html {
     align-items: center;
     gap: 0.75rem;
     padding: 0.6rem var(--card-padding);
-    border-bottom: 1px solid #f0f2f5;
+    border-bottom: 1px solid var(--line-soft);
 }
 
 .set-row > :nth-child(2) {
@@ -542,7 +562,7 @@ html {
 .set-input {
     text-align: center;
     font-weight: 600;
-    border-radius: 0.5rem;
+    border-radius: var(--control-radius);
     -moz-appearance: textfield;
 }
 
@@ -649,8 +669,8 @@ html {
     width: 2rem;
     height: 2rem;
     padding: 0;
-    border-radius: 50%;
-    background-color: #fff;
+    border-radius: var(--control-radius);
+    background-color: var(--surface);
 }
 
 /* Добавить подход: тихая строка под таблицей, текст слева под номерами подходов */
@@ -687,7 +707,7 @@ html {
     height: 3.5rem;
     padding: 0;
     border: 0;
-    background-color: #f8f9fb;
+    background-color: var(--surface-2);
     color: var(--bulky-accent-dark);
     font-size: 0.95rem;
     font-weight: 600;
@@ -723,7 +743,7 @@ html {
    Надпись лежит под контентом, а белые карточки частично её закрывают: получается глубина без теней.
    Размер задан переменной, чтобы отступ контента подстраивался под высоту букв. */
 .page-with-watermark {
-    --watermark-size: clamp(2.75rem, 11vw, 10rem);
+    --watermark-size: clamp(4rem, 16vw, 15rem);
     position: relative;
 }
 
@@ -735,7 +755,7 @@ html {
     z-index: 0;
     overflow: hidden;
     padding-left: 0.1em;
-    color: #e7eaee;
+    color: var(--watermark);
     font-size: var(--watermark-size);
     font-weight: 800;
     letter-spacing: 0.1em;
@@ -751,7 +771,7 @@ html {
 .page-with-watermark .watermark-content {
     position: relative;
     z-index: 1;
-    margin-top: calc(var(--watermark-size) * 0.45);
+    margin-top: calc(var(--watermark-size) * 0.62);
 }
 
 /* Колонка контента одной ширины на всех страницах; узкий вариант для страниц-форм (аккаунт) */
@@ -774,8 +794,8 @@ html {
 /* Белая карточка: общая основа для блоков страниц */
 .panel {
     overflow: hidden;
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
     border-radius: var(--card-radius);
 }
 
@@ -786,7 +806,7 @@ html {
     align-items: center;
     gap: 1rem;
     padding: var(--card-padding);
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
 }
 
 .account-avatar {
@@ -796,7 +816,7 @@ html {
     justify-content: center;
     width: 3.5rem;
     height: 3.5rem;
-    border-radius: 50%;
+    border-radius: var(--control-radius);
     background-color: var(--bulky-accent-soft);
     color: var(--bulky-accent-dark);
     font-size: 1.5rem;
@@ -817,7 +837,7 @@ html {
     display: inline-block;
     margin-top: 0.25rem;
     padding: 0.125rem 0.6rem;
-    border-radius: 999px;
+    border-radius: var(--control-radius);
     background-color: var(--bulky-accent-soft);
     color: var(--bulky-accent-dark);
     font-size: 0.75rem;
@@ -840,7 +860,7 @@ html {
     justify-content: space-between;
     gap: 1rem;
     padding: 0.9rem var(--card-padding);
-    border-bottom: 1px solid #eef0f3;
+    border-bottom: 1px solid var(--line-soft);
 }
 
 .account-row dt {
@@ -862,7 +882,7 @@ html {
     justify-content: flex-end;
     gap: 0.75rem;
     padding: 1.25rem var(--card-padding);
-    background-color: #f8f9fb;
+    background-color: var(--surface-2);
 }
 
 .history-list {
@@ -875,15 +895,15 @@ html {
    Строки без своих рамок и скруглений, их разделяют тонкие линии, как в карточке упражнения. */
 .history-month {
     overflow: hidden;
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
     border-radius: var(--card-radius);
 }
 
 .history-month-title {
     margin: 0;
     padding: 1rem 1.25rem;
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
     color: var(--bulky-ink);
     font-size: 0.95rem;
     font-weight: 600;
@@ -902,7 +922,7 @@ html {
     padding: 1rem 1.25rem;
     background-color: transparent;
     border: 0;
-    border-bottom: 1px solid #eef0f3;
+    border-bottom: 1px solid var(--line-soft);
     color: var(--bulky-ink);
     text-align: left;
     cursor: pointer;
@@ -914,14 +934,14 @@ html {
 }
 
 .history-card:hover {
-    background-color: #f8f9fb;
+    background-color: var(--surface-2);
 }
 
 /* Фокус внутри строки: кольцо не должно обрезаться краем карточки */
 .history-card:focus-visible {
     outline: 0;
-    background-color: #f8f9fb;
-    box-shadow: inset 0 0 0 2px rgba(14, 124, 102, 0.4);
+    background-color: var(--surface-2);
+    box-shadow: inset 0 0 0 2px rgba(var(--accent-rgb), 0.4);
 }
 
 /* Стрелка-«крыша»: смотрит вправо, при наведении чуть сдвигается и зеленеет */
@@ -945,7 +965,7 @@ html {
     min-width: 2.25rem;
     height: 2.25rem;
     padding: 0 0.5rem;
-    border-radius: 999px;
+    border-radius: var(--control-radius);
     background-color: var(--bulky-accent-soft);
     color: var(--bulky-accent-dark);
     font-size: 0.95rem;
@@ -995,7 +1015,7 @@ html {
 
 .history-dialog .app-dialog-header {
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
 }
 
 .history-dialog-meta {
@@ -1007,7 +1027,7 @@ html {
 .history-dialog-body {
     gap: 1rem;
     overflow-y: auto;
-    background-color: #f4f5f7;
+    background-color: var(--bg);
 }
 
 /* Карточки имеют overflow: hidden, и без этого flex их бы сжимал вместо прокрутки */
@@ -1021,8 +1041,8 @@ html {
     flex: none;
     justify-content: flex-end;
     padding: 1rem 1.5rem;
-    background-color: #fff;
-    border-top: 1px solid #e3e6eb;
+    background-color: var(--surface);
+    border-top: 1px solid var(--line);
 }
 
 /* Пустые состояния модалки: нет упражнений / нет подходов */
@@ -1041,8 +1061,8 @@ html {
 
 /* В модалке истории упражнения остаются отдельными белыми карточками на сером фоне */
 .exercise-card-readonly {
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
     border-radius: var(--card-radius);
 }
 
@@ -1073,8 +1093,8 @@ html {
 .analytics-card {
     min-width: 0;
     padding: var(--card-padding);
-    background-color: #fff;
-    border: 1px solid #e3e6eb;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
     border-radius: var(--card-radius);
 }
 
@@ -1114,14 +1134,14 @@ html {
 .analytics-select {
     width: auto;
     max-width: 100%;
-    border-color: #d5d9e0;
-    border-radius: 0.5rem;
+    border-color: var(--line-strong);
+    border-radius: var(--control-radius);
     font-weight: 600;
 }
 
 .analytics-select:focus {
     border-color: var(--bulky-accent);
-    box-shadow: 0 0 0 0.2rem rgba(14, 124, 102, 0.2);
+    box-shadow: 0 0 0 0.2rem rgba(var(--accent-rgb), 0.2);
 }
 
 .analytics-stats {
@@ -1161,7 +1181,7 @@ html {
 .stat-delta {
     margin-left: 0.25rem;
     padding: 0.125rem 0.5rem;
-    border-radius: 999px;
+    border-radius: var(--control-radius);
     background-color: var(--bulky-accent-soft);
     color: var(--bulky-accent-dark);
     font-size: 0.75rem;
@@ -1171,7 +1191,7 @@ html {
 .analytics-chart {
     margin-top: 1.5rem;
     padding-top: 1.25rem;
-    border-top: 1px solid #eef0f3;
+    border-top: 1px solid var(--line-soft);
 }
 
 /* Сводка из пяти показателей: равные колонки, на узком экране переносятся */
@@ -1187,7 +1207,7 @@ html {
     gap: 1.5rem;
     margin-top: 1.5rem;
     padding-top: 1.25rem;
-    border-top: 1px solid #eef0f3;
+    border-top: 1px solid var(--line-soft);
 }
 
 /* Общая подпись над обоими графиками: на всю ширину ряда */
@@ -1209,7 +1229,7 @@ html {
 
 /* Прирост ниже нуля: спокойный серый вместо зелёного */
 .stat-delta-down {
-    background-color: #eef0f3;
+    background-color: var(--line-soft);
     color: var(--bulky-muted);
 }
 
@@ -1246,8 +1266,8 @@ html {
 
 .site-footer {
     margin-top: auto;
-    background-color: #fff;
-    border-top: 1px solid #e3e6eb;
+    background-color: var(--surface-2);
+    border-top: 1px solid var(--line);
     padding: 2rem 0 1.5rem;
 }
 
@@ -1258,7 +1278,7 @@ html {
     gap: 1rem;
     padding-bottom: 1.25rem;
     margin-bottom: 1.25rem;
-    border-bottom: 1px solid #eef0f3;
+    border-bottom: 1px solid var(--line-soft);
 }
 
 .site-footer-brand {
@@ -1337,8 +1357,8 @@ html {
 .site-footer-dot {
     width: 3px;
     height: 3px;
-    border-radius: 50%;
-    background-color: #c2c8d1;
+    border-radius: var(--control-radius);
+    background-color: var(--line-strong);
 }
 
 /* ---------- Кнопки навигации дашборда ---------- */
@@ -1434,7 +1454,7 @@ html {
 /* Полоса-заголовок карточки: List / Create / Edit */
 .admin-band {
     padding: 1rem var(--card-padding);
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
     font-size: 0.95rem;
     font-weight: 600;
 }
@@ -1454,7 +1474,7 @@ html {
     align-items: center;
     gap: 0.75rem;
     padding-right: var(--card-padding);
-    border-bottom: 1px solid #eef0f3;
+    border-bottom: 1px solid var(--line-soft);
     transition: background-color 0.15s;
 }
 
@@ -1463,7 +1483,7 @@ html {
 }
 
 .admin-row:hover {
-    background-color: #f8f9fb;
+    background-color: var(--surface-2);
 }
 
 .admin-row.active {
@@ -1487,7 +1507,7 @@ html {
 
 .admin-row-select:focus-visible {
     outline: 0;
-    box-shadow: inset 0 0 0 2px rgba(14, 124, 102, 0.4);
+    box-shadow: inset 0 0 0 2px rgba(var(--accent-rgb), 0.4);
 }
 
 .admin-row.active .admin-row-select {
@@ -1505,9 +1525,9 @@ html {
     flex: none;
     height: 2rem;
     padding: 0 0.9rem;
-    border: 1px solid #d5d9e0;
-    border-radius: 999px;
-    background-color: #fff;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--control-radius);
+    background-color: var(--surface);
     color: var(--bulky-muted);
     font-size: 0.8rem;
     font-weight: 600;
@@ -1527,7 +1547,7 @@ html {
 
 .admin-row-action:focus-visible {
     outline: 0;
-    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Формы */
@@ -1555,8 +1575,8 @@ html {
 }
 
 .admin-form .form-control {
-    border-color: #d5d9e0;
-    border-radius: 0.5rem;
+    border-color: var(--line-strong);
+    border-radius: var(--control-radius);
 }
 
 /* Ошибки формы: спокойная красная плашка (admin-page.js показывает её, убирая d-none) */
@@ -1564,7 +1584,7 @@ html {
     margin: var(--card-padding) var(--card-padding) 0;
     padding: 0.75rem 1rem;
     border: 1px solid #f0c9ce;
-    border-radius: 0.75rem;
+    border-radius: var(--control-radius);
     background-color: #fdf3f4;
     color: #8a1f2d;
     font-size: 0.9rem;
@@ -1579,8 +1599,8 @@ html {
 .admin-muscles {
     max-height: 14rem;
     overflow: auto;
-    border: 1px solid #e3e6eb;
-    border-radius: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--control-radius);
 }
 
 .admin-muscle-row {
@@ -1589,7 +1609,7 @@ html {
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid #eef0f3;
+    border-bottom: 1px solid var(--line-soft);
 }
 
 .admin-muscle-row:last-child {
@@ -1612,8 +1632,8 @@ html {
     display: inline-flex;
     flex: none;
     overflow: hidden;
-    border: 1px solid #d5d9e0;
-    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--control-radius);
 }
 
 .segmented input {
@@ -1633,11 +1653,11 @@ html {
 }
 
 .segmented label:not(:first-of-type) {
-    border-left: 1px solid #d5d9e0;
+    border-left: 1px solid var(--line-strong);
 }
 
 .segmented input[value="none"]:checked + label {
-    background-color: #eef0f3;
+    background-color: var(--line-soft);
     color: var(--bulky-ink);
 }
 
@@ -1652,7 +1672,7 @@ html {
 }
 
 .segmented input:focus-visible + label {
-    box-shadow: inset 0 0 0 2px rgba(14, 124, 102, 0.5);
+    box-shadow: inset 0 0 0 2px rgba(var(--accent-rgb), 0.5);
 }
 
 /* ---------- Страница входа ---------- */
@@ -1661,13 +1681,14 @@ html {
    align-items: flex-start: карточка привязана к верху, а не центрируется, иначе при переключении вкладок
    (в регистрации на одно поле больше) она вместе с надписью прыгает вверх-вниз. */
 .auth-main {
+    --watermark-size: clamp(4rem, 16vw, 15rem);
     position: relative;
     align-items: flex-start;
     overflow: hidden;
-    background:
-            radial-gradient(60rem 30rem at 85% -10%, rgba(14, 124, 102, 0.10), transparent 60%),
-            radial-gradient(40rem 24rem at 0% 110%, rgba(14, 124, 102, 0.07), transparent 60%),
-            #f4f5f7;
+    /* Минимальная высота = отступы + место под надпись + самая высокая карточка (регистрация, около 33rem).
+       Поэтому при переключении вкладок страница не меняет высоту, а сама карточка растёт и тянется к футеру. */
+    min-height: calc(var(--watermark-size) * 0.85 + 40rem);
+    background-color: var(--bg);
 }
 
 /* Сцена шире карточки, чтобы название по бокам поместилось. margin-top оставляет над карточкой место
@@ -1678,11 +1699,11 @@ html {
     justify-content: center;
     width: 100%;
     max-width: var(--page-width);
-    margin-top: calc(var(--watermark-size) * 0.55);
+    margin-top: calc(var(--watermark-size) * 0.85);
 }
 
 .auth-stage .page-watermark {
-    top: calc(var(--watermark-size) * -0.55);
+    top: calc(var(--watermark-size) * -0.85);
 }
 
 /* Надпись зависит от активной вкладки: по умолчанию «Log in», на вкладке регистрации «Sign up» */
@@ -1703,24 +1724,24 @@ html {
     z-index: 1;
     width: 100%;
     max-width: 440px;
-    border: 1px solid #e3e6eb;
+    border: 1px solid var(--line);
     border-radius: var(--card-radius);
 }
 
 .auth-tabs {
-    background-color: #eef0f3;
-    border-radius: 0.85rem;
+    background-color: var(--line-soft);
+    border-radius: var(--control-radius);
     padding: 0.3rem;
 }
 
 .auth-tabs .nav-link {
     color: var(--bulky-muted);
     font-weight: 600;
-    border-radius: 0.65rem;
+    border-radius: var(--control-radius);
 }
 
 .auth-tabs .nav-link.active {
-    background-color: #fff;
+    background-color: var(--surface);
     color: var(--bulky-ink);
 }
 
@@ -1780,7 +1801,7 @@ html {
     color: var(--bulky-muted);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: #c2c8d1;
+    text-decoration-color: var(--line-strong);
     text-underline-offset: 0.3em;
     transition: color 0.2s, text-decoration-color 0.2s;
 }
@@ -1800,7 +1821,7 @@ html {
 
 .home-art-label {
     fill: var(--bulky-muted);
-    font-family: Inter, system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 14px;
     font-weight: 500;
 }
@@ -1821,7 +1842,7 @@ html {
 
 .home-art-axis {
     fill: var(--bulky-muted);
-    font-family: Inter, system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 12px;
 }
 
@@ -1831,7 +1852,7 @@ html {
 }
 
 .home-chart-bar {
-    fill: #bfe0d6;
+    fill: var(--accent-pale);
     transition: fill 0.3s ease;
 }
 
@@ -1861,8 +1882,8 @@ html {
     gap: 0.25rem;
     margin-bottom: 2rem;
     padding: 0.3rem;
-    border-radius: 0.85rem;
-    background-color: #eef0f3;
+    border-radius: var(--control-radius);
+    background-color: var(--line-soft);
 }
 
 .home-tour-input {
@@ -1874,7 +1895,7 @@ html {
 .home-tour-tab {
     margin: 0;
     padding: 0.5rem 1.25rem;
-    border-radius: 0.65rem;
+    border-radius: var(--control-radius);
     color: var(--bulky-muted);
     font-weight: 600;
     cursor: pointer;
@@ -1882,12 +1903,12 @@ html {
 }
 
 .home-tour-input:checked + .home-tour-tab {
-    background-color: #fff;
+    background-color: var(--surface);
     color: var(--bulky-ink);
 }
 
 .home-tour-input:focus-visible + .home-tour-tab {
-    box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.3);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Высота общая для всех вкладок, чтобы страница не прыгала при переключении */
@@ -1948,12 +1969,12 @@ html {
 /* Пункты строками с тонкими линиями, как данные в аккаунте */
 .home-points {
     margin: 0;
-    border-top: 1px solid #e3e6eb;
+    border-top: 1px solid var(--line);
 }
 
 .home-point {
     padding: 0.9rem 0;
-    border-bottom: 1px solid #e3e6eb;
+    border-bottom: 1px solid var(--line);
 }
 
 .home-point dt {
@@ -1993,10 +2014,10 @@ html {
 }
 
 .app-toast {
-    --bs-toast-bg: #ffffff;
+    --bs-toast-bg: var(--surface);
     --bs-toast-color: var(--bulky-ink);
-    --bs-toast-border-radius: 0.9rem;
-    --bs-toast-box-shadow: 0 2px 8px rgba(20, 24, 31, 0.08);
+    --bs-toast-border-radius: var(--control-radius);
+    --bs-toast-box-shadow: 0 2px 8px rgba(26, 24, 19, 0.08);
     border-left: 4px solid var(--app-toast-accent, var(--bulky-muted)) !important;
 }
 
@@ -2015,4 +2036,49 @@ html {
 
 .app-toast-info {
     --app-toast-accent: var(--bulky-muted);
+}
+
+/* ---------- Заголовочный шрифт ---------- */
+
+/* Узкий плакатный шрифт только для названий: фоновая надпись, название на главной и заголовки блоков.
+   Он узкий, поэтому размеры выше, чем у обычного шрифта; трекинг почти нулевой. */
+.page-watermark,
+.hero-title,
+.home-tour-title,
+.workout-title,
+.analytics-card-title,
+.history-month-title,
+.admin-section-title,
+.app-dialog-title,
+.account-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.page-watermark {
+    padding-left: 0.02em;
+    letter-spacing: 0.02em;
+}
+
+.hero-title {
+    font-size: clamp(4.5rem, 12vw, 8.5rem);
+    letter-spacing: 0;
+    line-height: 0.9;
+}
+
+.home-tour-title {
+    font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+    line-height: 1;
+}
+
+.workout-title,
+.analytics-card-title,
+.history-month-title,
+.admin-section-title,
+.app-dialog-title,
+.account-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
 }

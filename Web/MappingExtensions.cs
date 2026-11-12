@@ -80,4 +80,18 @@ public static class MappingExtensions
         WeeksVolumes = overview.WeeksVolumes.ToList(),
         WeeksSets = overview.WeeksSets.ToList()
     };
+
+    public static MuscleGroupOverviewResponse ToResponse(this MuscleGroupOverview overview) => new()
+    {
+        LastWeekVolume = overview.LastWeekVolume,
+        LastWeekVolumeIncrease = overview.LastWeekVolumeIncrease,
+        LastMonthVolume = overview.LastMonthVolume,
+        LastMonthVolumeIncreasePercents = overview.LastMonthVolumeIncreasePercents,
+        LastWeekSets = overview.LastWeekSets,
+        LastWeekSetsIncrease = overview.LastWeekSetsIncrease,
+        AverageWeekSets = overview.AverageWeekSets,
+        AverageWeekVolume = overview.AverageWeekVolume,
+        WeeksVolumes = overview.WeeksVolumes.ToList(),
+        WeeksSets = overview.WeeksSets.ToList()
+    };
 }

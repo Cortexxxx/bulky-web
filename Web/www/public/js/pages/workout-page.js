@@ -75,10 +75,10 @@ function updateTimer() {
     const seconds = Math.floor(elapsed / 1000) % 60;
     const minutes = Math.floor(elapsed / 1000 / 60) % 60;
     const hours = Math.floor(elapsed / 1000 / 60 / 60) % 24;
-    workoutTimer.textContent = `${hours > 0 ? `
-        ${String(hours).padStart(2, '0')}:` : ""}
-        ${String(minutes).padStart(2, '0')}:
-        ${String(seconds).padStart(2, '0')}`;
+    // Часы показываем только когда они есть. Строка собирается в одну линию: переводы строк внутри шаблонной
+    // строки попадали в текст и после двоеточий появлялись пробелы
+    const parts = hours > 0 ? [hours, minutes, seconds] : [minutes, seconds];
+    workoutTimer.textContent = parts.map(part => String(part).padStart(2, '0')).join(':');
 }
 
 async function setupCreateDialog() {

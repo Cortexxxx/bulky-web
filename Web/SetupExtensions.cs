@@ -118,7 +118,8 @@ public static class SetupExtensions
     public static void MapWorkoutAnalyticsApi(this Router router, WorkoutsAnalyticsService workoutsAnalyticsService)
     {
         var workoutExerciseEndpoints = new AnalyticsEndpoints(workoutsAnalyticsService);
-        router.MapGet("api/analytics/overview", workoutExerciseEndpoints.GetOverview, AuthorizedOnly);
+        router.MapGet("api/analytics/overview", workoutExerciseEndpoints.GetWorkoutsOverview, AuthorizedOnly);
+        router.MapGet("api/analytics/muscle/{id}", workoutExerciseEndpoints.GetMuscleGroupOverview, AuthorizedOnly);
     }
     
     private static void MapHtmlPage(this Router router, string route, string pageFilePath,

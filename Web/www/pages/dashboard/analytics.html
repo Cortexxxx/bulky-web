@@ -92,44 +92,55 @@
 
         <div class="analytics-row">
 
-            <!-- Блок 2: группы мышц -->
             <section class="analytics-card" aria-labelledby="muscle-title">
                 <div class="analytics-card-header">
                     <h2 id="muscle-title" class="analytics-card-title">Muscle groups</h2>
                     <div>
                         <label for="muscle-select" class="visually-hidden">Muscle group</label>
                         <select id="muscle-select" class="form-select analytics-select">
-                            <option selected>Chest</option>
-                            <option>Back</option>
-                            <option>Shoulders</option>
-                            <option>Biceps</option>
-                            <option>Triceps</option>
-                            <option>Quadriceps</option>
+                            <template id="muscle-select-template">
+                                <option data-muscle-id></option>
+                            </template>
                         </select>
                     </div>
                 </div>
 
+                <!-- Значения подставляет analytics-page.js (renderMuscleOverview), пока он не отработал, везде прочерк -->
                 <div class="analytics-stats">
                     <div class="stat">
-                        <div class="stat-label">Last 7 days</div>
+                        <div class="stat-label">Volume, 7 days</div>
                         <div class="stat-row">
-                            <span class="stat-value">3 900</span>
+                            <span id="muscle-week-volume-value" class="stat-value">–</span>
                             <span class="stat-unit">kg</span>
-                            <span class="stat-delta">+7%</span>
+                            <span id="muscle-week-volume-delta" class="stat-delta stat-delta-down">–</span>
                         </div>
                     </div>
                     <div class="stat">
-                        <div class="stat-label">Last 30 days</div>
+                        <div class="stat-label">Volume, 4 weeks</div>
                         <div class="stat-row">
-                            <span class="stat-value">15 300</span>
+                            <span id="muscle-month-volume-value" class="stat-value">–</span>
+                            <span class="stat-unit">kg</span>
+                            <span id="muscle-month-volume-delta" class="stat-delta stat-delta-down">–</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Sets, 7 days</div>
+                        <div class="stat-row">
+                            <span id="muscle-week-sets-value" class="stat-value">–</span>
+                            <span id="muscle-week-sets-delta" class="stat-delta stat-delta-down">–</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Average volume per week</div>
+                        <div class="stat-row">
+                            <span id="muscle-average-volume-value" class="stat-value">–</span>
                             <span class="stat-unit">kg</span>
                         </div>
                     </div>
                     <div class="stat">
-                        <div class="stat-label">Average per week</div>
+                        <div class="stat-label">Average sets per week</div>
                         <div class="stat-row">
-                            <span class="stat-value">3 000</span>
-                            <span class="stat-unit">kg</span>
+                            <span id="muscle-average-sets-value" class="stat-value">–</span>
                         </div>
                     </div>
                 </div>
@@ -205,98 +216,6 @@
 {{toasts}}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-<!-- Временно: рисует графики на тестовых данных, чтобы показать вёрстку без страницы-скрипта и бэка.
-     Когда появится analytics-page.js, этот блок нужно удалить. -->
-<script>
-    // Каждый столбец это 7 дней, подпись = дата начала периода; последний столбец = последние 7 дней
-    const weeks = Array.from({length: 12}, (_, i) => {
-        const start = new Date(Date.now() - (12 - i) * 7 * 24 * 60 * 60 * 1000);
-        return start.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
-    });
-    const lastIndex = weeks.length - 1;
-
-    const accent = '#0e7c66';
-
-    // Общий вид графиков
-    Chart.defaults.font.family = 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-    Chart.defaults.color = '#5b6472';
-    Chart.defaults.plugins.legend.display = false;
-    Chart.defaults.plugins.tooltip.backgroundColor = '#14181f';
-    Chart.defaults.plugins.tooltip.cornerRadius = 8;
-    Chart.defaults.plugins.tooltip.padding = 10;
-    Chart.defaults.plugins.tooltip.displayColors = false;
-
-    function chartOptions(unit, yScale) {
-        return {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {grid: {display: false}, ticks: {maxRotation: 0}},
-                y: {
-                    grid: {color: '#eef0f3'},
-                    border: {display: false},
-                    ticks: {callback: value => value >= 1000 ? `${value / 1000}k` : value},
-                    ...yScale
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        title: items => `7 days from ${items[0].label}`,
-                        label: item => `${item.parsed.y.toLocaleString('ru-RU')} ${unit}`
-                    }
-                }
-            }
-        };
-    }
-
-    // Столбцы по неделям (данные от старых к новым); unit попадает в подсказку
-    function createBarChart(canvasId, data, unit) {
-        new Chart(document.getElementById(canvasId), {
-            type: 'bar',
-            data: {
-                labels: weeks,
-                datasets: [{
-                    data,
-                    backgroundColor: accent,
-                    borderRadius: 5,
-                    maxBarThickness: 44
-                }]
-            },
-            options: chartOptions(unit, {beginAtZero: true})
-        });
-    }
-
-    createBarChart('overview-volume-chart',
-        [9800, 11200, 10500, 12900, 13400, 12100, 14600, 15200, 14100, 16800, 17500, 18200], 'kg');
-
-    createBarChart('overview-sets-chart',
-        [38, 44, 41, 50, 52, 47, 56, 59, 54, 63, 66, 70], 'sets');
-
-    createBarChart('muscle-chart',
-        [2100, 2600, 2300, 2900, 3100, 2700, 3300, 3500, 3200, 3900, 4200, 4400], 'kg');
-
-    // Линия 1RM: null = неделя без подходов, линия в этом месте прерывается (spanGaps: false)
-    new Chart(document.getElementById('exercise-chart'), {
-        type: 'line',
-        data: {
-            labels: weeks,
-            datasets: [{
-                data: [88, 90, null, 92, 93, 93, null, 95, 97, 98, 100, 101],
-                borderColor: accent,
-                borderWidth: 2.5,
-                tension: 0,
-                spanGaps: false,
-                pointRadius: 4,
-                pointBorderWidth: 2.5,
-                pointBorderColor: accent,
-                pointBackgroundColor: ctx => ctx.dataIndex === lastIndex ? accent : '#ffffff'
-            }]
-        },
-        options: chartOptions('kg', {suggestedMin: 80, suggestedMax: 110})
-    });
-</script>
 
 <script type="module" src="/js/pages/analytics-page.js"></script>
 </body>
