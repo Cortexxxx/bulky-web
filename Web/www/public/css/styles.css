@@ -1248,8 +1248,45 @@ html {
 }
 
 .analytics-chart-note {
+    margin: 0 0 0.75rem;
     color: var(--bulky-muted);
     font-size: 0.8125rem;
+}
+
+/* Переключатель метрики над графиком (Volume / Sets): две радиокнопки в виде сегментов */
+.metric-toggle {
+    position: relative;
+    display: inline-flex;
+    gap: 0.125rem;
+    padding: 0.2rem;
+    border-radius: var(--control-radius);
+    background-color: var(--line-soft);
+}
+
+.metric-toggle-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.metric-toggle-option {
+    margin: 0;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--control-radius);
+    color: var(--bulky-muted);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.metric-toggle-input:checked + .metric-toggle-option {
+    background-color: var(--surface);
+    color: var(--bulky-ink);
+}
+
+.metric-toggle-input:focus-visible + .metric-toggle-option {
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Chart.js занимает весь контейнер, поэтому высоту задаём ему */

@@ -147,9 +147,18 @@
 
                 <div class="analytics-chart">
                     <div class="analytics-chart-header">
-                        <span class="analytics-chart-title">Volume by week, kg</span>
-                        <span class="analytics-chart-note">Primary muscle counts fully, secondary by half</span>
+                        <span id="muscle-chart-title" class="analytics-chart-title">Volume by week, kg</span>
+                        <!-- Переключатель метрики графика: радиокнопки, analytics-page.js слушает change -->
+                        <div class="metric-toggle" role="radiogroup" aria-label="Chart metric">
+                            <input type="radio" name="muscle-metric" id="muscle-metric-volume"
+                                   class="metric-toggle-input" value="volume" checked>
+                            <label for="muscle-metric-volume" class="metric-toggle-option">Volume</label>
+                            <input type="radio" name="muscle-metric" id="muscle-metric-sets"
+                                   class="metric-toggle-input" value="sets">
+                            <label for="muscle-metric-sets" class="metric-toggle-option">Sets</label>
+                        </div>
                     </div>
+                    <p class="analytics-chart-note">Primary muscle counts fully, secondary by half</p>
                     <div class="chart-box">
                         <canvas id="muscle-chart" role="img"
                                 aria-label="Bar chart of weekly volume for the selected muscle group"></canvas>
