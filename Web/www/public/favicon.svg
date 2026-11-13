@@ -1,10 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" fill="#5b6b1e"/>
-  <g transform="rotate(-18 32 32)" fill="#ffffff">
-    <rect x="7" y="22" width="6" height="20" rx="2"/>
-    <rect x="14" y="15" width="9" height="34" rx="3"/>
-    <rect x="23" y="29" width="18" height="6" rx="3"/>
-    <rect x="41" y="15" width="9" height="34" rx="3"/>
-    <rect x="51" y="22" width="6" height="20" rx="2"/>
-  </g>
+  <!-- Чёрная плитка и узкая жирная «B» цвета бумаги. Буква нарисована контурами:
+       в favicon веб-шрифты не подгружаются, поэтому текстом её писать нельзя. -->
+  <rect width="64" height="64" rx="8" fill="#1a1813"/>
+  <path fill="#fcfaf5" fill-rule="evenodd" d="
+    M16 12 H35
+    C43 12 47 16 47 22.5
+    C47 27 45 29.5 42 31
+    C46 32.5 49 36 49 41.5
+    C49 48.5 44.5 52 36 52
+    H16 Z
+    M25 19.5 V28 H33
+    C35.5 28 37 26.5 37 23.8
+    C37 21 35.5 19.5 33 19.5 Z
+    M25 35.5 V44.5 H35
+    C38 44.5 40 43 40 40
+    C40 37.2 38 35.5 35 35.5 Z"/>
 </svg>
