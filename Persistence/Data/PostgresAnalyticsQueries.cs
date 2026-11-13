@@ -56,8 +56,8 @@ public class PostgresAnalyticsQueries(NpgsqlDataSource dataSource) : IAnalyticsQ
     }
 
     public async Task<List<MuscleWeekStats>> GetMuscleWeekStats(Guid userId, Guid muscleId, CancellationToken ct)
-    {
-                await using var connection = await dataSource.OpenConnectionAsync(ct);
+    { 
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
             """
             WITH weekly_stats AS (
@@ -93,6 +93,41 @@ public class PostgresAnalyticsQueries(NpgsqlDataSource dataSource) : IAnalyticsQ
                 WeekNumber = reader.GetInt32(reader.GetOrdinal("week_number")),
                 TotalVolume = reader.GetInt32(reader.GetOrdinal("total_volume")),
                 TotalSets = reader.GetInt32(reader.GetOrdinal("total_sets")),
+            });
+        }
+
+        return stats;
+    }
+
+    public async Task<List<ExerciseWeekSet>> GetExerciseWeekSets(Guid userId, Guid exerciseId, CancellationToken ct)
+    { 
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand(
+            """
+            SELECT floor(extract(epoch from now() - w.started_at) / extract(epoch from interval '1 week'))::int AS week_number,
+                   s.weight AS weight, s.repeats as repeats
+            FROM public.workouts w
+                     JOIN public.workout_exercises we on w.id = we.workout_id
+                     JOIN public.sets s on we.id = s.workout_exercise_id
+                     JOIN public.exercises e ON we.exercise_id = e.id
+            WHERE w.user_id = @user_id AND e.id = @exercise_id AND w.ended_at IS NOT NULL
+              AND s.repeats != 0 AND s.weight != 0 AND now() - w.started_at < interval '12 week'
+            ORDER BY week_number
+            """, connection);
+
+        command.Parameters.AddWithValue("user_id", userId);
+        command.Parameters.AddWithValue("exercise_id", exerciseId);
+
+        await using var reader = await command.ExecuteReaderAsync(ct);
+        var stats = new List<ExerciseWeekSet>();
+        
+        while (await reader.ReadAsync(ct))
+        {
+            stats.Add(new ExerciseWeekSet
+            {
+                WeekNumber = reader.GetInt32(reader.GetOrdinal("week_number")),
+                Repeats = reader.GetInt32(reader.GetOrdinal("repeats")),
+                Weight = reader.GetDecimal(reader.GetOrdinal("weight"))
             });
         }
 

@@ -20,4 +20,14 @@ public class AnalyticsEndpoints(WorkoutsAnalyticsService service)
         
         context.Response.WriteJson(overview.ToResponse());
     }
+
+    public async Task GetExerciseOverview(HttpContext context)
+    {
+        var exerciseId = WebHelpers.GetIdOrThrowNotFound(context);
+
+        var overview = await service.GetExerciseOverview(context.Request.RequiredUserClaims.Id, exerciseId,
+            context.CancellationToken);
+        
+        context.Response.WriteJson(overview);
+    }
 }

@@ -56,4 +56,42 @@ public class WorkoutsAnalyticsService(IAnalyticsQueries analyticsQueries)
 
         return overview;
     }
+
+    public async Task<ExercisesOverview> GetExerciseOverview(Guid userId, Guid muscleId, CancellationToken ct)
+    {
+        var exerciseWeekSets = await analyticsQueries.GetExerciseWeekSets(userId, muscleId, ct);
+        var weekGroups = exerciseWeekSets.GroupBy(w => w.WeekNumber).ToDictionary(sets => sets.Key, sets => sets.ToList());
+        
+        for (var i = 0; i < 12; i++)
+        {
+            if (!weekGroups.ContainsKey(i))
+            {
+                weekGroups[i] = [];
+            }
+        }
+
+        var maxWeekOrms = weekGroups.Select(pair => pair.Value.Select(CalculateOrm).Max()).ToList();
+        var lastWeekOrm = maxWeekOrms[0];
+        var lastMonthOrm = maxWeekOrms.Take(4).Max();
+        
+        var overview = new ExercisesOverview
+        {
+            LastWeekOrm = lastWeekOrm,
+            LastWeekOrmIncrease = lastWeekOrm - maxWeekOrms[1],
+            LastMonthOrm = lastMonthOrm,
+            LastMonthOrmIncrease = lastMonthOrm - maxWeekOrms.Skip(4).Take(4).Max(),
+            MaxOrm = maxWeekOrms.Max(),
+            MaxVolume = (int)exerciseWeekSets.Select(w => w.Weight * w.Repeats).Max(),
+            MaxWeight = (int)exerciseWeekSets.Select(w => w.Weight).Max(),
+            Orms = maxWeekOrms,
+            Volumes = weekGroups.Select(pair => pair.Value.Sum(w => (int)(w.Repeats * w.Weight))).ToList()
+        };
+
+        return overview;
+    }
+
+    private static decimal CalculateOrm(ExerciseWeekSet w)
+    {
+        return w.Weight * (1 + w.Repeats / 30m);
+    }
 }
