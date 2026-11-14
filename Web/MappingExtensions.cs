@@ -94,4 +94,17 @@ public static class MappingExtensions
         WeeksVolumes = overview.WeeksVolumes.ToList(),
         WeeksSets = overview.WeeksSets.ToList()
     };
+    
+    public static ExerciseOverviewResponse ToResponse(this ExercisesOverview overview) => new()
+    {
+        LastWeekOrm = overview.LastWeekOrm,
+        LastWeekOrmIncrease = overview.LastWeekOrmIncrease,
+        LastMonthOrm = overview.LastMonthOrm,
+        LastMonthOrmIncrease = overview.LastMonthOrmIncrease,
+        MaxOrm = overview.MaxOrm,
+        MaxVolume = overview.MaxVolume,
+        MaxWeight = overview.MaxWeight,
+        Orms = overview.Orms.ToList(),
+        Volumes = overview.Volumes.ToList()
+    };
 }

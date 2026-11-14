@@ -1,21 +1,30 @@
-import {getMuscleGroupOverview, getOverview} from "../api/analytics-api.js";
+import {getExerciseOverview, getMuscleGroupOverview, getOverview} from "../api/analytics-api.js";
 import {withErrorToasts} from "../shared/ui.js";
 import {getAllMuscles} from "../api/muscle-api.js";
+import {getAllExercises} from "../api/exercise-api.js";
 
 const averageDurationValue = document.getElementById('average-duration-value');
 const muscleGroups = await withErrorToasts(getAllMuscles);
-let selectedMuscle;
+const exercises = await withErrorToasts(getAllExercises);
 
-const WEEKS = 12;
-const dateFormat = new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric'});
-let overviewVolumeChart, overviewSetsChart, muscleChart;
-let muscleOverview = null;      
+let selectedMuscle;
+let selectedExercise;
+
+let overviewVolumeChart, overviewSetsChart, muscleChart, exerciseChart;
+
+let muscleOverview = null;
 let muscleMetric = 'volume';
 
-setupChartDefaults();
+let exerciseOverview = null;
+let exerciseMetric = 'volume';
+
+const weekLabels = Array.from({length: 12}, (_, i) => `${12 - i}w`);
+
 await setupOverview();
 setupMuscleMetricToggle();
+setupExerciseMetricToggle();
 await setupMuscleOverview();
+await setupExerciseOverview();
 
 async function setupOverview() {
     const overview = await withErrorToasts(getOverview);
@@ -28,36 +37,62 @@ async function setupOverview() {
     setStat('sets-month', overview.lastMonthSets, overview.lastMonthSetsIncrease);
 
     averageDurationValue.textContent = formatDuration(overview.averageDurationMinutes);
-    
-    overviewVolumeChart ??= createBarChart('overview-volume-chart', 'kg');
-    updateBarChart(overviewVolumeChart, overview.weeksVolumes, 'kg');
 
-    overviewSetsChart ??= createBarChart('overview-sets-chart', 'sets');
-    updateBarChart(overviewSetsChart, overview.weeksSets, 'sets');
+    overviewVolumeChart ??= createBarChart('overview-volume-chart');
+    updateBarChart(overviewVolumeChart, overview.weeksVolumes);
+
+    overviewSetsChart ??= createBarChart('overview-sets-chart');
+    updateBarChart(overviewSetsChart, overview.weeksSets);
 }
 
 async function setupMuscleOverview() {
-    const muscleSelect = document.getElementById('muscle-select');
-    const muscleTemplate = document.getElementById('muscle-select-template');
-    if (muscleGroups === undefined) return;
-    
-    for (const muscleGroup of muscleGroups) {
-        const option = muscleTemplate.content.firstElementChild.cloneNode(true);
-        option.dataset.muscleId = muscleGroup.id;
-        option.textContent = muscleGroup.title;
-        option.value = muscleGroup.id;
-        
-        muscleSelect.append(option);
+    const elements = muscleGroups;
+    const selector = document.getElementById('muscle-select');
+    const selectorTemplate = document.getElementById('muscle-select-template');
+    if (elements === undefined) return;
+
+    for (const element of elements) {
+        const option = selectorTemplate.content.firstElementChild.cloneNode(true);
+        option.dataset.muscleId = element.id;
+        option.textContent = element.title;
+        option.value = element.id;
+
+        selector.append(option);
     }
 
 
-    selectedMuscle = muscleSelect.value;
+    selectedMuscle = selector.value;
     await renderMuscleOverview();
-    
-    muscleSelect.addEventListener('change', async (e) => {
+
+    selector.addEventListener('change', async (e) => {
         e.preventDefault();
-        selectedMuscle = muscleSelect.value;
+        selectedMuscle = selector.value;
         await renderMuscleOverview();
+    });
+}
+
+async function setupExerciseOverview() {
+    const selector = document.getElementById('exercise-select');
+    const selectorTemplate = document.getElementById('exercise-select-template');
+    if (exercises === undefined) return;
+
+    for (const exercise of exercises) {
+        const option = selectorTemplate.content.firstElementChild.cloneNode(true);
+        option.dataset.exerciseId = exercise.id;
+        option.textContent = exercise.title;
+        option.value = exercise.id;
+
+        selector.append(option);
+    }
+
+
+    selectedExercise = selector.value;
+    await renderExerciseOverview();
+
+    selector.addEventListener('change', async (e) => {
+        e.preventDefault();
+        selectedExercise = selector.value;
+        await renderExerciseOverview();
     });
 }
 
@@ -76,6 +111,21 @@ async function renderMuscleOverview() {
     muscleOverview = overview;
     renderMuscleChart();
 }
+async function renderExerciseOverview() {
+    const overview = await withErrorToasts(() => getExerciseOverview(selectedExercise));
+
+    if (overview == null) return;
+    document.getElementById('exercise-month-orm-delta')
+    setStat('exercise-week-orm', formatNumber(overview.lastWeekOrm), overview.lastWeekOrmIncrease);
+    setStat('exercise-month-orm', formatNumber(overview.lastMonthOrm), overview.lastMonthOrmIncrease);
+
+    document.getElementById('exercise-max-orm-value').textContent = formatNumber(overview.maxOrm);
+    document.getElementById('exercise-max-volume-value').textContent = formatNumber(overview.maxVolume);
+    document.getElementById('exercise-max-weight-value').textContent = formatNumber(overview.maxWeight);
+
+    exerciseOverview = overview;
+    renderExerciseChart();
+}
 
 function setupMuscleMetricToggle() {
     for (const radio of document.querySelectorAll('input[name="muscle-metric"]')) {
@@ -86,117 +136,55 @@ function setupMuscleMetricToggle() {
     }
 }
 
+function setupExerciseMetricToggle() {
+    for (const radio of document.querySelectorAll('input[name="exercise-metric"]')) {
+        radio.addEventListener('change', () => {
+            exerciseMetric = radio.value;
+            renderExerciseChart();
+        });
+    }
+}
+
 function renderMuscleChart() {
     if (muscleOverview === null) return;
 
     const isVolume = muscleMetric === 'volume';
 
-    muscleChart ??= createBarChart('muscle-chart', 'kg');
-    updateBarChart(
-        muscleChart,
-        isVolume ? muscleOverview.weeksVolumes : muscleOverview.weeksSets,
-        isVolume ? 'kg' : 'sets');
+    muscleChart ??= createBarChart('muscle-chart');
+    updateBarChart(muscleChart, isVolume ? muscleOverview.weeksVolumes : muscleOverview.weeksSets);
 
     document.getElementById('muscle-chart-title').textContent = isVolume ? 'Volume by week, kg' : 'Sets by week';
 }
 
+function renderExerciseChart() {
+    if (exerciseOverview === null) return;
 
-function cssVar(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const isVolume = exerciseMetric === 'volume';
+
+    exerciseChart ??= createBarChart('exercise-chart');
+    updateBarChart(exerciseChart, isVolume ? exerciseOverview.volumes : exerciseOverview.orms);
+
+    document.getElementById('exercise-chart-title').textContent = isVolume ? 'Volume by week, kg' : '1RM by week';
 }
 
-function setupChartDefaults() {
-    Chart.defaults.font.family = cssVar('--font-body');
-    Chart.defaults.font.size = 12;
-    Chart.defaults.color = cssVar('--bulky-muted');
-
-    Chart.defaults.plugins.legend.display = false; 
-
-    const tooltip = Chart.defaults.plugins.tooltip;
-    tooltip.backgroundColor = cssVar('--bulky-ink');
-    tooltip.titleFont = {family: cssVar('--font-body'), weight: '600'};
-    tooltip.bodyFont = {family: cssVar('--font-numbers'), weight: '500'};
-    tooltip.cornerRadius = 4;
-    tooltip.padding = 10;
-    tooltip.displayColors = false;
-
-
-    document.fonts.ready.then(() => {
-        for (const chart of [overviewVolumeChart, overviewSetsChart, muscleChart]) {
-            chart?.update('none');
-        }
-    });
-}
-
-
-function weekPeriods() {
-    const day = 24 * 60 * 60 * 1000;
-
-    return Array.from({length: WEEKS}, (_, i) => {
-        const start = new Date(Date.now() - (WEEKS - i) * 7 * day);
-        const end = new Date(start.getTime() + 6 * day);
-
-        return {
-            label: dateFormat.format(start),
-            range: `${dateFormat.format(start)} – ${dateFormat.format(end)}`
-        };
-    });
-}
-
-function shortNumber(value) {
-    return value >= 1000 ? `${value / 1000}k` : value;
-}
-
-function createBarChart(canvasId, unit) {
-    const periods = weekPeriods();
-    const lastIndex = periods.length - 1;
-    const accent = cssVar('--bulky-accent');
-    const accentPale = cssVar('--accent-pale');
+function createBarChart(canvasId) {
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--bulky-accent').trim();
 
     return new Chart(document.getElementById(canvasId), {
         type: 'bar',
         data: {
-            labels: periods.map(p => p.label),
-            datasets: [{
-                data: [],
-                unit,
-                backgroundColor: context => context.dataIndex === lastIndex ? accent : accentPale,
-                hoverBackgroundColor: cssVar('--bulky-accent-dark'),
-                borderRadius: 3,
-                maxBarThickness: 40
-            }]
+            labels: weekLabels,
+            datasets: [{data: [], backgroundColor: accent}]
         },
         options: {
-            responsive: true,
             maintainAspectRatio: false, 
-            scales: {
-                x: {
-                    grid: {display: false},
-                    border: {color: cssVar('--line')},
-                    ticks: {maxRotation: 0, autoSkipPadding: 12}
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {color: cssVar('--line-soft')},
-                    border: {display: false},
-                    ticks: {font: {family: cssVar('--font-numbers')}, callback: shortNumber}
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        title: items => periods[items[0].dataIndex].range,
-                        label: item => `${item.parsed.y.toLocaleString('ru-RU')} ${item.dataset.unit}`
-                    }
-                }
-            }
+            plugins: {legend: {display: false}}
         }
     });
 }
 
-function updateBarChart(chart, valuesNewestFirst, unit) {
+function updateBarChart(chart, valuesNewestFirst) {
     chart.data.datasets[0].data = valuesNewestFirst.toReversed();
-    chart.data.datasets[0].unit = unit;
     chart.update();
 }
 
@@ -204,16 +192,20 @@ function setStat(prefix, value, increase, suffix = '') {
     document.getElementById(`${prefix}-value`).textContent = value;
 
     const delta = document.getElementById(`${prefix}-delta`);
-    delta.textContent = formatIncrease(increase) + suffix;
+    const trunkIncrease = formatNumber(increase);
+    delta.textContent = formatIncrease(increase, trunkIncrease) + suffix;
     delta.classList.toggle('stat-delta-down', increase <= 0);
 }
 
 function formatNumber(value) {
-    return value.toLocaleString('ru-RU');
+    return value.toLocaleString('ru-RU', {
+        maximumFractionDigits: 1,
+        roundingMode: 'trunc',
+    });
 }
 
-function formatIncrease(increase) {
-    return increase > 0 ? `+${increase}` : String(increase);
+function formatIncrease(increase, trunkIncrease) {
+    return increase > 0 ? `+${trunkIncrease}` : String(trunkIncrease);
 }
 
 function formatDuration(totalMinutes) {

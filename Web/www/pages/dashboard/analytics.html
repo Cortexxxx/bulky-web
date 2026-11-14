@@ -105,7 +105,6 @@
                     </div>
                 </div>
 
-                <!-- Значения подставляет analytics-page.js (renderMuscleOverview), пока он не отработал, везде прочерк -->
                 <div class="analytics-stats">
                     <div class="stat">
                         <div class="stat-label">Volume, 7 days</div>
@@ -158,7 +157,6 @@
                             <label for="muscle-metric-sets" class="metric-toggle-option">Sets</label>
                         </div>
                     </div>
-                    <p class="analytics-chart-note">Primary muscle counts fully, secondary by half</p>
                     <div class="chart-box">
                         <canvas id="muscle-chart" role="img"
                                 aria-label="Bar chart of weekly volume for the selected muscle group"></canvas>
@@ -173,43 +171,64 @@
                     <div>
                         <label for="exercise-select" class="visually-hidden">Exercise</label>
                         <select id="exercise-select" class="form-select analytics-select">
-                            <option selected>Barbell bench press</option>
-                            <option>Incline dumbbell press</option>
-                            <option>Overhead press</option>
-                            <option>Barbell row</option>
-                            <option>Back squat</option>
-                            <option>Romanian deadlift</option>
+                            <template id="exercise-select-template">
+                                <option data-muscle-id></option>
+                            </template>
                         </select>
                     </div>
                 </div>
 
                 <div class="analytics-stats">
                     <div class="stat">
-                        <div class="stat-label">Estimated 1RM</div>
+                        <div class="stat-label">Max week 1RM</div>
                         <div class="stat-row">
-                            <span class="stat-value">101</span>
+                            <span id="exercise-week-orm-value" class="stat-value">-</span>
                             <span class="stat-unit">kg</span>
-                            <span class="stat-delta">+3 kg</span>
+                            <span id="exercise-week-orm-delta" class="stat-delta">-</span>
                         </div>
                     </div>
                     <div class="stat">
-                        <div class="stat-label">Sets, last 7 days</div>
+                        <div class="stat-label">Max month 1RM</div>
                         <div class="stat-row">
-                            <span class="stat-value">12</span>
+                            <span id="exercise-month-orm-value" class="stat-value">-</span>
+                            <span class="stat-unit">kg</span>
+                            <span id="exercise-month-orm-delta" class="stat-delta">-</span>
                         </div>
                     </div>
                     <div class="stat">
-                        <div class="stat-label">Sets, last 30 days</div>
+                        <div class="stat-label">Max 1RM</div>
                         <div class="stat-row">
-                            <span class="stat-value">46</span>
+                            <span id="exercise-max-orm-value" class="stat-value">-</span>
+                            <span class="stat-unit">kg</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Max volume</div>
+                        <div class="stat-row">
+                            <span id="exercise-max-volume-value" class="stat-value">-</span>
+                            <span class="stat-unit">kg</span>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">Max weight</div>
+                        <div class="stat-row">
+                            <span id="exercise-max-weight-value" class="stat-value">-</span>
+                            <span class="stat-unit">kg</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="analytics-chart">
                     <div class="analytics-chart-header">
-                        <span class="analytics-chart-title">Estimated 1RM by week, kg</span>
-                        <span class="analytics-chart-note">Weeks without sets are skipped</span>
+                        <span id="exercise-chart-title" class="analytics-chart-title">Volume by week, kg</span>
+                        <div class="metric-toggle" role="radiogroup" aria-label="Chart metric">
+                            <input type="radio" name="exercise-metric" id="exercise-metric-volume"
+                                   class="metric-toggle-input" value="volume" checked>
+                            <label for="exercise-metric-volume" class="metric-toggle-option">Volume</label>
+                            <input type="radio" name="exercise-metric" id="exercise-metric-orms"
+                                   class="metric-toggle-input" value="orms">
+                            <label for="exercise-metric-orms" class="metric-toggle-option">1RM</label>
+                        </div>
                     </div>
                     <div class="chart-box">
                         <canvas id="exercise-chart" role="img"

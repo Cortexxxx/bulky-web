@@ -7,3 +7,7 @@ export async function getOverview() {
 export async function getMuscleGroupOverview(id) {
     return await getData(`/api/analytics/muscle/${id}`);
 }
+
+export async function getExerciseOverview(id) {
+    return await getData(`/api/analytics/exercise/${id}`);
+}

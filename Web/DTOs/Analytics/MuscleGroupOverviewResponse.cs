@@ -14,7 +14,6 @@ public record MuscleGroupOverviewResponse
     public int AverageWeekSets { get; init; }
     public int AverageWeekVolume { get; init; }
 
-    // Ряды для графиков: индекс 0 = последние 7 дней, дальше в прошлое
     public List<int> WeeksVolumes { get; init; } = [];
     public List<int> WeeksSets { get; init; } = [];
 }

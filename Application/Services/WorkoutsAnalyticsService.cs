@@ -60,20 +60,26 @@ public class WorkoutsAnalyticsService(IAnalyticsQueries analyticsQueries)
     public async Task<ExercisesOverview> GetExerciseOverview(Guid userId, Guid muscleId, CancellationToken ct)
     {
         var exerciseWeekSets = await analyticsQueries.GetExerciseWeekSets(userId, muscleId, ct);
-        var weekGroups = exerciseWeekSets.GroupBy(w => w.WeekNumber).ToDictionary(sets => sets.Key, sets => sets.ToList());
-        
-        for (var i = 0; i < 12; i++)
+        var weekGroups = exerciseWeekSets
+            .GroupBy(w => w.WeekNumber)
+            .Select(g => (g.Key, g.ToList())).ToList();
+
+        var weeksCount = weekGroups.Count;
+        while (weeksCount != 12)
         {
-            if (!weekGroups.ContainsKey(i))
-            {
-                weekGroups[i] = [];
-            }
+            weekGroups.Add((weeksCount, []));
+            weeksCount++;
         }
 
-        var maxWeekOrms = weekGroups.Select(pair => pair.Value.Select(CalculateOrm).Max()).ToList();
+        weekGroups = weekGroups.OrderBy(x => x.Key).ToList();
+        
+
+        var maxWeekOrms = weekGroups
+            .Select(sets => sets.Item2.Count == 0 ? 0 : sets.Item2.Select(CalculateOrm).Max()).ToList();
         var lastWeekOrm = maxWeekOrms[0];
         var lastMonthOrm = maxWeekOrms.Take(4).Max();
-        
+        Console.WriteLine(exerciseWeekSets.Count);
+
         var overview = new ExercisesOverview
         {
             LastWeekOrm = lastWeekOrm,
@@ -81,10 +87,14 @@ public class WorkoutsAnalyticsService(IAnalyticsQueries analyticsQueries)
             LastMonthOrm = lastMonthOrm,
             LastMonthOrmIncrease = lastMonthOrm - maxWeekOrms.Skip(4).Take(4).Max(),
             MaxOrm = maxWeekOrms.Max(),
-            MaxVolume = (int)exerciseWeekSets.Select(w => w.Weight * w.Repeats).Max(),
-            MaxWeight = (int)exerciseWeekSets.Select(w => w.Weight).Max(),
+            MaxVolume = exerciseWeekSets.Count != 0 
+                ? (int)exerciseWeekSets.Select(w => w.Weight * w.Repeats).Max()
+                : 0,
+            MaxWeight = exerciseWeekSets.Count != 0 
+                ? (int)exerciseWeekSets.Select(w => w.Weight).Max()
+                : 0,
             Orms = maxWeekOrms,
-            Volumes = weekGroups.Select(pair => pair.Value.Sum(w => (int)(w.Repeats * w.Weight))).ToList()
+            Volumes = weekGroups.Select(pair => pair.Item2.Sum(w => (int)(w.Repeats * w.Weight))).ToList()
         };
 
         return overview;

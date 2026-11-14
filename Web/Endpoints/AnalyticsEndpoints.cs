@@ -28,6 +28,6 @@ public class AnalyticsEndpoints(WorkoutsAnalyticsService service)
         var overview = await service.GetExerciseOverview(context.Request.RequiredUserClaims.Id, exerciseId,
             context.CancellationToken);
         
-        context.Response.WriteJson(overview);
+        context.Response.WriteJson(overview.ToResponse());
     }
 }
