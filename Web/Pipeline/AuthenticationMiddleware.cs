@@ -46,6 +46,7 @@ public static class AuthenticationMiddleware
         return new UserClaims
         {
             Role = user.Role,
+            Username = user.Username,
             Email = user.Email,
             Id = user.Id,
             CreatedAt = user.CreatedAt,

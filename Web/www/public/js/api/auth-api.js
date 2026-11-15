@@ -1,7 +1,8 @@
 import {postData, getData} from '../shared/http.js';
 
-export async function register(email, password) {
+export async function register(username, email, password) {
     const requestBody = JSON.stringify({
+        username: username,
         email: email,
         password: password
     });

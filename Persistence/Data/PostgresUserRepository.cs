@@ -32,13 +32,14 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
         return await reader.ReadAsync(ct) ? CreateUser(reader, Columns.From(reader)) : null;
     }
 
-    public async Task<Guid> CreateUserAsync(string email, string passwordHash, string passwordSalt, CancellationToken ct)
+    public async Task<Guid> CreateUserAsync(string username, string email, string passwordHash, string passwordSalt, CancellationToken ct)
     {
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
-            "INSERT INTO public.users (email, password_hash, password_salt) " +
-            "VALUES (@email, @password_hash, @password_salt) RETURNING id", connection);
+            "INSERT INTO public.users (username, email, password_hash, password_salt) " +
+            "VALUES (@username, @email, @password_hash, @password_salt) RETURNING id", connection);
 
+        command.Parameters.AddWithValue("username", username);
         command.Parameters.AddWithValue("email", email);
         command.Parameters.AddWithValue("password_hash", passwordHash);
         command.Parameters.AddWithValue("password_salt", passwordSalt);
@@ -62,6 +63,7 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
         return new User
         {
             Id = reader.GetGuid(columns.Id),
+            Username = reader.GetString(columns.Username),
             Email = reader.GetString(columns.Email),
             Role = Enum.Parse<Role>(reader.GetString(columns.Role), ignoreCase: true),
             PasswordHash = reader.GetString(columns.PasswordHash),
@@ -71,10 +73,11 @@ public class PostgresUserRepository(NpgsqlDataSource dataSource) : IUserReposito
     }
 
     private readonly record struct Columns(
-        int Id, int Email, int Role, int PasswordHash, int PasswordSalt, int CreatedAt)
+        int Id, int Username, int Email, int Role, int PasswordHash, int PasswordSalt, int CreatedAt)
     {
         public static Columns From(DbDataReader reader) => new(
             reader.GetOrdinal("id"),
+            reader.GetOrdinal("username"),
             reader.GetOrdinal("email"),
             reader.GetOrdinal("role"),
             reader.GetOrdinal("password_hash"),

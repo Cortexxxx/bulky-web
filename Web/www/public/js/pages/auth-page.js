@@ -7,6 +7,7 @@ async function setupRegisterForm() {
     const registerForm = document.getElementById("register-form");
     const registerErrors = document.getElementById("register-error");
 
+    const usernameField = registerForm.elements.username;
     const emailField = registerForm.elements.email;
     const passwordField = registerForm.elements.password;
     const passwordRepeatField = registerForm.elements.passwordRepeat;
@@ -14,6 +15,7 @@ async function setupRegisterForm() {
     registerForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         
+        const username = usernameField.value;
         const email = emailField.value;
         const password = passwordField.value;
         const passwordRepeat = passwordRepeatField.value;
@@ -25,7 +27,7 @@ async function setupRegisterForm() {
                 return;
             }
 
-            await register(email, password);
+            await register(username, email, password);
         }, "/dashboard/workout");
     });
 }

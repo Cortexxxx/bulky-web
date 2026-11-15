@@ -1,4 +1,9 @@
 export const errorMessages = {
+    // Auth: username
+    empty_username: "Please enter a username.",
+    short_username: "Username must be at least 3 characters long.",
+    long_username: "Username is too long (256 characters max).",
+
     // Auth: email
     empty_email: "Please enter your email.",
     long_email: "Email is too long.",

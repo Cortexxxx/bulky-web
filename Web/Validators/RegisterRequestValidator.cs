@@ -8,6 +8,12 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {
     public RegisterRequestValidator()
     {
+        RuleFor(r => r.Username)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty().WithErrorCode("empty_username")
+            .Must(username => username.EnumerateRunes().Count() >= 3).WithErrorCode("short_username")
+            .Must(username => username.EnumerateRunes().Count() <= 256).WithErrorCode("long_username");
+
         RuleFor(r => r.Password)
             .NotEmpty().WithErrorCode("empty_password")
             .MinimumLength(ValidationConstants.MinPasswordLength).WithErrorCode("short_password")

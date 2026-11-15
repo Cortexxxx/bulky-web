@@ -3,6 +3,7 @@ namespace Domain.Models.Auth;
 public record struct User()
 {
     public Guid Id { get; init; }
+    public required string Username { get; init; }
     public string Email { get; init; }
     public Role Role {get;init;}
     public string PasswordHash { get; init; }

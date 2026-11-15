@@ -20,12 +20,12 @@ public class AuthService
         _fakePassword = _passwordHasher.HashPassword(_passwordHasher.GenerateSalt(), _fakeSalt);
     }
 
-    public async Task<Guid> RegisterUserAsync(string email, string password, CancellationToken ct)
+    public async Task<Guid> RegisterUserAsync(string username, string email, string password, CancellationToken ct)
     {
         var passwordSalt = _passwordHasher.GenerateSalt();
         var passwordHash = _passwordHasher.HashPassword(password, passwordSalt);
         
-        var createdUserId = await _userRepository.CreateUserAsync(email, passwordHash, passwordSalt, ct);
+        var createdUserId = await _userRepository.CreateUserAsync(username, email, passwordHash, passwordSalt, ct);
 
         return createdUserId;
     }

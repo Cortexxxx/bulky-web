@@ -1,3 +1,3 @@
 namespace Web.DTOs.Auth;
 
-public record RegisterRequest(string Email, string Password);
+public record RegisterRequest(string Username, string Email, string Password);

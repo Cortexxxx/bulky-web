@@ -15,7 +15,7 @@ async function setupProfile() {
     const meInfo = await me();
     const sessions = await getSessions();
     
-    document.getElementById("account-email-title").textContent = meInfo.id;
+    document.getElementById("account-username").textContent = meInfo.username;
     document.getElementById("account-email").textContent = meInfo.email;
     document.getElementById("account-role").textContent = meInfo.role;
     document.getElementById("account-sessions").textContent = sessions.length;
