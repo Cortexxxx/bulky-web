@@ -6,18 +6,12 @@ public static class PageRenderer
     private const string GuestsHeaderPlaceholder = "{{guests_header}}";
     private const string FooterPlaceholder = "{{footer}}";
     private const string ToastsPlaceholder = "{{toasts}}";
-    /// <summary>
-    /// Read page file, render all partial parts of page
-    /// </summary>
-    /// <param name="relationPath">Path to page without www/pages/ prefix (ex. home.html)</param>
+
     public static async Task<string> RenderAsync(string relationPath)
     {
         return await RenderFileAsync(Path.Combine(FilePaths.Pages, relationPath));
     }
-
-    /// <summary>
-    /// Read page by its full path (ex. error pages), render all partial parts of page
-    /// </summary>
+    
     public static async Task<string> RenderFileAsync(string path)
     {
         var page = await File.ReadAllTextAsync(path);

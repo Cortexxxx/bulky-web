@@ -30,6 +30,7 @@ var exercisesService = new ExercisesService(new PostgresExercisesRepository(data
 var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(dataSource));
 var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(dataSource));
 var analyticsService = new WorkoutsAnalyticsService(new PostgresAnalyticsQueries(dataSource));
+var guidesService = new GuideService(exercisesService, musclesService);
 
 // Routing
 
@@ -41,6 +42,7 @@ router.MapExercisesApi(exercisesService, new ExerciseRequestValidator());
 router.MapWorkoutsApi(workoutsService, new WorkoutRequestValidator());
 router.MapWorkoutExercisesApi(workoutExercisesService, new WorkoutSetRequestValidator());
 router.MapWorkoutAnalyticsApi(analyticsService);
+router.MapGuidesApi(guidesService);
 router.Initialize();
 
 // Middleware

@@ -4,6 +4,7 @@ using Domain.Models.Workouts;
 using Web.DTOs.Analytics;
 using Web.DTOs.Auth;
 using Web.DTOs.Exercise;
+using Web.DTOs.Guide;
 using Web.DTOs.MuscleGroup;
 using Web.DTOs.Workout;
 
@@ -11,6 +12,15 @@ namespace Web;
 
 public static class MappingExtensions
 {
+    public static GuideItemResponse ToResponse(this GuideItem guideItem) => new()
+    {
+        Category = guideItem.Category,
+        SourceId = guideItem.SourceId,
+        Title = guideItem.Title,
+        Description = guideItem.Description,
+        ImagePath = guideItem.ImagePath
+    };
+
     public static MuscleGroupResponse ToResponse(this MuscleGroup muscleGroup) => new()
     {
         Id = muscleGroup.Id,

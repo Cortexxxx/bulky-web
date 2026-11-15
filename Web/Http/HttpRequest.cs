@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 using Domain.Models.Auth;
@@ -100,4 +101,9 @@ public class HttpRequest
         return _bodyBytes;
     }
 
+    public bool TryGetQuery(string name, [NotNullWhen(true)] out string? value)
+    {
+        value = _request.QueryString[name];
+        return value != null;
+    }
 }

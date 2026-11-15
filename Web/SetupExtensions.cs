@@ -122,6 +122,12 @@ public static class SetupExtensions
         router.MapGet("api/analytics/muscle/{id}", workoutExerciseEndpoints.GetMuscleGroupOverview, AuthorizedOnly);
         router.MapGet("api/analytics/exercise/{id}", workoutExerciseEndpoints.GetExerciseOverview, AuthorizedOnly);
     }
+
+    public static void MapGuidesApi(this Router router, GuideService guideService)
+    {
+        var guidesEndpoints = new GuidesEndpoints(guideService);
+        router.MapGet("api/guides", guidesEndpoints.GetGuides, AuthorizedOnly);
+    }
     
     private static void MapHtmlPage(this Router router, string route, string pageFilePath,
         AuthRequirements authRequirements)
