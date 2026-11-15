@@ -839,7 +839,8 @@ html {
 }
 
 .guide-heading,
-.guide-list summary {
+.guide-list button,
+.guide-detail {
     padding: 1rem var(--card-padding);
 }
 
@@ -868,32 +869,38 @@ html {
     border-bottom: 0;
 }
 
-.guide-list summary {
+.guide-list button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: inherit;
     font-weight: 600;
+    text-align: left;
     cursor: pointer;
 }
 
-.guide-list summary:hover,
-.guide-list details[open] summary {
+.guide-list button:hover {
     background-color: var(--surface-2);
 }
 
-.guide-list summary:focus-visible {
+.guide-list button:focus-visible {
     outline: 2px solid var(--bulky-accent);
     outline-offset: -2px;
 }
 
-.guide-type {
-    display: block;
-    margin-left: 1rem;
-    color: var(--bulky-muted);
-    font-size: 0.875rem;
-    font-weight: 400;
+.guide-detail h1 {
+    margin: 1rem 0 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 800;
 }
 
-.guide-list p {
-    margin: 0;
-    padding: 0.75rem var(--card-padding) 1rem;
+.guide-detail p {
+    white-space: pre-wrap;
+}
+
+.guide-detail img {
+    max-width: 100%;
+    height: auto;
 }
 
 @media (min-width: 48rem) {
