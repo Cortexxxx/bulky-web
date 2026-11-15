@@ -78,6 +78,7 @@ async function setupHistory() {
     for (const [month, cards] of months) {
         const section = monthTemplate.content.firstElementChild.cloneNode(true);
         section.querySelector('.history-month-title').textContent = month;
+        section.querySelector('.history-month-count').textContent = String(cards.length);
         section.querySelector('.history-month-cards').replaceChildren(...cards);
         sections.push(section);
     }

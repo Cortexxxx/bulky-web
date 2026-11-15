@@ -10,6 +10,7 @@ import {
 import {withErrorToasts} from "../shared/ui.js";
 import {getAllExercises} from "../api/exercise-api.js";
 import {getAllMuscles} from "../api/muscle-api.js";
+import {searchByTitle} from "../shared/search.js";
 
 const createWorkoutDialog = document.getElementById('create-workout-dialog');
 const confirmDialog = document.getElementById('confirm-dialog');
@@ -25,6 +26,7 @@ const workoutTimer = document.getElementById('workout-timer');
 let timerId = null;
 const addExerciseButton = document.getElementById('add-exercise-btn');
 const addExerciseDialog = document.getElementById('add-exercise-dialog');
+const exerciseSearch = document.getElementById('exercise-search');
 const exercisePickerList = document.getElementById("exercise-picker");
 const pickerGroupTemplate = document.getElementById("picker-group-template");
 const pickerItemTemplate = document.getElementById("picker-item-template");
@@ -59,13 +61,6 @@ async function setupWorkout() {
         createWorkoutDialog.showModal();
     });
 
-    addExerciseButton.addEventListener('click', async (e) => {
-        e.preventDefault();
-
-        addExerciseDialog.returnValue = "";
-        addExerciseDialog.showModal();
-    });
-    
     renderCurrentWorkout();
 }
 
@@ -264,9 +259,24 @@ async function setupExercisePicker() {
         grouped.get(groupId).push(exercise);
     }
 
-    for (const group of muscleGroups.toSorted((a, b) => a.title.localeCompare(b.title))) {
-        const groupExercises = grouped.get(group.id);
-        if (groupExercises === undefined) continue;
+    const sortedGroups = muscleGroups.toSorted((a, b) => a.title.localeCompare(b.title));
+    const renderMatches = () => renderExercisePicker(sortedGroups, grouped);
+    exerciseSearch.addEventListener('input', renderMatches);
+    addExerciseButton.addEventListener('click', e => {
+        e.preventDefault();
+        exerciseSearch.value = '';
+        renderMatches();
+        addExerciseDialog.returnValue = "";
+        addExerciseDialog.showModal();
+    });
+}
+
+function renderExercisePicker(muscleGroups, grouped) {
+    const results = document.createDocumentFragment();
+
+    for (const group of muscleGroups) {
+        const groupExercises = searchByTitle(grouped.get(group.id) ?? [], exerciseSearch.value);
+        if (groupExercises.length === 0) continue;
         const groupNode = pickerGroupTemplate.content.firstElementChild.cloneNode(true);
         groupNode.dataset.id = group.id;
         groupNode.querySelector('h3').textContent = group.title;
@@ -287,8 +297,10 @@ async function setupExercisePicker() {
             groupNode.append(exerciseNode);
         }
 
-        exercisePickerList.append(groupNode);
+        results.append(groupNode);
     }
+
+    exercisePickerList.replaceChildren(results);
 }
 
 async function refreshCurrent() {

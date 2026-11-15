@@ -189,17 +189,15 @@
         <input type="search" id="exercise-search" class="form-control mb-3"
                placeholder="Search exercise" autocomplete="off" aria-label="Search exercise">
 
-        <!-- Тестовые данные: потом список наполнит JS -->
-        <div id="exercise-picker" class="exercise-picker">
-            <template id="picker-group-template">
-                <section class="picker-group">
-                    <h3 class="picker-group-title"></h3>
-                </section>
-            </template>
-            <template id="picker-item-template">
-                <button type="button" class="picker-item" data-exercise-id></button>
-            </template>
-        </div>
+        <div id="exercise-picker" class="exercise-picker"></div>
+        <template id="picker-group-template">
+            <section class="picker-group">
+                <h3 class="picker-group-title"></h3>
+            </section>
+        </template>
+        <template id="picker-item-template">
+            <button type="button" class="picker-item" data-exercise-id></button>
+        </template>
     </div>
 </dialog>
 

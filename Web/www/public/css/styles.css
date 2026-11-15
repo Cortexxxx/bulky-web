@@ -839,20 +839,28 @@ html {
 }
 
 .guide-heading,
-.guide-list button,
-.guide-detail {
+.guide-list button {
     padding: 1rem var(--card-padding);
 }
 
 .guide-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
     border-bottom: 1px solid var(--line);
 }
 
-.guide-heading h1 {
-    margin: 0 0 0.75rem;
-    font-family: var(--font-display);
-    font-weight: 800;
-    text-transform: uppercase;
+.guide-count,
+.history-month-count {
+    min-width: 2.75rem;
+    padding-inline-start: 0.75rem;
+    border-inline-start: 1px solid var(--line);
+    color: var(--bulky-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: end;
 }
 
 .guide-list {
@@ -888,17 +896,50 @@ html {
     outline-offset: -2px;
 }
 
-.guide-detail h1 {
-    margin: 1rem 0 0.75rem;
-    font-family: var(--font-display);
-    font-weight: 800;
+.guide-dialog .app-dialog-header {
+    justify-content: flex-start;
+    gap: 0.75rem;
 }
 
-.guide-detail p {
+.guide-dialog .app-dialog-title {
+    overflow-wrap: anywhere;
+}
+
+.guide-dialog-close {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--control-radius);
+    background-color: var(--surface-2);
+    color: var(--bulky-muted);
+    cursor: pointer;
+}
+
+.guide-dialog-close:hover,
+.guide-dialog-close:active {
+    background-color: var(--line);
+    color: var(--bulky-ink);
+}
+
+.guide-dialog-close:focus-visible {
+    outline: 2px solid var(--bulky-muted);
+    outline-offset: 2px;
+}
+
+.guide-dialog .app-dialog-body {
+    display: block;
+    overflow-y: auto;
+}
+
+.guide-dialog p {
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
-.guide-detail img {
+.guide-dialog img {
     max-width: 100%;
     height: auto;
 }
@@ -1014,10 +1055,17 @@ html {
     border-radius: var(--card-radius);
 }
 
-.history-month-title {
-    margin: 0;
+.history-month-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--line);
+}
+
+.history-month-title {
+    margin: 0;
     color: var(--bulky-ink);
     font-size: 0.95rem;
     font-weight: 600;
