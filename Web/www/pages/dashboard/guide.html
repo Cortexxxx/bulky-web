@@ -13,13 +13,34 @@
 <body class="d-flex flex-column min-vh-100">
 {{header}}
 <main class="container flex-grow-1 py-5 page-with-watermark">
-    <!-- Декор: огромное название на фоне. Настоящий заголовок для скринридеров скрыт визуально -->
     <div class="page-watermark" aria-hidden="true">Guide</div>
-    <h1 class="visually-hidden">Guide</h1>
 
-    <div class="watermark-content">
-        <!-- Заглушка: здесь будет справочник упражнений -->
-        <p class="history-empty">The exercise guide is coming soon</p>
+    <div class="guide-layout page-column watermark-content">
+        <div class="guide-filters panel" role="group" aria-label="Guide categories">
+            <button type="button" id="guide-all" aria-pressed="true">All</button>
+            <button type="button" id="guide-exercises" aria-pressed="false">Exercises</button>
+            <button type="button" id="guide-programs" aria-pressed="false">Workout programs</button>
+            <button type="button" id="guide-muscles" aria-pressed="false">Muscle groups</button>
+        </div>
+
+        <section class="panel" aria-labelledby="guide-title">
+            <div class="guide-heading">
+                <h1 id="guide-title">ALL</h1>
+                <label class="visually-hidden" for="guide-search">Search guides</label>
+                <input class="form-control" type="search" id="guide-search" placeholder="Search guides">
+            </div>
+
+            <ul id="guide-list" class="guide-list">
+                <template id="guide-item-template">
+                    <li>
+                        <details>
+                            <summary><span class="guide-item-title"></span> <span class="guide-type"></span></summary>
+                            <p class="guide-description"></p>
+                        </details>
+                    </li>
+                </template>
+            </ul>
+        </section>
     </div>
 </main>
 

@@ -799,6 +799,113 @@ html {
     border-radius: var(--card-radius);
 }
 
+/* ---------- Справочник ---------- */
+
+.guide-layout {
+    display: grid;
+    gap: var(--space-gap);
+    align-items: start;
+}
+
+.guide-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+}
+
+.guide-filters button {
+    border: 0;
+    background-color: transparent;
+    text-align: left;
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--control-radius);
+    color: var(--bulky-muted);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.guide-filters button:hover {
+    background-color: var(--surface-2);
+}
+
+.guide-filters button[aria-pressed="true"] {
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+}
+
+.guide-filters button:focus-visible {
+    outline: 2px solid var(--bulky-accent);
+}
+
+.guide-heading,
+.guide-list summary {
+    padding: 1rem var(--card-padding);
+}
+
+.guide-heading {
+    border-bottom: 1px solid var(--line);
+}
+
+.guide-heading h1 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.guide-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.guide-list li {
+    border-bottom: 1px solid var(--line-soft);
+}
+
+.guide-list li:last-of-type {
+    border-bottom: 0;
+}
+
+.guide-list summary {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.guide-list summary:hover,
+.guide-list details[open] summary {
+    background-color: var(--surface-2);
+}
+
+.guide-list summary:focus-visible {
+    outline: 2px solid var(--bulky-accent);
+    outline-offset: -2px;
+}
+
+.guide-type {
+    display: block;
+    margin-left: 1rem;
+    color: var(--bulky-muted);
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+.guide-list p {
+    margin: 0;
+    padding: 0.75rem var(--card-padding) 1rem;
+}
+
+@media (min-width: 48rem) {
+    .guide-layout {
+        grid-template-columns: 13rem minmax(0, 1fr);
+    }
+
+    .guide-filters {
+        flex-direction: column;
+    }
+}
+
 /* ---------- Аккаунт: одна карточка из полос на всю ширину (профиль, данные, действия) ---------- */
 
 .account-head {
