@@ -80,4 +80,10 @@ public static class WebHelpers
         BadRequestException   => HttpStatusCode.BadRequest,
         _ => HttpStatusCode.BadRequest
     };
+
+    public static string GetEnviromentVariableOrThrow(string name)
+    {
+        return Environment.GetEnvironmentVariable(name)
+               ?? throw new Exception($"Environment variable '{name}' is not set"); 
+    }
 }

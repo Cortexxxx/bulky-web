@@ -3,33 +3,41 @@ using Application.Services;
 using Npgsql;
 using Persistence;
 using Persistence.Data;
+using Persistence.Redis;
+using StackExchange.Redis;
 using Web.Pipeline;
 using Web.Routing;
 using Web.Validators;
 using Web;
+using Web.Http;
 
 var httpListener = new HttpListener();
-var prefix = Environment.GetEnvironmentVariable(EnvironmentVariables.Prefix)
-             ?? throw new Exception($"Environment variable '{EnvironmentVariables.Prefix}' is not set");
-var db = new NpgsqlDataSourceBuilder(Environment.GetEnvironmentVariable(EnvironmentVariables.DbConnection)
-                                     ?? throw new Exception($"Environment variable '{EnvironmentVariables.DbConnection}' is not set"));
-Console.WriteLine(prefix);
 
+var prefix = WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.Prefix);
 httpListener.Prefixes.Add(prefix);
 httpListener.Start();
-
-
-// Dependencies
-
+Console.WriteLine(prefix);
 var appCts = new CancellationTokenSource();
-var dataSource = db.Build();
-var authService = new AuthService(new PostgresUserRepository(dataSource), 
-    new PostgresSessionRepository(dataSource), new PasswordHasher());
-var musclesService = new MusclesService(new PostgresMuscleGroupsRepository(dataSource));
-var exercisesService = new ExercisesService(new PostgresExercisesRepository(dataSource));
-var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(dataSource));
-var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(dataSource));
-var analyticsService = new WorkoutsAnalyticsService(new PostgresAnalyticsQueries(dataSource));
+
+// Data
+
+var postgres = new NpgsqlDataSourceBuilder(
+    WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.PostgresConnection));
+var redis = await ConnectionMultiplexer.ConnectAsync(
+    WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.RedisConnection));
+
+var postgresDataSource = postgres.Build();
+var redisDataSource = redis.GetDatabase();
+
+// Services
+
+var authService = new AuthService(new PostgresUserRepository(postgresDataSource), 
+    new PostgresSessionRepository(postgresDataSource), new PasswordHasher());
+var musclesService = new MusclesService(new PostgresMuscleGroupsRepository(postgresDataSource));
+var exercisesService = new ExercisesService(new CachedExercisesRepository(redisDataSource, new PostgresExercisesRepository(postgresDataSource)));
+var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(postgresDataSource));
+var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(postgresDataSource));
+var analyticsService = new WorkoutsAnalyticsService(new PostgresAnalyticsQueries(postgresDataSource));
 var guidesService = new GuideService(exercisesService, musclesService);
 
 // Routing
