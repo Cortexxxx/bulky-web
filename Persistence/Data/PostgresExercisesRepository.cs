@@ -11,6 +11,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
 {
     public async Task<IEnumerable<Exercise>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
+        Console.WriteLine("using postgres");
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
             """
