@@ -11,4 +11,14 @@ internal static class RedisKeys
     {
         return $"bulky:exercises:v1:{id}";
     }
+    
+    public static string MuscleGroupsList(bool includeArchived)
+    {
+        return $"bulky:muscleGroups:v1:{(includeArchived ? "all" : "active")}";
+    }
+    
+    public static string MuscleGroupById(Guid id)
+    {
+        return $"bulky:muscleGroups:v1:{id}";
+    }
 }

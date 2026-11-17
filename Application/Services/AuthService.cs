@@ -51,7 +51,7 @@ public class AuthService
         var tokenHash = _passwordHasher.HashToken(token);
         
         var sessionId = await _sessionRepository.CreateSessionAsync(userId, 
-            tokenHash, DateTime.UtcNow.AddMinutes(5), ct);
+            tokenHash, DateTime.UtcNow.AddMinutes(SessionConfiguration.SessionLifetimeMinutes), ct);
 
         return (sessionId, token);
     }

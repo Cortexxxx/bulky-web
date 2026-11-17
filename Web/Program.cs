@@ -33,8 +33,10 @@ var redisDataSource = redis.GetDatabase();
 
 var authService = new AuthService(new PostgresUserRepository(postgresDataSource), 
     new PostgresSessionRepository(postgresDataSource), new PasswordHasher());
-var musclesService = new MusclesService(new PostgresMuscleGroupsRepository(postgresDataSource));
-var exercisesService = new ExercisesService(new CachedExercisesRepository(redisDataSource, new PostgresExercisesRepository(postgresDataSource)));
+var musclesService = new MusclesService(new CachedMuscleGroupsRepository(redisDataSource, 
+    new PostgresMuscleGroupsRepository(postgresDataSource)));
+var exercisesService = new ExercisesService(new CachedExercisesRepository(redisDataSource, 
+    new PostgresExercisesRepository(postgresDataSource)));
 var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(postgresDataSource));
 var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(postgresDataSource));
 var analyticsService = new WorkoutsAnalyticsService(new PostgresAnalyticsQueries(postgresDataSource));

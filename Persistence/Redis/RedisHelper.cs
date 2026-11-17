@@ -23,23 +23,50 @@ public static class RedisHelper
         return defaultValue;
     }
     
-    public static Task InvalidateCacheAsync(string key, IDatabaseAsync cacheDataSource)
+    public static Task InvalidateCacheAsync(this IDatabaseAsync source, string key)
     {
-        return RedisHelper.ProceedRedisRequest(() => 
-            cacheDataSource.StringDeleteAsync(key, ValueCondition.Always), false);
+        return ProceedRedisRequest(() => 
+            source.StringDeleteAsync(key, ValueCondition.Always), false);
     }
 
-    public static Task SetCacheAsync<T>(string key, T obj, IDatabaseAsync cacheDataSource)
+    public static Task SetCacheAsync<T>(this IDatabaseAsync source, string key, T obj)
     {
-        return ProceedRedisRequest(() => cacheDataSource.StringSetAsync(key,
+        return ProceedRedisRequest(() => source.StringSetAsync(key,
             JsonSerializer.Serialize(obj, JsonSerializerOptions.Web),
             new Expiration(TimeSpan.FromSeconds(RedisConstants.DefaultCacheTtlSeconds))), false);
     }
 
-    public static T? GetCacheOrNull<T>(RedisValue data) where T : class
+    public static async Task<T?> GetCachedAsync<T>(this IDatabaseAsync source, string key) where T : class
     {
-        return data.HasValue
+        var data = await ProceedRedisRequest(() => 
+            source.StringGetAsync(key), RedisValue.Null);
+        
+        return data.HasValue 
             ? JsonSerializer.Deserialize<T>(data.ToString(), JsonSerializerOptions.Web)
             : null;
+    }
+
+    public static async Task InvalidateExercisesListAsync(this IDatabaseAsync source)
+    {
+        await source.InvalidateCacheAsync(RedisKeys.ExercisesList(true));
+        await source.InvalidateCacheAsync(RedisKeys.ExercisesList(false));
+    }
+
+    public static async Task InvalidateExerciseAsync(this IDatabaseAsync source, Guid id)
+    {
+        await source.InvalidateCacheAsync(RedisKeys.ExerciseById(id));
+        await source.InvalidateExercisesListAsync();
+    }
+    
+    public static async Task InvalidateMuscleGroupAsync(this IDatabaseAsync source, Guid id)
+    {
+        await source.InvalidateCacheAsync(RedisKeys.MuscleGroupById(id));
+        await source.InvalidateMuscleGroupsListAsync();
+    }
+    
+    public static async Task InvalidateMuscleGroupsListAsync(this IDatabaseAsync source)
+    {
+        await source.InvalidateCacheAsync(RedisKeys.MuscleGroupsList(true));
+        await source.InvalidateCacheAsync(RedisKeys.MuscleGroupsList(false));
     }
 }
