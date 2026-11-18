@@ -3,7 +3,7 @@ using Domain.Models.Workouts;
 
 namespace Application.Services;
 
-public class WorkoutsService(IWorkoutsRepository workoutsRepository)
+public class WorkoutsService(IWorkoutsRepository workoutsRepository, IAnalyticsCacheInvalidator analyticsCacheInvalidator)
 {
     public async Task<Guid> CreateAsync(Guid userId, string title, CancellationToken ct)
     {
@@ -13,6 +13,7 @@ public class WorkoutsService(IWorkoutsRepository workoutsRepository)
     public async Task DeleteAsync(Guid userId, Guid id, CancellationToken ct)
     {
         await workoutsRepository.DeleteAsync(userId, id, ct);
+        await analyticsCacheInvalidator.InvalidateAnalytics(userId);
     }
 
     public async Task<Workout?> GetCurrentAsync(Guid userId, CancellationToken ct)
@@ -43,5 +44,7 @@ public class WorkoutsService(IWorkoutsRepository workoutsRepository)
         {
             throw new NotFoundException("no_current_workout");
         }
+        
+        await analyticsCacheInvalidator.InvalidateAnalytics(userId);
     }
 }

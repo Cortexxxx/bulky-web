@@ -37,9 +37,9 @@ var musclesService = new MusclesService(new CachedMuscleGroupsRepository(redisDa
     new PostgresMuscleGroupsRepository(postgresDataSource)));
 var exercisesService = new ExercisesService(new CachedExercisesRepository(redisDataSource, 
     new PostgresExercisesRepository(postgresDataSource)));
-var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(postgresDataSource));
+var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(postgresDataSource), new RedisCacheInvalidator(redisDataSource));
 var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(postgresDataSource));
-var analyticsService = new WorkoutsAnalyticsService(new PostgresAnalyticsQueries(postgresDataSource));
+var analyticsService = new WorkoutsAnalyticsService(new CachedAnalyticsQueries(new PostgresAnalyticsQueries(postgresDataSource), redisDataSource));
 var guidesService = new GuideService(exercisesService, musclesService);
 
 // Routing
