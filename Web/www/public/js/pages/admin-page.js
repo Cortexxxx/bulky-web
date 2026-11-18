@@ -22,6 +22,7 @@ const selected = {muscle: null, exercise: null};
 
 const entities = {
     muscle: {
+        imageEntityType: "muscleGroup",
         api: {
             getAll: getAllMuscles,
             get: getMuscleById,

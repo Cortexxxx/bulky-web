@@ -75,7 +75,7 @@ public class PostgresMuscleGroupsRepository(NpgsqlDataSource dataSource) : IMusc
         await using var connection = await dataSource.OpenConnectionAsync(ct);
         await using var command = new NpgsqlCommand(
             "UPDATE public.muscle_groups " +
-            "SET title = @title, description = @description, image_path = @image_path " +
+            "SET title = @title, description = @description, image_path = COALESCE(@image_path, image_path) " +
             "WHERE id = @id", connection);
         
         command.Parameters.AddWithValue("id", muscleGroup.Id);

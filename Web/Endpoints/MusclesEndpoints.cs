@@ -34,7 +34,7 @@ public class MusclesEndpoints(MusclesService musclesService,
         {
             Title = normalizedRequest.Title,
             Description = normalizedRequest.Description,
-            ImagePath = null
+            ImagePath = normalizedRequest.ImagePath
         }, context.CancellationToken);
             
         context.Response.StatusCode = HttpStatusCode.Created;
@@ -51,7 +51,7 @@ public class MusclesEndpoints(MusclesService musclesService,
             Id = id,
             Title = normalizedRequest.Title,
             Description = normalizedRequest.Description,
-            ImagePath = null
+            ImagePath = normalizedRequest.ImagePath
         }, context.CancellationToken);
     }
 
@@ -73,7 +73,8 @@ public class MusclesEndpoints(MusclesService musclesService,
     
     private async Task<MuscleGroupRequest> ProceedMuscleRequestAsync(HttpContext context)
     {
-        return await WebHelpers.ProceedRequestAsync(context, muscleGroupRequestValidator, request => 
-                new MuscleGroupRequest(request.Title.Trim(), request.Description.Trim()), context.CancellationToken);
+        return await WebHelpers.ProceedRequestAsync(context, muscleGroupRequestValidator,
+            request => request with { Title = request.Title.Trim(), Description = request.Description.Trim() },
+            context.CancellationToken);
     }
 }
