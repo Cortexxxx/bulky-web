@@ -8,10 +8,10 @@ public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabas
 {
     public async Task<List<WorkoutWeekStats>> GetWorkoutWeeksStats(Guid userId, CancellationToken ct)
     {
-        var version = await source.GetVersion(RedisKeys.AnalyticsVersion(userId));
+        var version = await source.GetVersionAsync(RedisKeys.AnalyticsVersion(userId));
+        if (version == null) return await analyticsQueries.GetWorkoutWeeksStats(userId, ct);
         
-        var key = RedisKeys.WorkoutOverview(version, userId);
-
+        var key = RedisKeys.WorkoutOverview(version.Value, userId);
         var value = await source.GetCachedAsync<List<WorkoutWeekStats>>(key);
 
         if (value is not null) return value;
@@ -24,8 +24,10 @@ public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabas
 
     public async Task<List<MuscleWeekStats>> GetMuscleWeekStats(Guid userId, Guid muscleId, CancellationToken ct)
     {
-        var version = await source.GetVersion(RedisKeys.AnalyticsVersion(userId));
-        var key = RedisKeys.MuscleGroupOverview(version, userId, muscleId);
+        var version = await source.GetVersionAsync(RedisKeys.AnalyticsVersion(userId));
+        if (version == null) return await analyticsQueries.GetMuscleWeekStats(userId, muscleId, ct);
+        
+        var key = RedisKeys.MuscleGroupOverview(version.Value, userId, muscleId);
         var value = await source.GetCachedAsync<List<MuscleWeekStats>>(key);
 
         if (value is not null) return value;
@@ -38,9 +40,10 @@ public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabas
 
     public async Task<List<ExerciseWeekSet>> GetExerciseWeekSets(Guid userId, Guid exerciseId, CancellationToken ct)
     {
-        var version = await source.GetVersion(RedisKeys.AnalyticsVersion(userId));
+        var version = await source.GetVersionAsync(RedisKeys.AnalyticsVersion(userId));
+        if (version == null) return await analyticsQueries.GetExerciseWeekSets(userId, exerciseId, ct);
 
-        var key = RedisKeys.ExerciseOverview(version, userId, exerciseId);
+        var key = RedisKeys.ExerciseOverview(version.Value, userId, exerciseId);
         var value = await source.GetCachedAsync<List<ExerciseWeekSet>>(key);
 
         if (value is not null) return value;

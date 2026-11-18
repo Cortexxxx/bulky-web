@@ -70,15 +70,19 @@ public static class RedisHelper
         await source.InvalidateCacheAsync(RedisKeys.MuscleGroupsList(false));
     }
 
-    public static async Task<int> GetVersion(this IDatabaseAsync source, string versionKey)
+    public static async Task<int?> GetVersionAsync(this IDatabaseAsync source, string versionKey)
     {
-        var version = await source.StringGetAsync(versionKey);
-        
-        if (!version.HasValue)
+        return await ProceedRedisRequest<int?>(async () =>
         {
-            version = 0;
-        }
+            var version = await source.StringGetAsync(versionKey);
 
-        return (int)version;
+            if (!version.HasValue)
+            {
+                version = 0;
+            }
+
+            return (int)version;
+        }, null);
+
     }
 }
