@@ -32,6 +32,7 @@ public class ExercisesService(IExercisesRepository repository)
             throw new NotFoundException("unknown_exercise");
         }
     }
+    
     public async Task SetArchivedAsync(Guid id, bool isArchived, CancellationToken ct)
     {
         if (!await repository.SetArchivedAsync(id, isArchived, ct))

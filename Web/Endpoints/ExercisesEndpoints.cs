@@ -29,7 +29,7 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
         var normalizedRequest = await ProceedExerciseRequestAsync(context, ct);
 
         var id = await exercisesService.CreateAsync( normalizedRequest.Title, normalizedRequest.Description, 
-            null, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
+            normalizedRequest.ImagePath, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
 
         context.Response.WriteJson(id);
         context.Response.StatusCode = HttpStatusCode.Created;
@@ -42,13 +42,13 @@ public class ExercisesEndpoints(ExercisesService exercisesService, ExerciseReque
         var id = WebHelpers.GetIdOrThrowNotFound(context);
 
         await exercisesService.UpdateAsync(id, normalizedRequest.Title, normalizedRequest.Description, 
-            null, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
+            normalizedRequest.ImagePath, normalizedRequest.MuscleGroups.Select(m => m.ToDomain()).ToList(), ct);
     }
     
     public async Task ArchiveExerciseAsync(HttpContext context) => await SetArchiveStatusAsync(context, true);
     
     public async Task UnarchiveExerciseAsync(HttpContext context) => await SetArchiveStatusAsync(context, false);
-    
+
     private async Task SetArchiveStatusAsync(HttpContext context, bool isArchived)
     {
         var id = WebHelpers.GetIdOrThrowNotFound(context);

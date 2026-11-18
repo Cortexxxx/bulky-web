@@ -12,13 +12,13 @@ namespace Web;
 
 public static class MappingExtensions
 {
-    public static GuideItemResponse ToResponse(this GuideItem guideItem) => new()
+    public static GuideItemResponse ToResponse(this GuideItem guideItem, string? imageUrl) => new()
     {
         Category = guideItem.Category,
         SourceId = guideItem.SourceId,
         Title = guideItem.Title,
         Description = guideItem.Description,
-        ImagePath = guideItem.ImagePath
+        ImagePath = imageUrl
     };
 
     public static MuscleGroupResponse ToResponse(this MuscleGroup muscleGroup) => new()

@@ -122,7 +122,7 @@ public class PostgresExercisesRepository(NpgsqlDataSource dataSource) : IExercis
         await using var updateExerciseCommand = new NpgsqlCommand(
             """
             UPDATE public.exercises
-            SET (title, description, image_path) = (@title, @description, @image_path)
+            SET (title, description, image_path) = (@title, @description, COALESCE(@image_path, image_path))
             WHERE id = @id
             """, connection, transaction);
 

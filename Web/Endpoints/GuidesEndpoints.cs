@@ -5,11 +5,11 @@ using Web.Http;
 
 namespace Web.Endpoints;
 
-public class GuidesEndpoints(GuideService service)
+public class GuidesEndpoints(GuideService service, ImageUrlProvider imageUrlProvider)
 {
     public async Task GetGuides(HttpContext context)
     {
-        IEnumerable<GuideItem>? items = null;
+        IEnumerable<GuideItem>? items;
         var ct = context.CancellationToken;
         if (context.Request.TryGetQuery("category", out var query) 
             && Enum.TryParse(query, true, out GuideCategory category))
@@ -29,7 +29,7 @@ public class GuidesEndpoints(GuideService service)
         if (items != null)
         {
             context.Response.WriteJson(items
-                .Select(el => el.ToResponse())
+                .Select(el => el.ToResponse(imageUrlProvider.GetPreSignedImageUrl(el.ImagePath)))
                 .ToList());
         }
     }

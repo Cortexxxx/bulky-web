@@ -92,6 +92,12 @@ public static class SetupExtensions
         router.MapPost("api/exercises/{id}/unarchive", exercisesEndpoints.UnarchiveExerciseAsync, AdminOnly);
     }
 
+    public static void MapImagesApi(this Router router, ImageUrlProvider imageUrlProvider)
+    {
+        var imageEndpoints = new ImageEndpoints(imageUrlProvider);
+        router.MapPost("api/images/upload-url", imageEndpoints.CreatePutImageUrlAsync, AdminOnly);
+    }
+
     public static void MapWorkoutsApi(this Router router, WorkoutsService workoutsService,
         WorkoutRequestValidator workoutRequestValidator)
     {
@@ -123,9 +129,9 @@ public static class SetupExtensions
         router.MapGet("api/analytics/exercise/{id}", workoutExerciseEndpoints.GetExerciseOverview, AuthorizedOnly);
     }
 
-    public static void MapGuidesApi(this Router router, GuideService guideService)
+    public static void MapGuidesApi(this Router router, GuideService guideService, ImageUrlProvider imageUrlProvider)
     {
-        var guidesEndpoints = new GuidesEndpoints(guideService);
+        var guidesEndpoints = new GuidesEndpoints(guideService, imageUrlProvider);
         router.MapGet("api/guides", guidesEndpoints.GetGuides, AuthorizedOnly);
     }
     

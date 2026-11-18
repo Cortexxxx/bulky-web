@@ -14,6 +14,7 @@ import {
     unarchiveExercise,
     updateExercise
 } from "../api/exercise-api.js";
+import {createImagePutUrl} from "../api/image-api.js";
 import {handleSubmit} from "../shared/http.js";
 import {logout} from "../api/auth-api.js";
 
@@ -32,6 +33,7 @@ const entities = {
         onChange: refreshExerciseMuscles
     },
     exercise: {
+        imageEntityType: "exercise",
         api: {
             getAll: getAllExercises,
             get: getExerciseById,
@@ -44,6 +46,7 @@ const entities = {
         fillEdit: (data) => fillMusclesBox(getMusclesBox('edit'), data.muscleGroups)
     }
 };
+
 
 for (const entity of Object.keys(entities)) {
     await setupList(entity);
@@ -113,7 +116,7 @@ async function selectItem(entity, id) {
     const data = await api.get(true, id);
     const list = document.getElementById(`${entity}-list`);
     const form = document.getElementById(`${entity}-edit-form`);
-
+    document.getElementById(`${entity}-edit-image`).value = '';
     selected[entity] = id;
     list.querySelector('.active')?.classList.remove('active');
     list.querySelector(`li[data-id="${id}"]`)?.classList.add('active');
@@ -135,7 +138,14 @@ async function afterChange(entity) {
 function setupForm(entity, mode) {
     const form = document.getElementById(`${entity}-${mode}-form`);
     const errorBox = document.getElementById(`${entity}-${mode}-error`);
-
+    const imageInput = document.getElementById(`${entity}-${mode}-image`);
+    const {api, readExtra, imageEntityType} = entities[entity];
+    imageInput.disabled = !imageEntityType;
+    
+    imageInput.addEventListener('change', async (e) => {
+        e.preventDefault();
+        // set preview
+    });
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -144,21 +154,36 @@ function setupForm(entity, mode) {
             return;
         }
 
-        const {api, readExtra} = entities[entity];
+        const file = imageInput.files[0];
+
         const data = {
             title: form.elements.title.value,
             description: form.elements.description.value,
+            imagePath: null,
             ...readExtra?.(mode)
         };
 
         await handleSubmit(errorBox, async () => {
+            if (file && imageEntityType) {
+                const {url, key} = await createImagePutUrl(imageEntityType, file.type, file.size);
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    body: file
+                });
+
+                if (!response.ok) {
+                    throw new Error(`SeaweedFS error: ${response.status}`);
+                }
+
+                data.imagePath = key;
+            }
+
             if (mode === 'edit') {
                 await api.update(id, data);
             } else {
                 await api.create(data);
                 form.reset();
             }
-
             await afterChange(entity);
         });
     });

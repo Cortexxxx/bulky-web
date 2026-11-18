@@ -40,6 +40,8 @@ export const errorMessages = {
     null_muscle: "Muscle group is invalid.",
     empty_muscle_id: "Select a muscle group.",
     invalid_role: "Invalid muscle group role.",
+    unsupported_image_type: "Choose a JPEG, PNG, WebP, GIF, or AVIF image.",
+    unsupported_image_entity_type: "Image uploads are unavailable for this item.",
 
     // Workouts
     no_current_workout: "You don't have an active workout.",

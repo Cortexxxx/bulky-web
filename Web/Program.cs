@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using Amazon.Runtime;
+using Amazon.S3;
 using Application.Services;
 using Npgsql;
 using Persistence;
@@ -25,6 +27,15 @@ var postgres = new NpgsqlDataSourceBuilder(
     WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.PostgresConnection));
 var redis = await ConnectionMultiplexer.ConnectAsync(
     WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.RedisConnection));
+var s3Client = new AmazonS3Client(new AmazonS3Config
+{
+    ServiceURL = WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.AwsServiceUrl),
+    AuthenticationRegion = WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.AwsAuthRegion),
+    ForcePathStyle = true,
+    DefaultAWSCredentials = new BasicAWSCredentials(
+        WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.AwsAccessKeyId), 
+        WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.AwsSecretAccessKey))
+});
 
 var postgresDataSource = postgres.Build();
 var redisDataSource = redis.GetDatabase();
@@ -41,6 +52,7 @@ var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(postgre
 var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(postgresDataSource));
 var analyticsService = new WorkoutsAnalyticsService(new CachedAnalyticsQueries(new PostgresAnalyticsQueries(postgresDataSource), redisDataSource));
 var guidesService = new GuideService(exercisesService, musclesService);
+var imageUrlProvider = new ImageUrlProvider(s3Client);
 
 // Routing
 
@@ -49,10 +61,11 @@ router.MapPages();
 router.MapAuthApi(authService, new RegisterRequestValidator());
 router.MapMuscleGroupsApi(musclesService, new MuscleGroupRequestValidator());
 router.MapExercisesApi(exercisesService, new ExerciseRequestValidator());
+router.MapImagesApi(imageUrlProvider);
 router.MapWorkoutsApi(workoutsService, new WorkoutRequestValidator());
 router.MapWorkoutExercisesApi(workoutExercisesService, new WorkoutSetRequestValidator());
 router.MapWorkoutAnalyticsApi(analyticsService);
-router.MapGuidesApi(guidesService);
+router.MapGuidesApi(guidesService, imageUrlProvider);
 router.Initialize();
 
 // Middleware
