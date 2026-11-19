@@ -49,4 +49,13 @@ public class WorkoutExercisesEndpoints(WorkoutExerciseService service, WorkoutSe
         var request = await WebHelpers.ProceedRequestAsync(context, workoutSetRequestValidator, ct);
         await service.UpdateSetAsync(context.Request.RequiredUserClaims.Id, id, request.Repeats, request.Weight, ct);
     }
+
+    public async Task GetExerciseHintAsync(HttpContext context)
+    {
+        var ct = context.CancellationToken;
+        var exerciseId = WebHelpers.GetIdOrThrowNotFound(context);
+        var hint = await service.GetExerciseHint(context.Request.RequiredUserClaims.Id, exerciseId, ct);
+        
+        context.Response.WriteJson(hint); // TODO: Create DTO
+    }
 }

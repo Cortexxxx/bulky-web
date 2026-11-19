@@ -55,6 +55,11 @@ public class AuthService
 
         return (sessionId, token);
     }
+
+    public async Task RefreshSessionTimeAsync(Guid sessionId, CancellationToken ct)
+    {
+        await _sessionRepository.UpdateSessionTimeAsync(sessionId, DateTime.UtcNow.AddMinutes(SessionConfiguration.SessionLifetimeMinutes), ct);
+    }
     
     public async Task<Session> GetUserSessionAsync(string token, CancellationToken ct)
     {

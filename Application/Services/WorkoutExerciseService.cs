@@ -1,4 +1,5 @@
 using Application.Abstractions;
+using Application.Models;
 
 namespace Application.Services;
 
@@ -38,6 +39,18 @@ public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRe
         {
             throw new NotFoundException("set_not_found");
         }
-    } 
-    
+    }
+
+    public async Task<ExerciseHint> GetExerciseHint(Guid userId, Guid exerciseId, CancellationToken ct)
+    {
+        var sets = 
+            await workoutExerciseRepository.GetLastCompletedExerciseSetsAsync(userId, exerciseId, ct);
+        
+        if (sets.Count == 0)
+        {
+            throw new Exception();
+        }
+
+        return new ExerciseHint(sets);
+    }
 }

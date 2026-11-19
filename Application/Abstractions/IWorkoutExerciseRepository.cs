@@ -1,3 +1,5 @@
+using Domain.Models.Workouts;
+
 namespace Application.Abstractions;
 
 public interface IWorkoutExerciseRepository
@@ -8,4 +10,5 @@ public interface IWorkoutExerciseRepository
     Task<Guid> CreateSetAsync(Guid userId, Guid workoutExerciseId, CancellationToken ct);
     Task<bool> UpdateSetAsync(Guid userId, Guid id, int repeats, decimal weight, CancellationToken ct);
     Task<bool> DeleteSetAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<List<WorkoutSet>> GetLastCompletedExerciseSetsAsync(Guid userId, Guid exerciseId, CancellationToken ct);
 }

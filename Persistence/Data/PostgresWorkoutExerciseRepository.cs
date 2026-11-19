@@ -110,4 +110,50 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
 
         return await command.ExecuteNonQueryAsync(ct) != 0;
     }
+
+    public async Task<List<WorkoutSet>> GetLastCompletedExerciseSetsAsync(Guid userId, Guid exerciseId, CancellationToken ct)
+    {
+        await using var connection = await dataSource.OpenConnectionAsync(ct);
+        await using var command = new NpgsqlCommand(
+            """
+            WITH last_workout AS (
+            
+                SELECT * FROM public.workouts w
+                WHERE w.user_id = @user_id AND w.ended_at is NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM workout_exercises we
+                    JOIN public.sets s ON s.workout_exercise_id = we.id
+                    WHERE we.workout_id = w.id AND we.exercise_id = @exercise_id
+                )
+                ORDER BY w.ended_at DESC, w.id DESC 
+                LIMIT 1
+            )
+            
+            SELECT s.weight, s.repeats
+            FROM last_workout lw
+            JOIN public.workout_exercises we on lw.id = we.workout_id
+            JOIN public.sets s on s.workout_exercise_id = we.id
+            WHERE we.exercise_id = @exercise_id
+            ORDER BY we.exercise_number, s.set_number;
+            """, connection);
+
+        command.Parameters.AddWithValue("@user_id", userId);
+        command.Parameters.AddWithValue("@exercise_id", exerciseId);
+
+        var sets = new List<WorkoutSet>();
+        await using var reader = await command.ExecuteReaderAsync(ct);
+
+        while (await reader.ReadAsync(ct))
+        {
+            sets.Add(new WorkoutSet
+            {
+                Id = default,
+                Repeats = reader.GetInt16(reader.GetOrdinal("repeats")),
+                Weight = reader.GetInt16(reader.GetOrdinal("weight"))
+            });
+        }
+
+        return sets;
+    }
 }

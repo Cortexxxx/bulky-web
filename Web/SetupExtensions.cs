@@ -119,6 +119,7 @@ public static class SetupExtensions
         router.MapPost("api/workouts/current/sets", workoutExerciseEndpoints.CreateSetAsync, AuthorizedOnly);
         router.MapDelete("api/workouts/current/sets/{id}", workoutExerciseEndpoints.DeleteSetAsync, AuthorizedOnly);
         router.MapPut("api/workouts/current/sets/{id}", workoutExerciseEndpoints.UpdateSetAsync, AuthorizedOnly);
+        router.MapGet("api/workouts/hint/{id}", workoutExerciseEndpoints.GetExerciseHintAsync, AuthorizedOnly);
     }
     
     public static void MapWorkoutAnalyticsApi(this Router router, WorkoutsAnalyticsService workoutsAnalyticsService)
