@@ -38,6 +38,8 @@ const exerciseHintStyles = new Map([
     ['hold', {label: 'Keep weight', icon: 'M5 12h14m-6-6 6 6-6 6'}],
     ['decrease', {label: 'Decrease weight', icon: 'M12 5v14m-6-6 6 6 6-6'}]
 ]);
+const exerciseHintRequests = new Map();
+let hintWorkoutId = null;
 
 let currentWorkout = null;
 let renderedSetIds = null;
@@ -122,6 +124,12 @@ async function setDeleteEvent(e) {
 
 
 function renderCurrentWorkout() {
+    const workoutId = currentWorkout?.id ?? null;
+    if (workoutId !== hintWorkoutId) {
+        exerciseHintRequests.clear();
+        hintWorkoutId = workoutId;
+    }
+
     updateTimer();
     if (timerId !== null) {
         clearInterval(timerId);
@@ -239,7 +247,19 @@ function renderWorkoutExercises() {
 }
 
 async function renderExerciseHint(exerciseCard, exerciseId) {
-    const hint = await withErrorToasts(() => getExerciseHint(exerciseId));
+    let request = exerciseHintRequests.get(exerciseId);
+    if (!request) {
+        request = withErrorToasts(() => getExerciseHint(exerciseId));
+        exerciseHintRequests.set(exerciseId, request);
+    }
+
+    const hint = await request;
+    if (exerciseHintRequests.get(exerciseId) !== request) return;
+    if (!hint) {
+        exerciseHintRequests.delete(exerciseId);
+        return;
+    }
+
     const style = exerciseHintStyles.get(hint?.status);
     if (!style || !exerciseCard.isConnected) return;
 
