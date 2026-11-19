@@ -5,7 +5,7 @@ import {
     deleteSet,
     deleteWorkout, deleteWorkoutExercise,
     endCurrentWorkout,
-    getCurrentWorkout, updateSet
+    getCurrentWorkout, getExerciseHint, updateSet
 } from "../api/workout-api.js";
 import {withErrorToasts} from "../shared/ui.js";
 import {getAllExercises} from "../api/exercise-api.js";
@@ -33,6 +33,11 @@ const pickerItemTemplate = document.getElementById("picker-item-template");
 const rowTemplate = document.getElementById("row-template");
 const exerciseTemplate = document.getElementById('exercise-template');
 
+const exerciseHintStyles = new Map([
+    ['increase', {label: 'Increase weight', icon: 'M12 19V5m-6 6 6-6 6 6'}],
+    ['hold', {label: 'Keep weight', icon: 'M5 12h14m-6-6 6 6-6 6'}],
+    ['decrease', {label: 'Decrease weight', icon: 'M12 5v14m-6-6 6 6 6-6'}]
+]);
 
 let currentWorkout = null;
 let renderedSetIds = null;
@@ -226,10 +231,27 @@ function renderWorkoutExercises() {
         }
 
         exerciseList.append(exerciseCard);
+        void renderExerciseHint(exerciseCard, exercise.exerciseId);
     }
 
     renderedSetIds = currentSetIds;
     renderedExerciseIds = currentExerciseIds;
+}
+
+async function renderExerciseHint(exerciseCard, exerciseId) {
+    const hint = await withErrorToasts(() => getExerciseHint(exerciseId));
+    const style = exerciseHintStyles.get(hint?.status);
+    if (!style || !exerciseCard.isConnected) return;
+
+    const panel = exerciseCard.querySelector('.exercise-hint');
+    const weight = hint.previousWeight.toLocaleString('en-US', {maximumFractionDigits: 2});
+    const repeats = hint.lastSetsRepeats.join(' / ');
+
+    panel.dataset.status = hint.status;
+    panel.querySelector('.exercise-hint-icon').setAttribute('d', style.icon);
+    panel.querySelector('.exercise-hint-label').textContent = style.label;
+    panel.querySelector('.exercise-hint-history').textContent = `Last workout: ${weight} kg × ${repeats}`;
+    panel.classList.remove('d-none');
 }
 
 function playRemoval(element) {

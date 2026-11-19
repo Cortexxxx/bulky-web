@@ -500,6 +500,45 @@ html {
     font-weight: 600;
 }
 
+.exercise-hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+    margin: 0.75rem var(--card-padding) 0;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: var(--control-radius);
+    background-color: var(--surface-2);
+    color: var(--bulky-ink);
+    font-size: 0.875rem;
+}
+
+.exercise-hint[data-status="increase"] {
+    border-color: #c5cda6;
+    background-color: var(--bulky-accent-soft);
+    color: var(--bulky-accent-dark);
+}
+
+.exercise-hint[data-status="decrease"] {
+    border-color: #dfc899;
+    background-color: #f6ecd8;
+    color: #71501b;
+}
+
+.exercise-hint-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.exercise-hint-history {
+    border-inline-start: 1px solid var(--line-strong);
+    padding-inline-start: 0.75rem;
+    color: var(--bulky-muted);
+    font-variant-numeric: tabular-nums;
+}
+
 .delete-exercise-btn {
     flex: none;
     width: 2.25rem;

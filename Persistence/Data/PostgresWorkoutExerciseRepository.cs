@@ -150,7 +150,7 @@ public class PostgresWorkoutExerciseRepository(NpgsqlDataSource dataSource) : IW
             {
                 Id = default,
                 Repeats = reader.GetInt16(reader.GetOrdinal("repeats")),
-                Weight = reader.GetInt16(reader.GetOrdinal("weight"))
+                Weight = reader.GetDecimal(reader.GetOrdinal("weight"))
             });
         }
 

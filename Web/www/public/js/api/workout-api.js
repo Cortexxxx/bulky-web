@@ -4,6 +4,10 @@ export async function getCurrentWorkout() {
     return await getData("/api/workouts/current");
 }
 
+export function getExerciseHint(exerciseId) {
+    return getData(`/api/workouts/hint/${exerciseId}`);
+}
+
 export async function getAllWorkouts() {
     return await getData("/api/workouts");
 }
