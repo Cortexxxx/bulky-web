@@ -10,15 +10,11 @@ const exercises = await withErrorToasts(getAllExercises);
 let selectedMuscle;
 let selectedExercise;
 
-let overviewVolumeChart, overviewSetsChart, muscleChart, exerciseChart;
-
 let muscleOverview = null;
 let muscleMetric = 'volume';
 
 let exerciseOverview = null;
 let exerciseMetric = 'volume';
-
-const weekLabels = Array.from({length: 12}, (_, i) => `${12 - i}w`);
 
 await setupOverview();
 setupMuscleMetricToggle();
@@ -38,11 +34,8 @@ async function setupOverview() {
 
     averageDurationValue.textContent = formatDuration(overview.averageDurationMinutes);
 
-    overviewVolumeChart ??= createBarChart('overview-volume-chart');
-    updateBarChart(overviewVolumeChart, overview.weeksVolumes);
-
-    overviewSetsChart ??= createBarChart('overview-sets-chart');
-    updateBarChart(overviewSetsChart, overview.weeksSets);
+    renderWeeklyBars('overview-volume-chart', overview.weeksVolumes, 'kg');
+    renderWeeklyBars('overview-sets-chart', overview.weeksSets, 'sets');
 }
 
 async function setupMuscleOverview() {
@@ -150,8 +143,8 @@ function renderMuscleChart() {
 
     const isVolume = muscleMetric === 'volume';
 
-    muscleChart ??= createBarChart('muscle-chart');
-    updateBarChart(muscleChart, isVolume ? muscleOverview.weeksVolumes : muscleOverview.weeksSets);
+    const values = isVolume ? muscleOverview.weeksVolumes : muscleOverview.weeksSets;
+    renderWeeklyBars('muscle-chart', values, isVolume ? 'kg' : 'sets');
 
     document.getElementById('muscle-chart-title').textContent = isVolume ? 'Volume by week, kg' : 'Sets by week';
 }
@@ -161,31 +154,69 @@ function renderExerciseChart() {
 
     const isVolume = exerciseMetric === 'volume';
 
-    exerciseChart ??= createBarChart('exercise-chart');
-    updateBarChart(exerciseChart, isVolume ? exerciseOverview.volumes : exerciseOverview.orms);
+    const values = isVolume ? exerciseOverview.volumes : exerciseOverview.orms.map(value => value === 0 ? null : value);
+    renderWeeklyBars('exercise-chart', values, 'kg');
 
     document.getElementById('exercise-chart-title').textContent = isVolume ? 'Volume by week, kg' : '1RM by week';
 }
 
-function createBarChart(canvasId) {
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--bulky-accent').trim();
+function renderWeeklyBars(chartId, valuesNewestFirst, unit) {
+    const svg = document.getElementById(chartId);
+    const values = [...valuesNewestFirst].reverse();
+    const plot = {left: 52, right: 472, top: 16, bottom: 216};
+    const plotHeight = plot.bottom - plot.top;
+    const gridIntervals = 5;
+    const gridStep = Math.max(1, Math.ceil(Math.max(0, ...values) / gridIntervals));
+    const scaleMax = gridStep * gridIntervals;
+    const slotWidth = (plot.right - plot.left) / values.length;
+    const barWidth = slotWidth * 0.68;
 
-    return new Chart(document.getElementById(canvasId), {
-        type: 'bar',
-        data: {
-            labels: weekLabels,
-            datasets: [{data: [], backgroundColor: accent}]
-        },
-        options: {
-            maintainAspectRatio: false, 
-            plugins: {legend: {display: false}}
-        }
+    svg.replaceChildren();
+
+    for (let index = 0; index <= gridIntervals; index++) {
+        const tick = index * gridStep;
+        const y = plot.bottom - index / gridIntervals * plotHeight;
+        svg.append(
+            createSvgElement('line', {
+                x1: plot.left, x2: plot.right, y1: y, y2: y,
+                stroke: 'var(--line)'
+            }),
+            createSvgElement('text', {
+                x: plot.left - 8, y,
+                'text-anchor': 'end',
+                'dominant-baseline': 'middle'
+            }, formatNumber(tick))
+        );
+    }
+
+    values.forEach((value, index) => {
+        const x = plot.left + slotWidth * index;
+        const centerX = x + slotWidth / 2;
+        const height = (value ?? 0) / scaleMax * plotHeight;
+        const week = values.length - index;
+        const tooltip = value === null ? 'No data' : `${formatNumber(value)} ${unit}`;
+        const column = createSvgElement('g', {});
+
+        column.append(
+            createSvgElement('title', {}, `${week}w · ${tooltip}`),
+            createSvgElement('rect', {x, y: plot.top, width: slotWidth, height: plotHeight, fill: 'transparent'}),
+            createSvgElement('rect', {
+                x: centerX - barWidth / 2, y: plot.bottom - height,
+                width: barWidth, height, rx: 3, fill: 'var(--bulky-accent)'
+            }),
+            createSvgElement('text', {x: centerX, y: plot.bottom + 18, 'text-anchor': 'middle'}, `${week}w`)
+        );
+        svg.append(column);
     });
 }
 
-function updateBarChart(chart, valuesNewestFirst) {
-    chart.data.datasets[0].data = valuesNewestFirst.toReversed();
-    chart.update();
+function createSvgElement(tag, attributes, text) {
+    const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [name, value] of Object.entries(attributes)) {
+        element.setAttribute(name, value);
+    }
+    if (text !== undefined) element.textContent = text;
+    return element;
 }
 
 function setStat(prefix, value, increase, suffix = '') {

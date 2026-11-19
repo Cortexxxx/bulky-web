@@ -72,20 +72,16 @@
                     <div class="analytics-chart-header">
                         <span class="analytics-chart-title">Total volume by week, kg</span>
                     </div>
-                    <div class="chart-box">
-                        <canvas id="overview-volume-chart" role="img"
-                                aria-label="Bar chart of total training volume for each of the last 12 weeks"></canvas>
-                    </div>
+                    <svg id="overview-volume-chart" class="analytics-chart-svg" viewBox="0 0 480 240"
+                         role="img" aria-label="Total training volume for each of the last 12 weeks"></svg>
                 </div>
 
                 <div class="analytics-chart">
                     <div class="analytics-chart-header">
                         <span class="analytics-chart-title">Sets by week</span>
                     </div>
-                    <div class="chart-box">
-                        <canvas id="overview-sets-chart" role="img"
-                                aria-label="Bar chart of the number of sets for each of the last 12 weeks"></canvas>
-                    </div>
+                    <svg id="overview-sets-chart" class="analytics-chart-svg" viewBox="0 0 480 240"
+                         role="img" aria-label="Number of sets for each of the last 12 weeks"></svg>
                 </div>
             </div>
         </section>
@@ -157,10 +153,8 @@
                             <label for="muscle-metric-sets" class="metric-toggle-option">Sets</label>
                         </div>
                     </div>
-                    <div class="chart-box">
-                        <canvas id="muscle-chart" role="img"
-                                aria-label="Bar chart of weekly volume for the selected muscle group"></canvas>
-                    </div>
+                    <svg id="muscle-chart" class="analytics-chart-svg" viewBox="0 0 480 240"
+                         role="img" aria-labelledby="muscle-chart-title"></svg>
                 </div>
             </section>
 
@@ -230,10 +224,8 @@
                             <label for="exercise-metric-orms" class="metric-toggle-option">1RM</label>
                         </div>
                     </div>
-                    <div class="chart-box">
-                        <canvas id="exercise-chart" role="img"
-                                aria-label="Line chart of the estimated one-rep max for the selected exercise by week"></canvas>
-                    </div>
+                    <svg id="exercise-chart" class="analytics-chart-svg" viewBox="0 0 480 240"
+                         role="img" aria-labelledby="exercise-chart-title"></svg>
                 </div>
             </section>
 
@@ -243,7 +235,6 @@
 
 {{toasts}}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script type="module" src="/js/pages/analytics-page.js"></script>
 </body>

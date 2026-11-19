@@ -1451,14 +1451,15 @@ html {
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.3);
 }
 
-/* Chart.js занимает весь контейнер, поэтому высоту задаём ему */
-.chart-box {
-    position: relative;
-    height: 16rem;
+.analytics-chart-svg {
+    display: block;
+    width: 100%;
+    max-height: 21.5rem;
+    font-size: 12px;
 }
 
-.chart-box-lg {
-    height: 18rem;
+.analytics-chart-svg text {
+    fill: var(--bulky-muted);
 }
 
 /* ---------- Футер ---------- */
