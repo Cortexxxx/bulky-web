@@ -1946,103 +1946,185 @@ html {
 
 /* ---------- Главная ---------- */
 
-/* Главный блок: текст слева, иллюстрация справа; на узком экране друг под другом */
-.home-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem;
-    align-items: center;
-    padding: 1.5rem 0 4rem;
+.home-page {
+    background-color: var(--surface-2);
 }
 
-@media (min-width: 62rem) {
-    .home-hero {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 4rem;
-        padding: 3rem 0 6rem;
+@media (min-width: 75rem) {
+    .home-main {
+        max-width: min(calc(100% - 3rem), calc(var(--page-width) * 1.2 + 1.5rem));
+    }
+
+    .home-main > .page-column {
+        max-width: none;
+    }
+
+    .home-tour {
+        max-width: var(--page-width);
+        margin-inline: auto;
+    }
+
+    .home-hero .home-hero-visual {
+        height: min(48rem, 83svh, calc(100svh - 11.5rem));
     }
 }
 
+.home-hero {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: calc(100vh - 4.5rem - 1px);
+    min-height: calc(100svh - 4.5rem - 1px);
+    gap: 1rem;
+    padding: clamp(1.25rem, 3vh, 2.5rem) 0 1rem;
+}
+
+.home-hero-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    align-content: center;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+@media (min-width: 48rem) {
+    .home-hero-content {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.home-hero-copy {
+    container-type: inline-size;
+}
+
 .home-eyebrow {
-    margin: 0 0 0.75rem;
+    margin: 0 0 1rem;
     color: var(--bulky-muted);
+    font-size: 0.78rem;
     font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .hero-title {
-    margin: 0 0 1rem;
-    font-size: clamp(3.5rem, 9vw, 6rem);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1;
+    margin: 0 0 1.35rem;
 }
 
 .hero-title span {
+    display: block;
     color: var(--bulky-accent);
 }
 
-.hero-lead {
-    max-width: 30rem;
-    margin: 0 0 2rem;
-    color: var(--bulky-muted);
-    font-size: 1.15rem;
+.home-hero-start {
+    gap: 0.85rem;
+    border-color: var(--bulky-accent);
+    background-color: var(--bulky-accent);
+    color: var(--surface);
 }
 
-.home-hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1rem 1.75rem;
+.home-hero-start span {
+    font-size: 1.25em;
+    line-height: 1;
 }
 
-/* Вторая ссылка тихая: подчёркнутый текст, не конкурирует с кнопкой */
-.home-link {
-    color: var(--bulky-muted);
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: var(--line-strong);
-    text-underline-offset: 0.3em;
-    transition: color 0.2s, text-decoration-color 0.2s;
+.home-hero-start:hover,
+.home-hero-start:focus-visible {
+    border-color: var(--bulky-accent-dark);
+    background-color: var(--bulky-accent-dark);
+    color: var(--surface);
 }
 
-.home-link:hover {
-    color: var(--bulky-accent-dark);
-    text-decoration-color: var(--bulky-accent);
+.home-hero-start::before {
+    content: none;
 }
 
-/* Иллюстрация-график: SVG-карточка в стиле карточек приложения */
+.home-hero-visual {
+    position: relative;
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    place-items: center;
+    height: min(40rem, 69svh);
+    overflow: clip;
+}
+
+.home-hero-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, var(--line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    background-size: clamp(1rem, 2vw, 1.75rem) clamp(1rem, 2vw, 1.75rem);
+    background-position: center;
+    opacity: 0.55;
+    mask-image: radial-gradient(ellipse 54% 53% at center, #000 35%, transparent 100%);
+}
+
 .home-art {
+    position: relative;
     width: 100%;
-    max-width: 520px;
-    height: auto;
-    justify-self: center;
+    height: 82%;
+    object-fit: contain;
+    transform: scale(1.2);
 }
 
-.home-art-label {
-    fill: var(--bulky-muted);
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
+@media (max-width: 47.99rem) {
+    .home-hero-visual {
+        height: min(21rem, 38svh);
+    }
 }
 
-.home-art-number {
-    fill: var(--bulky-ink);
-    font-family: var(--font-numbers);
-    font-size: 32px;
-    font-weight: 600;
+.home-hero-footer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0.8rem;
 }
 
-.home-art-chip {
-    fill: var(--bulky-accent-dark);
-    font-family: var(--font-numbers);
-    font-size: 12px;
-    font-weight: 600;
+.home-hero-footer::before,
+.home-hero-footer::after {
+    content: "";
+    border-top: 1px solid var(--line-strong);
 }
 
-.home-art-axis {
-    fill: var(--bulky-muted);
-    font-family: var(--font-body);
-    font-size: 12px;
+.home-tour-link {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--control-radius);
+    color: var(--bulky-ink);
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.home-tour-link span {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-0.15rem) rotate(45deg);
+}
+
+.home-tour-link:hover,
+.home-tour-link:focus-visible {
+    border-color: var(--bulky-accent);
+    background-color: var(--surface);
+    color: var(--bulky-accent-dark);
+}
+
+.home-tour-link:focus-visible {
+    outline: 2px solid var(--bulky-accent);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html:has(.home-main) {
+        scroll-behavior: smooth;
+    }
+}
+
+.home-tour {
+    padding-top: clamp(2rem, 5vw, 4rem);
 }
 
 /* Столбики: блёклые, при наведении насыщаются и показывают значение */
@@ -2077,12 +2159,10 @@ html {
    Переключение панелей через :has(); если браузер его не знает, остаётся первая вкладка. */
 .home-tour-tabs {
     position: relative;
-    display: inline-flex;
-    gap: 0.25rem;
-    margin-bottom: 2rem;
-    padding: 0.3rem;
-    border-radius: var(--control-radius);
-    background-color: var(--line-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
 }
 
 .home-tour-input {
@@ -2093,16 +2173,16 @@ html {
 
 .home-tour-tab {
     margin: 0;
-    padding: 0.5rem 1.25rem;
-    border-radius: var(--control-radius);
+    padding: 0.65rem 0.25rem;
+    border-bottom: 2px solid transparent;
     color: var(--bulky-muted);
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
+    transition: border-color 0.15s, color 0.15s;
 }
 
 .home-tour-input:checked + .home-tour-tab {
-    background-color: var(--surface);
+    border-bottom-color: var(--bulky-accent);
     color: var(--bulky-ink);
 }
 
@@ -2113,7 +2193,7 @@ html {
 /* Высота общая для всех вкладок, чтобы страница не прыгала при переключении */
 .home-tour-body {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
 }
 
 @media (min-width: 62rem) {
@@ -2165,15 +2245,10 @@ html {
     font-size: 1.05rem;
 }
 
-/* Пункты строками с тонкими линиями, как данные в аккаунте */
 .home-points {
+    display: grid;
+    gap: 0.9rem;
     margin: 0;
-    border-top: 1px solid var(--line);
-}
-
-.home-point {
-    padding: 0.9rem 0;
-    border-bottom: 1px solid var(--line);
 }
 
 .home-point dt {
@@ -2261,9 +2336,10 @@ html {
 }
 
 .hero-title {
-    font-size: clamp(4.5rem, 12vw, 8.5rem);
+    font-size: clamp(2.35rem, 6vw, 7.5rem);
+    font-size: clamp(2.35rem, 14cqi, 7.5rem);
     letter-spacing: 0;
-    line-height: 0.9;
+    line-height: 0.98;
 }
 
 .home-tour-title {

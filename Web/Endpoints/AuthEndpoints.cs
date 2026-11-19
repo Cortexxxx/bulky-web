@@ -1,7 +1,7 @@
 using System.Net;
+using Application;
 using Application.Services;
 using Web.DTOs.Auth;
-using Web.Exceptions;
 using Web.Http;
 using Web.Validators;
 
@@ -82,7 +82,8 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         {
             HttpOnly = true,
             Secure = true,
-            MaxAge = TimeSpan.FromMinutes(5)
+            MaxAge = TimeSpan.FromMinutes(SessionConfiguration.SessionLifetimeMinutes)
         });
     }
 }
+    
