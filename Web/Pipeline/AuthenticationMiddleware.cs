@@ -13,20 +13,24 @@ public static class AuthenticationMiddleware
         {
             var request = context.Request;
             var route = context.Request.Route;
-            
             var tokenCookie = request.GetCookie("token");
             
             if (route != null)
             {
                 var claims = await GetClaimsAsync(authService, tokenCookie, context.CancellationToken);
-                request.UserClaims = claims;
+                if (claims is { userClaims: not null })
+                {
+                    request.UserClaims = claims.Value.userClaims;
+                    await authService.RefreshSessionTimeAsync(claims.Value.session.Id, context.CancellationToken);
+                }
+                
             }
             
             await (next?.Invoke(context) ?? Task.CompletedTask);
         });
     }
     
-    private static async Task<UserClaims?> GetClaimsAsync(AuthService authService, Cookie? tokenCookie, CancellationToken ct)
+    private static async Task<(Session session, UserClaims? userClaims)?> GetClaimsAsync(AuthService authService, Cookie? tokenCookie, CancellationToken ct)
     {
         if (tokenCookie == null) return null;
 
@@ -43,13 +47,13 @@ public static class AuthenticationMiddleware
                 
         var user = await authService.GetUserByIdAsync(session.UserId, ct);
         
-        return new UserClaims
+        return (session, new UserClaims
         {
             Role = user.Role,
             Username = user.Username,
             Email = user.Email,
             Id = user.Id,
             CreatedAt = user.CreatedAt,
-        };
+        });
     }
 }
