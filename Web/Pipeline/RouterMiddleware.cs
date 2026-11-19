@@ -1,5 +1,4 @@
 using System.Net;
-using Web.Exceptions;
 using Web.Routing;
 using WebException = Web.Exceptions.WebException;
 

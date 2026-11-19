@@ -6,7 +6,7 @@ namespace Web.Validators;
 
 public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {
-    public RegisterRequestValidator()
+    public RegisterRequestValidator(ValidationOptions options)
     {
         RuleFor(r => r.Username)
             .Cascade(CascadeMode.Stop)
@@ -16,8 +16,8 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 
         RuleFor(r => r.Password)
             .NotEmpty().WithErrorCode("empty_password")
-            .MinimumLength(ValidationConstants.MinPasswordLength).WithErrorCode("short_password")
-            .MaximumLength(ValidationConstants.MaxPasswordLength).WithErrorCode("long_password");
+            .MinimumLength(options.MinPasswordLength).WithErrorCode("short_password")
+            .MaximumLength(options.MaxPasswordLength).WithErrorCode("long_password");
 
         RuleFor(r => r.Email)
             .NotEmpty().WithErrorCode("empty_email")

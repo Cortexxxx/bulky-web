@@ -3,7 +3,7 @@ using Application.Models;
 
 namespace Application.Services;
 
-public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRepository)
+public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRepository, ExerciseHintOptions exerciseHintOptions)
 {
     public async Task<Guid> CreateExerciseAsync(Guid userId, Guid exerciseId, CancellationToken ct)
     {
@@ -51,6 +51,6 @@ public class WorkoutExerciseService(IWorkoutExerciseRepository workoutExerciseRe
             throw new Exception();
         }
 
-        return new ExerciseHint(sets);
+        return new ExerciseHint(sets, exerciseHintOptions);
     }
 }

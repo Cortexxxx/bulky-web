@@ -29,11 +29,11 @@ public static class RedisHelper
             source.StringDeleteAsync(key, ValueCondition.Always), false);
     }
 
-    public static Task SetCacheAsync<T>(this IDatabaseAsync source, string key, T obj)
+    public static Task SetCacheAsync<T>(this IDatabaseAsync source, string key, T obj, TimeSpan ttl)
     {
         return ProceedRedisRequest(() => source.StringSetAsync(key,
             JsonSerializer.Serialize(obj, JsonSerializerOptions.Web),
-            new Expiration(TimeSpan.FromSeconds(RedisConstants.DefaultCacheTtlSeconds))), false);
+            new Expiration(ttl)), false);
     }
 
     public static async Task<T?> GetCachedAsync<T>(this IDatabaseAsync source, string key) where T : class

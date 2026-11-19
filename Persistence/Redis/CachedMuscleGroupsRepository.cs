@@ -4,7 +4,8 @@ using StackExchange.Redis;
 
 namespace Persistence.Redis;
 
-public class CachedMuscleGroupsRepository(IDatabaseAsync source, IMuscleGroupsRepository muscleGroupsRepository) : IMuscleGroupsRepository
+public class CachedMuscleGroupsRepository(IDatabaseAsync source, IMuscleGroupsRepository muscleGroupsRepository, TimeSpan cacheTtl)
+    : IMuscleGroupsRepository
 {
     public async Task<IEnumerable<MuscleGroup>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
@@ -15,7 +16,7 @@ public class CachedMuscleGroupsRepository(IDatabaseAsync source, IMuscleGroupsRe
         {
             value = (await muscleGroupsRepository.GetAllAsync(includeArchived, ct)).ToList();
             
-            await source.SetCacheAsync(key, value);
+            await source.SetCacheAsync(key, value, cacheTtl);
         }
         
         return value;
@@ -35,7 +36,7 @@ public class CachedMuscleGroupsRepository(IDatabaseAsync source, IMuscleGroupsRe
                 return null;
             }
 
-            await source.SetCacheAsync(key, value);
+            await source.SetCacheAsync(key, value, cacheTtl);
         }
 
         return includeArchived || !value.IsArchived ? value : null;

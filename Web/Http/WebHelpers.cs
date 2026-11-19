@@ -2,10 +2,13 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application;
+using Application.Models;
 using Domain.Models.Auth;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Web.Exceptions;
 using Web.Routing;
+using Web.Validators;
 
 namespace Web.Http;
 
@@ -85,5 +88,37 @@ public static class WebHelpers
     {
         return Environment.GetEnvironmentVariable(name)
                ?? throw new Exception($"Environment variable '{name}' is not set"); 
+    }
+
+    public static ValidationOptions GetValidationOptions(this IConfiguration configuration)
+    {
+        var options = configuration.GetRequiredSection("Validation").Get<ValidationOptions>()
+            ?? throw new InvalidOperationException("Validation settings are required.");
+        options.Validate();
+        return options;
+    }
+    
+    public static TimeSpan GetCacheTtl(this IConfiguration configuration)
+    {
+        var cacheTtlSeconds = configuration.GetValue<int>("Redis:DefaultCacheTtlSeconds");
+        if (cacheTtlSeconds <= 0)
+            throw new InvalidOperationException("Redis:DefaultCacheTtlSeconds must be greater than zero.");
+        return TimeSpan.FromSeconds(cacheTtlSeconds);
+    }
+    
+    public static int GetSessionLifetime(this IConfiguration configuration)
+    {
+        var sessionLifetimeMinutes = configuration.GetValue<int>("Sessions:SessionLifetimeMinutes");
+        if (sessionLifetimeMinutes <= 0)
+            throw new InvalidOperationException("Sessions:SessionLifetimeMinutes must be greater than zero.");
+        return sessionLifetimeMinutes;
+    }
+    
+    public static ExerciseHintOptions GetExerciseHintOptions(this IConfiguration configuration)
+    {
+        var exerciseHint = configuration.GetSection("ExerciseHint").Get<ExerciseHintOptions>() 
+                                     ?? throw new InvalidOperationException("Exercise hint settings are required.");
+        exerciseHint.Validate();
+        return exerciseHint;
     }
 }

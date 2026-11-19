@@ -4,7 +4,8 @@ using StackExchange.Redis;
 
 namespace Persistence.Redis;
 
-public class CachedExercisesRepository(IDatabaseAsync source, IExercisesRepository exerciseRepository) : IExercisesRepository
+public class CachedExercisesRepository(IDatabaseAsync source, IExercisesRepository exerciseRepository, TimeSpan cacheTtl)
+    : IExercisesRepository
 {
     public async Task<IEnumerable<Exercise>> GetAllAsync(bool includeArchived, CancellationToken ct)
     {
@@ -14,7 +15,7 @@ public class CachedExercisesRepository(IDatabaseAsync source, IExercisesReposito
         if (exercises is not null) return exercises;
         
         exercises = (await exerciseRepository.GetAllAsync(includeArchived, ct)).ToList();
-        await source.SetCacheAsync(key, exercises);
+        await source.SetCacheAsync(key, exercises, cacheTtl);
 
         return exercises;
     }
@@ -33,7 +34,7 @@ public class CachedExercisesRepository(IDatabaseAsync source, IExercisesReposito
                 return null;
             }
 
-            await source.SetCacheAsync(key, exercise);
+            await source.SetCacheAsync(key, exercise, cacheTtl);
         }
 
         return includeArchived || !exercise.IsArchived ? exercise : null;

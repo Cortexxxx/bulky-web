@@ -7,7 +7,7 @@ using Web.Validators;
 
 namespace Web.Endpoints;
 
-public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, AuthService authService)
+public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, AuthService authService, int sessionLifetimeMinutes)
 {
     public async Task RegisterUserAsync(HttpContext context)
     {
@@ -70,19 +70,19 @@ public class AuthEndpoints(RegisterRequestValidator registerRequestValidator, Au
         context.Response.WriteJson(sessions.Select(s => s.ToResponse()).ToList());
     }
 
-    private static void FillLogoutResponse(HttpContext context)
+    private void FillLogoutResponse(HttpContext context)
     {
         SetTokenCookie(context, "");
         context.Response.StatusCode = HttpStatusCode.NoContent;
     }
     
-    private static void SetTokenCookie(HttpContext context, string token)
+    private void SetTokenCookie(HttpContext context, string token)
     {
         context.Response.SetCookie("token", token, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            MaxAge = TimeSpan.FromMinutes(SessionConfiguration.SessionLifetimeMinutes)
+            MaxAge = TimeSpan.FromMinutes(sessionLifetimeMinutes)
         });
     }
 }

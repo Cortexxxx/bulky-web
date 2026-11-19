@@ -42,9 +42,9 @@ public static class SetupExtensions
     }
     
     public static void MapAuthApi(this Router router, AuthService authService,
-        RegisterRequestValidator registerRequestValidator)
+        RegisterRequestValidator registerRequestValidator, int sessionLifetimeMinutes)
     {
-        var authEndpoints = new AuthEndpoints(registerRequestValidator, authService);
+        var authEndpoints = new AuthEndpoints(registerRequestValidator, authService, sessionLifetimeMinutes);
         router.MapPost("api/auth/register", authEndpoints.RegisterUserAsync, GuestsOnly);
         router.MapPost("api/auth/login", authEndpoints.LoginUserAsync, GuestsOnly);
         router.MapGet("api/auth/me", authEndpoints.GetMeAsync, AuthorizedOnly);

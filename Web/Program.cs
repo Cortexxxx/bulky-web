@@ -2,6 +2,7 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Application.Services;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Persistence;
 using Persistence.Data;
@@ -10,11 +11,23 @@ using StackExchange.Redis;
 using Web.Pipeline;
 using Web.Routing;
 using Web.Validators;
-using Microsoft.Extensions.Configuration.Json;
 using Web;
 using Web.Http;
 
+// Configuration
+
+var config = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
+
+var validationOptions = config.GetValidationOptions();
+var exerciseHintOptions = config.GetExerciseHintOptions();
+var cacheTtl = config.GetCacheTtl();
+var sessionLifetime = config.GetSessionLifetime();
 var httpListener = new HttpListener();
+
+// Initialization
 
 var prefix = WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.Prefix);
 httpListener.Prefixes.Add(prefix);
@@ -22,7 +35,7 @@ httpListener.Start();
 Console.WriteLine(prefix);
 var appCts = new CancellationTokenSource();
 
-// Data
+// Persistance
 
 var postgres = new NpgsqlDataSourceBuilder(
     WebHelpers.GetEnviromentVariableOrThrow(EnvironmentVariables.PostgresConnection));
@@ -44,14 +57,15 @@ var redisDataSource = redis.GetDatabase();
 // Services
 
 var authService = new AuthService(new PostgresUserRepository(postgresDataSource), 
-    new PostgresSessionRepository(postgresDataSource), new PasswordHasher());
+    new PostgresSessionRepository(postgresDataSource), new PasswordHasher(), sessionLifetime);
 var musclesService = new MusclesService(new CachedMuscleGroupsRepository(redisDataSource, 
-    new PostgresMuscleGroupsRepository(postgresDataSource)));
+    new PostgresMuscleGroupsRepository(postgresDataSource), cacheTtl));
 var exercisesService = new ExercisesService(new CachedExercisesRepository(redisDataSource, 
-    new PostgresExercisesRepository(postgresDataSource)));
+    new PostgresExercisesRepository(postgresDataSource), cacheTtl));
 var workoutsService = new WorkoutsService(new PostgresWorkoutsRepository(postgresDataSource), new RedisCacheInvalidator(redisDataSource));
-var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(postgresDataSource));
-var analyticsService = new WorkoutsAnalyticsService(new CachedAnalyticsQueries(new PostgresAnalyticsQueries(postgresDataSource), redisDataSource));
+var workoutExercisesService = new WorkoutExerciseService(new PostgresWorkoutExerciseRepository(postgresDataSource), exerciseHintOptions);
+var analyticsService = new WorkoutsAnalyticsService(new CachedAnalyticsQueries(
+    new PostgresAnalyticsQueries(postgresDataSource), redisDataSource, cacheTtl));
 var guidesService = new GuideService(exercisesService, musclesService);
 var imageUrlProvider = new ImageUrlProvider(s3Client);
 
@@ -59,12 +73,12 @@ var imageUrlProvider = new ImageUrlProvider(s3Client);
 
 var router = new Router();
 router.MapPages();
-router.MapAuthApi(authService, new RegisterRequestValidator());
-router.MapMuscleGroupsApi(musclesService, new MuscleGroupRequestValidator());
+router.MapAuthApi(authService, new RegisterRequestValidator(validationOptions), sessionLifetime);
+router.MapMuscleGroupsApi(musclesService, new MuscleGroupRequestValidator(validationOptions));
 router.MapExercisesApi(exercisesService, new ExerciseRequestValidator());
 router.MapImagesApi(imageUrlProvider);
 router.MapWorkoutsApi(workoutsService, new WorkoutRequestValidator());
-router.MapWorkoutExercisesApi(workoutExercisesService, new WorkoutSetRequestValidator());
+router.MapWorkoutExercisesApi(workoutExercisesService, new WorkoutSetRequestValidator(validationOptions));
 router.MapWorkoutAnalyticsApi(analyticsService);
 router.MapGuidesApi(guidesService, imageUrlProvider);
 router.Initialize();

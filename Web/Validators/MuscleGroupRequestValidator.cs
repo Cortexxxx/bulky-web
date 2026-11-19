@@ -6,12 +6,12 @@ namespace Web.Validators;
 
 public class MuscleGroupRequestValidator : AbstractValidator<MuscleGroupRequest>
 {
-    public MuscleGroupRequestValidator()
+    public MuscleGroupRequestValidator(ValidationOptions options)
     {
         RuleFor(m => m.Title)
             .NotEmpty().WithErrorCode("empty_title")
-            .MinimumLength(ValidationConstants.MinMuscleTitleLength).WithErrorCode("short_title")
-            .MaximumLength(ValidationConstants.MaxMuscleTitleLength).WithErrorCode("long_title")
+            .MinimumLength(options.MinMuscleTitleLength).WithErrorCode("short_title")
+            .MaximumLength(options.MaxMuscleTitleLength).WithErrorCode("long_title")
             .Matches(@"[\p{L}\s]+");
 
         RuleFor(m => m.Description)

@@ -4,7 +4,8 @@ using StackExchange.Redis;
 
 namespace Persistence.Redis;
 
-public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabaseAsync source) : IAnalyticsQueries
+public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabaseAsync source, TimeSpan cacheTtl)
+    : IAnalyticsQueries
 {
     public async Task<List<WorkoutWeekStats>> GetWorkoutWeeksStats(Guid userId, CancellationToken ct)
     {
@@ -17,7 +18,7 @@ public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabas
         if (value is not null) return value;
         
         value = await analyticsQueries.GetWorkoutWeeksStats(userId, ct);
-        await source.SetCacheAsync(key, value);
+        await source.SetCacheAsync(key, value, cacheTtl);
 
         return value;
     }
@@ -33,7 +34,7 @@ public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabas
         if (value is not null) return value;
         
         value = await analyticsQueries.GetMuscleWeekStats(userId, muscleId, ct);
-        await source.SetCacheAsync(key, value);
+        await source.SetCacheAsync(key, value, cacheTtl);
 
         return value;
     }
@@ -49,7 +50,7 @@ public class CachedAnalyticsQueries(IAnalyticsQueries analyticsQueries, IDatabas
         if (value is not null) return value;
         
         value = await analyticsQueries.GetExerciseWeekSets(userId, exerciseId, ct);
-        await source.SetCacheAsync(key, value);
+        await source.SetCacheAsync(key, value, cacheTtl);
 
         return value;
     }

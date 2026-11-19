@@ -10,12 +10,13 @@ public class AuthService
     private readonly IUserRepository _userRepository;
     private readonly ISessionRepository _sessionRepository;
     private readonly IPasswordHasher _passwordHasher;
-
-    public AuthService(IUserRepository userRepository, ISessionRepository sessionRepository, IPasswordHasher passwordHasher)
+    private readonly int _sessionLifetimeMinutes;
+    public AuthService(IUserRepository userRepository, ISessionRepository sessionRepository, IPasswordHasher passwordHasher, int sessionLifetimeMinutes)
     {
         _userRepository = userRepository;
         _sessionRepository = sessionRepository;
         _passwordHasher = passwordHasher;
+        _sessionLifetimeMinutes = sessionLifetimeMinutes;
         _fakeSalt = _passwordHasher.GenerateSalt();
         _fakePassword = _passwordHasher.HashPassword(_passwordHasher.GenerateSalt(), _fakeSalt);
     }
@@ -51,14 +52,14 @@ public class AuthService
         var tokenHash = _passwordHasher.HashToken(token);
         
         var sessionId = await _sessionRepository.CreateSessionAsync(userId, 
-            tokenHash, DateTime.UtcNow.AddMinutes(SessionConfiguration.SessionLifetimeMinutes), ct);
+            tokenHash, DateTime.UtcNow.AddMinutes(_sessionLifetimeMinutes), ct);
 
         return (sessionId, token);
     }
 
     public async Task RefreshSessionTimeAsync(Guid sessionId, CancellationToken ct)
     {
-        await _sessionRepository.UpdateSessionTimeAsync(sessionId, DateTime.UtcNow.AddMinutes(SessionConfiguration.SessionLifetimeMinutes), ct);
+        await _sessionRepository.UpdateSessionTimeAsync(sessionId, DateTime.UtcNow.AddMinutes(_sessionLifetimeMinutes), ct);
     }
     
     public async Task<Session> GetUserSessionAsync(string token, CancellationToken ct)

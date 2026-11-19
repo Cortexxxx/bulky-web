@@ -4,15 +4,14 @@ namespace Application.Models;
 
 public record ExerciseHint
 {
-    private const int MinRepeats = 8;
-    private const int MaxRepeats = 12;
+
     private const double HoldPercentage = 0.5f;
     
     public HintStatus Status { get; init; } = HintStatus.InsufficientData;
     public decimal PreviousWeight { get; init; }
     public List<short> LastSetsRepeats { get; init; } = [];
 
-    public ExerciseHint(IEnumerable<WorkoutSet> exerciseSets)
+    public ExerciseHint(IEnumerable<WorkoutSet> exerciseSets, ExerciseHintOptions hintOptions)
     {
         var setsGroups = exerciseSets.GroupBy(s => s.Weight)
             .Where(g => g.Count() > 1).ToList();
@@ -28,8 +27,8 @@ public record ExerciseHint
         var setsRepeats = hintGroup.Select(s => s.Repeats).ToList();
         var setsCount = setsRepeats.Count;
         
-        var setsBelowMin = setsRepeats.Count(x => x < MinRepeats);
-        var allSetsReachedTarget = setsRepeats.Count(x => x >= MaxRepeats);
+        var setsBelowMin = setsRepeats.Count(x => x < hintOptions.MinRepeats);
+        var allSetsReachedTarget = setsRepeats.Count(x => x >= hintOptions.MaxRepeats);
 
         if ((double)setsBelowMin / setsCount > HoldPercentage) Status = HintStatus.Decrease;
         else if (allSetsReachedTarget == setsCount) Status = HintStatus.Increase;
