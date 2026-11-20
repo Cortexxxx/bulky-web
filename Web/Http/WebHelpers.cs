@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application;
 using Application.Models;
-using Domain.Models.Auth;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Web.Exceptions;
